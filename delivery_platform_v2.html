@@ -1,0 +1,2428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TRAZA — Plataforma de Entregas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════
+   TOKENS
+════════════════════════════════════════ */
+:root {
+  --bg:       #0A0A0F;
+  --surface:  #111118;
+  --card:     #16161F;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.13);
+
+  --blue:     #2D7EFF;
+  --blue-dim: rgba(45,126,255,0.12);
+  --blue-glow:rgba(45,126,255,0.3);
+
+  --green:    #00E096;
+  --green-dim:rgba(0,224,150,0.1);
+  --orange:   #FF6B2D;
+  --orange-dim:rgba(255,107,45,0.1);
+  --red:      #FF3B5C;
+  --yellow:   #FFD426;
+
+  --white:    #F2F2F8;
+  --muted:    #5A5A72;
+  --muted2:   #2A2A38;
+
+  --uber:     #000000;
+  --rappi:    #FF441B;
+  --didi:     #FF6100;
+
+  --r:        10px;
+  --font-head:'Barlow Condensed',sans-serif;
+  --font-body:'Space Grotesk',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ════════════════════════════════════════
+   TRAZA LANDING — ROLE SELECTOR
+════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+#role-screen {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px 32px;
+  background: #03030A;
+  position: relative;
+  overflow: hidden;
+}
+
+/* particle canvas behind everything */
+#landing-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* central glow */
+#role-screen::before {
+  content: '';
+  position: absolute;
+  width: 700px; height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,200,255,0.055) 0%, transparent 65%);
+  top: 45%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Logo ── */
+.traza-logo {
+  position: relative;
+  z-index: 2;
+  font-family: 'Syne', var(--font-head), sans-serif;
+  font-weight: 800;
+  font-size: clamp(38px, 9vw, 58px);
+  letter-spacing: .1em;
+  color: #EDEDF5;
+  line-height: 1;
+  margin-bottom: 6px;
+  text-align: center;
+}
+.traza-logo .hi { color: #00C8FF; }
+
+.traza-tagline {
+  position: relative;
+  z-index: 2;
+  font-family: 'JetBrains Mono', var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: .22em;
+  color: #6E6E88;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* ── Live stats bar ── */
+.traza-stats {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 0;
+  background: rgba(18,18,30,0.7);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 22px;
+  backdrop-filter: blur(12px);
+}
+.ts-item {
+  padding: 10px 18px;
+  text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  min-width: 80px;
+}
+.ts-item:last-child { border-right: none; }
+.ts-val {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+  color: #00C8FF;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.ts-lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .12em;
+  color: #6E6E88;
+  text-transform: uppercase;
+}
+
+/* ── Mini Monterrey map ── */
+.traza-map-wrap {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 420px;
+  background: rgba(18,18,30,0.65);
+  border: 1px solid rgba(0,200,255,0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+}
+#landing-map {
+  width: 100%;
+  height: 120px;
+  display: block;
+}
+.traza-map-label {
+  position: absolute;
+  bottom: 8px; left: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .14em;
+  color: rgba(110,110,136,0.8);
+  text-transform: uppercase;
+}
+.traza-map-dot {
+  position: absolute;
+  top: 8px; right: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .1em;
+  color: #00C8FF;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.traza-map-dot::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #00C8FF;
+  animation: blink-dot 1.2s ease infinite;
+}
+@keyframes blink-dot { 0%,100%{opacity:1}50%{opacity:.2} }
+
+/* ── Role cards ── */
+.role-cards {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 440px;
+}
+
+.role-card {
+  flex: 1;
+  min-width: 110px;
+  max-width: 136px;
+  background: rgba(14,14,26,0.8);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 20px 12px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .25s cubic-bezier(.34,1.56,.64,1);
+  backdrop-filter: blur(16px);
+  position: relative;
+  overflow: hidden;
+}
+
+.role-card::before {
+  content: '';
+  position: absolute;
+  bottom: -30px; left: 50%;
+  transform: translateX(-50%);
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity .3s;
+}
+.role-card.rc-chofer::before  { background: radial-gradient(circle, rgba(0,200,255,.18), transparent 70%); }
+.role-card.rc-dispatch::before { background: radial-gradient(circle, rgba(180,255,71,.15), transparent 70%); }
+.role-card.rc-cliente::before { background: radial-gradient(circle, rgba(255,107,45,.15), transparent 70%); }
+
+.role-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: rgba(0,200,255,0.3);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,200,255,0.1);
+}
+.role-card:hover::before { opacity: 1; }
+.role-card:active { transform: scale(.97); }
+
+.rc-icon {
+  font-size: 28px;
+  margin-bottom: 10px;
+  display: block;
+  filter: grayscale(0);
+}
+.rc-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: .08em;
+  color: #EDEDF5;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.rc-desc {
+  font-size: 10px;
+  color: #6E6E88;
+  line-height: 1.45;
+  font-family: 'Instrument Sans', sans-serif;
+}
+
+/* ── Bottom ticker ── */
+.traza-ticker {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 32px;
+  background: rgba(0,200,255,0.04);
+  border-top: 1px solid rgba(0,200,255,0.08);
+  overflow: hidden;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+}
+.ticker-track {
+  display: flex;
+  gap: 0;
+  white-space: nowrap;
+  animation: ticker-scroll 28s linear infinite;
+}
+@keyframes ticker-scroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+.ticker-item {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .14em;
+  color: rgba(0,200,255,0.5);
+  text-transform: uppercase;
+  padding: 0 24px;
+}
+.ticker-sep {
+  color: rgba(0,200,255,0.2);
+  padding: 0 4px;
+}
+
+@keyframes land-in {
+  from { opacity:0; transform: translateY(16px); }
+  to   { opacity:1; transform: none; }
+}
+.traza-logo    { animation: land-in .5s ease .1s both; }
+.traza-tagline { animation: land-in .5s ease .2s both; }
+.traza-stats   { animation: land-in .5s ease .3s both; }
+.traza-map-wrap{ animation: land-in .5s ease .38s both; }
+.role-cards    { animation: land-in .5s ease .46s both; }
+
+/* ════════════════════════════════════════
+   SHARED LAYOUT SHELL
+════════════════════════════════════════ */
+.app-shell {
+  display: none;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+.app-shell.active { display: flex; }
+
+/* Top bar */
+.topbar {
+  height: 56px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.tb-back {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 16px;
+  transition: all .2s;
+  flex-shrink: 0;
+}
+.tb-back:hover { border-color: var(--border2); }
+.tb-title {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: .04em;
+  flex: 1;
+}
+.tb-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 100px;
+}
+.badge-driver { background: var(--green-dim); color: var(--green); }
+.badge-admin  { background: var(--blue-dim);  color: var(--blue); }
+.badge-customer { background: var(--orange-dim); color: var(--orange); }
+
+/* Scrollable content */
+.app-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.app-body::-webkit-scrollbar { width: 2px; }
+.app-body::-webkit-scrollbar-thumb { background: var(--muted2); }
+
+/* Bottom nav */
+.bottom-nav {
+  height: 60px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-shrink: 0;
+}
+.bn-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all .2s;
+  border: none;
+  background: none;
+  color: var(--muted);
+}
+.bn-item.active { color: var(--blue); }
+.bn-item:active { background: rgba(255,255,255,.03); }
+.bn-icon { font-size: 20px; line-height: 1; }
+.bn-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+/* ════════════════════════════════════════
+   REUSABLE COMPONENTS
+════════════════════════════════════════ */
+.section { padding: 16px; }
+.section + .section { padding-top: 0; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
+  margin-bottom: 10px;
+}
+.card:last-child { margin-bottom: 0; }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.pill-green { background: var(--green-dim); color: var(--green); }
+.pill-orange { background: var(--orange-dim); color: var(--orange); }
+.pill-blue { background: var(--blue-dim); color: var(--blue); }
+.pill-red { background: rgba(255,59,92,.1); color: var(--red); }
+.pill-yellow { background: rgba(255,212,38,.1); color: var(--yellow); }
+.pill-muted { background: var(--muted2); color: var(--muted); }
+
+.pill::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.btn {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 13px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+.btn-primary {
+  background: var(--blue);
+  color: #fff;
+  box-shadow: 0 4px 20px var(--blue-glow);
+}
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-primary:active { transform: scale(.98); }
+.btn-success {
+  background: var(--green);
+  color: var(--bg);
+  box-shadow: 0 4px 20px rgba(0,224,150,0.3);
+}
+.btn-danger {
+  background: var(--red);
+  color: #fff;
+}
+.btn-ghost {
+  background: var(--card);
+  color: var(--white);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { border-color: var(--border2); }
+.btn-sm {
+  padding: 8px 14px;
+  font-size: 13px;
+  border-radius: 8px;
+  width: auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.label-sm {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.val-lg {
+  font-family: var(--font-head);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 14px 0;
+}
+
+/* Map placeholder */
+.map-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  position: relative;
+}
+.map-canvas { width: 100%; display: block; }
+.map-label {
+  position: absolute;
+  bottom: 10px; left: 10px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: .12em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* Order card */
+.order-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px;
+  margin-bottom: 10px;
+  transition: border-color .2s;
+}
+.order-card:hover { border-color: var(--border2); }
+.oc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.oc-id {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--blue);
+  letter-spacing: .06em;
+}
+.oc-source {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+.src-uber { background: #fff; color: #000; }
+.src-rappi { background: var(--rappi); color: #fff; }
+.src-didi { background: var(--didi); color: #fff; }
+.src-traza { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(45,126,255,.2); }
+
+.oc-route {
+  font-size: 13px;
+  color: var(--white);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.oc-route .from { color: var(--muted); font-size: 12px; }
+.oc-route .arrow { color: var(--muted); font-size: 11px; margin: 0 4px; }
+.oc-meta {
+  display: flex;
+  gap: 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+.oc-meta .val { color: var(--white); }
+
+/* Toggle switch */
+.toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.toggle {
+  width: 52px; height: 28px;
+  background: var(--muted2);
+  border-radius: 100px;
+  position: relative;
+  cursor: pointer;
+  transition: background .2s;
+  flex-shrink: 0;
+  border: none;
+}
+.toggle.on { background: var(--green); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  top: 3px; left: 3px;
+  transition: transform .2s;
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+.toggle.on::after { transform: translateX(24px); }
+.toggle-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px;
+}
+.stat-card .s-val {
+  font-family: var(--font-head);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-card .s-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .12em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* Incoming order alert */
+.incoming-order {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%) translateY(200px);
+  width: calc(100% - 32px);
+  max-width: 440px;
+  background: var(--surface);
+  border: 1px solid var(--blue);
+  border-radius: 16px;
+  padding: 16px;
+  z-index: 200;
+  box-shadow: 0 0 0 1px var(--blue-glow), 0 20px 60px rgba(0,0,0,.6);
+  transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+}
+.incoming-order.show { transform: translateX(-50%) translateY(0); }
+.io-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .18em;
+  color: var(--blue);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.io-label::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  animation: blink 1s ease infinite;
+}
+.io-title {
+  font-family: var(--font-head);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.io-route {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.io-route strong { color: var(--white); }
+.io-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+.io-timer {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--yellow);
+  text-align: center;
+  margin-top: 8px;
+  letter-spacing: .06em;
+}
+
+/* ════════════════════════════════════════
+   ADMIN MAP (full canvas)
+════════════════════════════════════════ */
+#admin-map-canvas {
+  width: 100%;
+  display: block;
+  position: relative;
+}
+
+/* Driver dot tooltip */
+.driver-tooltip {
+  position: absolute;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  pointer-events: none;
+  z-index: 50;
+  display: none;
+  min-width: 140px;
+}
+.dt-name {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+.dt-status {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* ════════════════════════════════════════
+   PAGE VISIBILITY
+════════════════════════════════════════ */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ════════════════════════════════════════
+   ANIMATIONS
+════════════════════════════════════════ */
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 var(--blue-glow); }
+  70% { box-shadow: 0 0 0 10px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+@keyframes slideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+
+.slide-up { animation: slideUp .4s ease forwards; }
+
+/* ════════════════════════════════════════
+   CUSTOMER ORDER FORM
+════════════════════════════════════════ */
+.form-group { margin-bottom: 14px; }
+.form-group label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  transition: border-color .2s;
+}
+.form-group input:focus,
+.form-group select:focus { border-color: var(--blue); }
+.form-group select option { background: #111; }
+input::placeholder { color: var(--muted); }
+
+/* service selector */
+.svc-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.svc-opt {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+}
+.svc-opt.sel {
+  border-color: var(--blue);
+  background: var(--blue-dim);
+}
+.svc-opt .so-icon { font-size: 20px; margin-bottom: 5px; }
+.svc-opt .so-name { font-size: 11px; font-weight: 600; margin-bottom: 2px; }
+.svc-opt .so-price {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--blue);
+}
+
+/* ════════════════════════════════════════
+   DRIVER STATUS BAR
+════════════════════════════════════════ */
+.driver-status-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+/* ════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════ */
+@media (min-width: 480px) {
+  .incoming-order { max-width: 400px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     TRAZA LANDING
+══════════════════════════════════════ -->
+<div id="role-screen">
+  <!-- Particle canvas -->
+  <canvas id="landing-canvas"></canvas>
+
+  <!-- Logo -->
+  <div class="traza-logo">TRA<span class="hi">ZA</span></div>
+  <div class="traza-tagline">Logística Inteligente · Monterrey</div>
+
+  <!-- Live stats -->
+  <div class="traza-stats">
+    <div class="ts-item">
+      <div class="ts-val" id="ls-units">27</div>
+      <div class="ts-lbl">Activos</div>
+    </div>
+    <div class="ts-item">
+      <div class="ts-val" id="ls-eta">8 min</div>
+      <div class="ts-lbl">ETA Prom.</div>
+    </div>
+    <div class="ts-item">
+      <div class="ts-val" id="ls-rate">97%</div>
+      <div class="ts-lbl">Éxito</div>
+    </div>
+    <div class="ts-item">
+      <div class="ts-val" id="ls-orders">14</div>
+      <div class="ts-lbl">En ruta</div>
+    </div>
+  </div>
+
+  <!-- Mini live map -->
+  <div class="traza-map-wrap">
+    <canvas id="landing-map"></canvas>
+    <div class="traza-map-label">Monterrey · GPS en vivo</div>
+    <div class="traza-map-dot">Live</div>
+  </div>
+
+  <!-- Role cards -->
+  <div class="role-cards">
+    <div class="role-card rc-chofer" onclick="enterApp('driver')">
+      <span class="rc-icon">🚗</span>
+      <div class="rc-title">Chofer</div>
+      <div class="rc-desc">Acepta órdenes y navega en tiempo real</div>
+    </div>
+    <div class="role-card rc-dispatch" onclick="enterApp('admin')">
+      <span class="rc-icon">🗺️</span>
+      <div class="rc-title">Control</div>
+      <div class="rc-desc">Mapa de flota y asignación automática</div>
+    </div>
+    <div class="role-card rc-cliente" onclick="enterApp('customer')">
+      <span class="rc-icon">📦</span>
+      <div class="rc-title">Enviar</div>
+      <div class="rc-desc">Cotiza, paga y rastrea tu paquete</div>
+    </div>
+  </div>
+
+  <!-- Bottom ticker -->
+  <div class="traza-ticker">
+    <div class="ticker-track" id="ticker-track">
+      <span class="ticker-item">Express 1–2 hrs $149</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">GPS cada 3 segundos</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">IA Route Optimizer</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">WhatsApp automático</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">27 choferes activos</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">97% entregas a tiempo</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Pago Stripe seguro</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Same-Day $99</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Express 1–2 hrs $149</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">GPS cada 3 segundos</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">IA Route Optimizer</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">WhatsApp automático</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">27 choferes activos</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">97% entregas a tiempo</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Pago Stripe seguro</span><span class="ticker-sep">·</span>
+      <span class="ticker-item">Same-Day $99</span><span class="ticker-sep">·</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     DRIVER APP
+══════════════════════════════════════ -->
+<div class="app-shell" id="driver-app">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="tb-back" onclick="goHome()">←</div>
+    <div class="tb-title">TRAZA Chofer</div>
+    <span class="tb-badge badge-driver" id="driver-status-badge">● OFFLINE</span>
+  </div>
+
+  <!-- Status toggle bar -->
+  <div class="driver-status-bar">
+    <div class="toggle-wrap">
+      <button class="toggle" id="online-toggle" onclick="toggleOnline()"></button>
+      <span class="toggle-label" id="online-label">Go Online</span>
+    </div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">
+      Driver: <span style="color:var(--white)" id="driver-name-display">Carlos R.</span>
+    </div>
+  </div>
+
+  <!-- Bottom nav -->
+  <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+    <div class="app-body" id="driver-body">
+
+      <!-- PAGE: Home -->
+      <div class="page active" id="d-home">
+        <!-- Live map -->
+        <div class="section">
+          <div class="map-box" style="height:200px">
+            <canvas class="map-canvas" id="driver-map" height="200"></canvas>
+            <div class="map-label">Live GPS · Monterrey</div>
+            <div style="position:absolute;top:10px;right:10px;">
+              <span class="pill pill-green" id="gps-pill">GPS Active</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current order (if any) -->
+        <div class="section" id="current-order-section" style="display:none">
+          <div class="label-sm">Active Order</div>
+          <div class="card" id="current-order-card">
+            <div class="oc-header">
+              <span class="oc-id" id="co-id">ORD-00000</span>
+              <span class="pill pill-blue">In Progress</span>
+            </div>
+            <div class="oc-route">
+              <div class="from" id="co-from">Pickup: —</div>
+              <div style="margin-top:4px" id="co-to">→ Drop: —</div>
+            </div>
+            <div class="divider"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+              <div>
+                <div class="label-sm">Distance</div>
+                <div style="font-weight:600;font-size:15px" id="co-dist">—</div>
+              </div>
+              <div>
+                <div class="label-sm">Earning</div>
+                <div style="font-weight:600;font-size:15px;color:var(--green)" id="co-earn">—</div>
+              </div>
+            </div>
+            <button class="btn btn-success" onclick="completeOrder()">✓ Mark as Delivered</button>
+          </div>
+        </div>
+
+        <!-- No order state -->
+        <div class="section" id="no-order-section">
+          <div class="card" style="text-align:center;padding:32px 16px">
+            <div style="font-size:40px;margin-bottom:12px">🟢</div>
+            <div style="font-weight:600;font-size:16px;margin-bottom:6px">Waiting for orders</div>
+            <div style="color:var(--muted);font-size:13px">You'll get notified when a new order matches your location</div>
+          </div>
+        </div>
+
+        <!-- Today's stats -->
+        <div class="section">
+          <div class="label-sm">Today</div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="s-val" style="color:var(--green)" id="d-earn">$0</div>
+              <div class="s-label">Earnings</div>
+            </div>
+            <div class="stat-card">
+              <div class="s-val" id="d-orders">0</div>
+              <div class="s-label">Deliveries</div>
+            </div>
+            <div class="stat-card">
+              <div class="s-val" id="d-km">0</div>
+              <div class="s-label">KM Driven</div>
+            </div>
+            <div class="stat-card">
+              <div class="s-val" id="d-rating">—</div>
+              <div class="s-label">Rating</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Integration sources active -->
+        <div class="section">
+          <div class="label-sm">Connected Platforms</div>
+          <div class="card">
+            <div class="row-between" style="margin-bottom:10px">
+              <div class="row" style="gap:8px">
+                <span class="oc-source src-uber" style="font-size:11px;padding:3px 8px">UBER</span>
+                <span style="font-size:13px">Uber Eats / Delivery</span>
+              </div>
+              <span class="pill pill-green">Connected</span>
+            </div>
+            <div class="row-between" style="margin-bottom:10px">
+              <div class="row" style="gap:8px">
+                <span class="oc-source src-rappi">RAPPI</span>
+                <span style="font-size:13px">Rappi Express</span>
+              </div>
+              <span class="pill pill-green">Connected</span>
+            </div>
+            <div class="row-between">
+              <div class="row" style="gap:8px">
+                <span class="oc-source src-didi">DIDI</span>
+                <span style="font-size:13px">DiDi Food</span>
+              </div>
+              <span class="pill pill-green">Connected</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: History -->
+      <div class="page" id="d-history">
+        <div class="section">
+          <div class="label-sm">Completed Today</div>
+          <div id="history-list">
+            <div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">
+              No completed orders yet today
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: Earnings -->
+      <div class="page" id="d-earnings">
+        <div class="section">
+          <div class="card" style="text-align:center;padding:24px">
+            <div class="label-sm">This Week</div>
+            <div class="val-lg" style="color:var(--green);font-size:44px" id="week-earn">$0</div>
+            <div style="color:var(--muted);font-size:12px;margin-top:4px">MXN · 0 deliveries</div>
+          </div>
+          <div class="stats-grid" style="margin-top:10px">
+            <div class="stat-card">
+              <div class="s-val" style="color:var(--blue)">$0</div>
+              <div class="s-label">TRAZA</div>
+            </div>
+            <div class="stat-card">
+              <div class="s-val">$0</div>
+              <div class="s-label">Uber</div>
+            </div>
+            <div class="stat-card">
+              <div class="s-val">$0</div>
+              <div class="s-label">Rappi</div>
+            </div>
+            <div class="stat-card">
+              <div class="s-val">$0</div>
+              <div class="s-label">DiDi</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Nav -->
+    <div class="bottom-nav">
+      <button class="bn-item active" onclick="driverTab('d-home','d-orders-btn')" id="d-orders-btn">
+        <span class="bn-icon">🏠</span>
+        <span class="bn-label">Home</span>
+      </button>
+      <button class="bn-item" onclick="driverTab('d-history','d-hist-btn')" id="d-hist-btn">
+        <span class="bn-icon">📋</span>
+        <span class="bn-label">History</span>
+      </button>
+      <button class="bn-item" onclick="driverTab('d-earnings','d-earn-btn')" id="d-earn-btn">
+        <span class="bn-icon">💰</span>
+        <span class="bn-label">Earnings</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- INCOMING ORDER POPUP -->
+  <div class="incoming-order" id="incoming-popup">
+    <div class="io-label">New Order</div>
+    <div class="io-title" id="ip-title">Package Delivery</div>
+    <div class="io-route" style="margin-bottom:2px">📍 Pickup: <strong id="ip-from">—</strong></div>
+    <div class="io-route">📬 Drop: <strong id="ip-to">—</strong></div>
+    <div style="display:flex;gap:16px;margin-top:10px;font-family:var(--font-mono);font-size:11px;">
+      <span>💰 <span style="color:var(--green)" id="ip-earn">$0</span></span>
+      <span>📏 <span id="ip-dist">—</span></span>
+      <span>⏱ <span id="ip-eta">— min</span></span>
+    </div>
+    <div style="margin-top:8px">
+      <span class="oc-source" id="ip-source-badge">—</span>
+    </div>
+    <div class="io-actions">
+      <button class="btn btn-danger btn-sm" style="width:100%" onclick="rejectOrder()">✗ Reject</button>
+      <button class="btn btn-success btn-sm" style="width:100%" onclick="acceptOrder()">✓ Accept</button>
+    </div>
+    <div class="io-timer" id="ip-timer">Expires in 30s</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ADMIN / DISPATCHER APP
+══════════════════════════════════════ -->
+<div class="app-shell" id="admin-app">
+  <div class="topbar">
+    <div class="tb-back" onclick="goHome()">←</div>
+    <div class="tb-title">Dispatcher</div>
+    <span class="tb-badge badge-admin" id="admin-fleet-badge">60 vehicles</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+    <div class="app-body" id="admin-body">
+
+      <!-- PAGE: Live Map -->
+      <div class="page active" id="a-map">
+        <!-- Fleet stats -->
+        <div class="section">
+          <div class="stats-grid">
+            <div class="stat-card" style="border-color:rgba(0,224,150,.2)">
+              <div class="s-val" style="color:var(--green)" id="a-online">0</div>
+              <div class="s-label">Online</div>
+            </div>
+            <div class="stat-card">
+              <div class="s-val" id="a-busy">0</div>
+              <div class="s-label">On Delivery</div>
+            </div>
+            <div class="stat-card">
+              <div class="s-val" style="color:var(--muted)" id="a-offline">60</div>
+              <div class="s-label">Offline</div>
+            </div>
+            <div class="stat-card" style="border-color:rgba(45,126,255,.2)">
+              <div class="s-val" style="color:var(--blue)" id="a-pending">0</div>
+              <div class="s-label">Pending</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Map -->
+        <div class="section" style="padding-top:0">
+          <div class="label-sm">Fleet Map — Monterrey</div>
+          <div class="map-box" style="position:relative">
+            <canvas id="admin-map-canvas" height="340"></canvas>
+            <div class="map-label">60 units · Auto-assign ON</div>
+            <!-- Tooltip -->
+            <div class="driver-tooltip" id="driver-tooltip">
+              <div class="dt-name" id="tt-name">Driver</div>
+              <div class="dt-status" id="tt-status">Online</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending orders queue -->
+        <div class="section" style="padding-top:0">
+          <div class="row-between" style="margin-bottom:8px">
+            <div class="label-sm" style="margin:0">Pending Queue</div>
+            <button class="btn btn-primary btn-sm" onclick="autoAssignAll()">⚡ Auto-Assign All</button>
+          </div>
+          <div id="admin-queue">
+            <div style="text-align:center;padding:28px;color:var(--muted);font-size:13px">No pending orders</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: Orders -->
+      <div class="page" id="a-orders">
+        <div class="section">
+          <div class="row-between" style="margin-bottom:12px">
+            <div class="label-sm" style="margin:0">All Orders Today</div>
+            <div style="display:flex;gap:6px">
+              <span class="pill pill-green" id="a-completed-cnt">0 done</span>
+              <span class="pill pill-orange" id="a-active-cnt">0 active</span>
+            </div>
+          </div>
+          <div id="admin-orders-list">
+            <div style="text-align:center;padding:28px;color:var(--muted);font-size:13px">No orders yet</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: Drivers -->
+      <div class="page" id="a-drivers">
+        <div class="section">
+          <div class="label-sm">All Drivers (60)</div>
+          <div id="drivers-list"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="bottom-nav">
+      <button class="bn-item active" onclick="adminTab('a-map','a-map-btn')" id="a-map-btn">
+        <span class="bn-icon">🗺️</span>
+        <span class="bn-label">Map</span>
+      </button>
+      <button class="bn-item" onclick="adminTab('a-orders','a-ord-btn')" id="a-ord-btn">
+        <span class="bn-icon">📋</span>
+        <span class="bn-label">Orders</span>
+      </button>
+      <button class="bn-item" onclick="adminTab('a-drivers','a-drv-btn')" id="a-drv-btn">
+        <span class="bn-icon">👥</span>
+        <span class="bn-label">Drivers</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CUSTOMER APP
+══════════════════════════════════════ -->
+<div class="app-shell" id="customer-app">
+  <div class="topbar">
+    <div class="tb-back" onclick="goHome()">←</div>
+    <div class="tb-title">Send Package</div>
+    <span class="tb-badge badge-customer">TRAZA</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+    <div class="app-body">
+
+      <!-- PAGE: New Order -->
+      <div class="page active" id="c-new">
+        <div class="section">
+
+          <!-- Service type -->
+          <div class="label-sm">Service Type</div>
+          <div class="svc-row">
+            <div class="svc-opt sel" onclick="selectService(this,'express',149,'⚡','1-2 hrs')">
+              <div class="so-icon">⚡</div>
+              <div class="so-name">Express</div>
+              <div class="so-price">$149</div>
+            </div>
+            <div class="svc-opt" onclick="selectService(this,'sameday',99,'📦','2-4 hrs')">
+              <div class="so-icon">📦</div>
+              <div class="so-name">Same-Day</div>
+              <div class="so-price">$99</div>
+            </div>
+            <div class="svc-opt" onclick="selectService(this,'food',79,'🍔','30-60 min')">
+              <div class="so-icon">🍔</div>
+              <div class="so-name">Food</div>
+              <div class="so-price">$79</div>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <div class="form-group">
+            <label>Pickup Address</label>
+            <input type="text" id="c-from" placeholder="e.g. San Pedro, Monterrey">
+          </div>
+          <div class="form-group">
+            <label>Delivery Address</label>
+            <input type="text" id="c-to" placeholder="e.g. Cumbres, Monterrey">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="form-group">
+              <label>Your Name</label>
+              <input type="text" id="c-name" placeholder="Full name">
+            </div>
+            <div class="form-group">
+              <label>Phone / WhatsApp</label>
+              <input type="tel" id="c-phone" placeholder="81 0000 0000">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Package Description</label>
+            <input type="text" id="c-desc" placeholder="e.g. Small box, documents...">
+          </div>
+
+          <!-- Price summary -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="row-between">
+              <span style="color:var(--muted);font-size:13px">Service</span>
+              <span style="font-weight:600" id="c-svc-name">Express</span>
+            </div>
+            <div class="divider"></div>
+            <div class="row-between">
+              <span style="color:var(--muted);font-size:13px">Estimated time</span>
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--blue)" id="c-svc-time">1-2 hrs</span>
+            </div>
+            <div class="row-between" style="margin-top:8px">
+              <span style="font-weight:600;font-size:15px">Total</span>
+              <span style="font-family:var(--font-head);font-size:28px;font-weight:700;color:var(--blue)" id="c-svc-price">$149</span>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" onclick="placeOrder()">
+            Place Order →
+          </button>
+          <div style="margin-top:10px">
+            <a href="https://wa.me/528115550619?text=Hola%20TRAZA%2C%20quiero%20hacer%20un%20envío" target="_blank"
+               class="btn btn-ghost" style="font-size:13px">
+              💬 Order via WhatsApp instead
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: Track -->
+      <div class="page" id="c-track">
+        <div class="section">
+          <div class="form-group">
+            <label>Tracking ID</label>
+            <div style="display:flex;gap:8px">
+              <input type="text" id="track-input" placeholder="e.g. ORD-00847" style="flex:1">
+              <button class="btn btn-primary btn-sm" onclick="trackOrder()" style="width:auto;padding:11px 16px">→</button>
+            </div>
+          </div>
+          <div id="track-result" style="display:none">
+            <div class="card slide-up">
+              <div class="oc-header">
+                <span class="oc-id" id="tr-id">—</span>
+                <span class="pill" id="tr-status-pill">—</span>
+              </div>
+              <div class="oc-route">
+                <div class="from" id="tr-from">—</div>
+                <div style="margin-top:4px" id="tr-to">—</div>
+              </div>
+              <div class="divider"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div>
+                  <div class="label-sm">Driver</div>
+                  <div style="font-size:14px;font-weight:500" id="tr-driver">—</div>
+                </div>
+                <div>
+                  <div class="label-sm">ETA</div>
+                  <div style="font-size:14px;font-weight:500;color:var(--blue)" id="tr-eta">—</div>
+                </div>
+              </div>
+              <!-- Progress bar -->
+              <div style="margin-top:14px">
+                <div style="height:4px;background:var(--muted2);border-radius:2px;overflow:hidden">
+                  <div id="tr-progress" style="height:100%;background:var(--blue);border-radius:2px;transition:width 1s"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:6px;font-family:var(--font-mono);font-size:9px;color:var(--muted)">
+                  <span>Pickup</span><span>In Transit</span><span>Delivered</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live mini map -->
+            <div class="map-box" style="height:160px;margin-top:10px">
+              <canvas id="track-map" height="160" style="width:100%;display:block"></canvas>
+              <div class="map-label">Driver location · Live</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="bottom-nav">
+      <button class="bn-item active" onclick="customerTab('c-new','c-new-btn')" id="c-new-btn">
+        <span class="bn-icon">📦</span>
+        <span class="bn-label">New Order</span>
+      </button>
+      <button class="bn-item" onclick="customerTab('c-track','c-track-btn')" id="c-track-btn">
+        <span class="bn-icon">📡</span>
+        <span class="bn-label">Track</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SUCCESS MODAL
+══════════════════════════════════════ -->
+<div style="position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px" id="success-modal">
+  <div style="background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:36px;max-width:360px;width:100%;text-align:center">
+    <div style="font-size:52px;margin-bottom:16px">🚀</div>
+    <div style="font-family:var(--font-head);font-size:26px;font-weight:700;margin-bottom:10px">Order Placed!</div>
+    <div style="color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.6">
+      Your order has been received. A driver will be auto-assigned based on proximity.
+    </div>
+    <div style="font-family:var(--font-mono);font-size:14px;color:var(--blue);background:var(--blue-dim);padding:10px 20px;border-radius:8px;letter-spacing:.08em;margin-bottom:20px" id="modal-order-id">ORD-00000</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:20px">You'll receive updates via WhatsApp</div>
+    <button class="btn btn-primary" onclick="closeModal()">Track Order →</button>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   DATA ENGINE
+══════════════════════════════════════════ */
+
+// Driver names
+const DRIVER_NAMES = [
+  'Carlos R.','Ana M.','José G.','María L.','Pedro S.','Laura V.',
+  'Miguel A.','Sofia T.','Roberto H.','Elena C.','Juan P.','Claudia F.',
+  'Diego N.','Patricia O.','Andrés B.','Verónica Z.','Fernando Q.','Isabel M.',
+  'Sergio K.','Alejandra W.','Héctor J.','Natalia X.','Oscar Y.','Daniela U.',
+  'Raúl E.','Gabriela I.','Javier R.','Valeria D.','Ernesto C.','Paola S.',
+  'Tomás N.','Carmen A.','Guillermo L.','Lucía P.','Arturo M.','Beatriz V.',
+  'Marcos T.','Rosa G.','Álvaro H.','Cristina B.','Rodrigo F.','Mónica Q.',
+  'Ernestina Z.','Germán K.','Adriana W.','Víctor J.','Liliana X.','Saúl Y.',
+  'Norma U.','Felipe E.','Mariana I.','Armando R.','Silvia D.','Aurelio C.',
+  'Teresa S.','Ignacio N.','Brenda A.','Leandro L.','Esther P.','Jesús M.'
+];
+
+const LOCATIONS_MTY = [
+  'San Pedro','Cumbres','Del Valle','Centro MTY','Contry',
+  'Mitras','Obispado','Garza García','Guadalupe','Apodaca',
+  'San Nicolás','Santa Catarina','Escobedo','Monterrey Sur',
+  'Col. Roma','Tecnológico','Chepevera','Lomas Modelo'
+];
+
+const PLATFORMS = ['uber','rappi','didi','traza'];
+const PLATFORM_LABELS = { uber:'UBER', rappi:'RAPPI', didi:'DIDI', traza:'TRAZA' };
+
+// State
+let drivers = [];
+let orders  = [];
+let driverOnline = false;
+let currentOrder = null;
+let driverEarnings = 0;
+let driverCompletedOrders = [];
+let driverOrderCount = 0;
+let orderCounter = 1;
+let pendingOrderTimer = null;
+let pendingOrderTimeout = 30;
+
+function rand(a,b){ return Math.random()*(b-a)+a; }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function orderId(){ return 'ORD-'+String(orderCounter++).padStart(5,'0'); }
+
+/* ══════════════════════════════════════════
+   TRAZA LANDING — PARTICLES + MAP + STATS
+══════════════════════════════════════════ */
+
+// ── Particle network ─────────────────────
+let landingAnimFrame;
+const PARTICLES = [];
+const N_PARTICLES = 55;
+
+function initLandingCanvas() {
+  const c = document.getElementById('landing-canvas');
+  if (!c) return;
+  c.width  = window.innerWidth;
+  c.height = window.innerHeight;
+
+  PARTICLES.length = 0;
+  for (let i = 0; i < N_PARTICLES; i++) {
+    PARTICLES.push({
+      x:  Math.random() * c.width,
+      y:  Math.random() * c.height,
+      vx: (Math.random() - .5) * .5,
+      vy: (Math.random() - .5) * .5,
+      r:  Math.random() * 1.5 + .5,
+    });
+  }
+  cancelAnimationFrame(landingAnimFrame);
+  drawLanding(c);
+}
+
+function drawLanding(c) {
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Move + draw particles
+  PARTICLES.forEach(p => {
+    p.x = (p.x + p.vx + W) % W;
+    p.y = (p.y + p.vy + H) % H;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,200,255,0.25)';
+    ctx.fill();
+  });
+
+  // Connection lines
+  for (let i = 0; i < PARTICLES.length; i++) {
+    for (let j = i + 1; j < PARTICLES.length; j++) {
+      const dx = PARTICLES[i].x - PARTICLES[j].x;
+      const dy = PARTICLES[i].y - PARTICLES[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 110) {
+        ctx.beginPath();
+        ctx.moveTo(PARTICLES[i].x, PARTICLES[i].y);
+        ctx.lineTo(PARTICLES[j].x, PARTICLES[j].y);
+        ctx.strokeStyle = `rgba(0,200,255,${0.06 * (1 - dist/110)})`;
+        ctx.lineWidth = .6;
+        ctx.stroke();
+      }
+    }
+  }
+  landingAnimFrame = requestAnimationFrame(() => drawLanding(c));
+}
+
+// ── Mini Monterrey map ────────────────────
+const LANDING_COURIERS = Array.from({length: 6}, () => ({
+  x: Math.random(), y: Math.random(),
+  tx: Math.random(), ty: Math.random(),
+  color: Math.random() > .4 ? '#00C8FF' : '#B4FF47',
+}));
+
+function drawLandingMap() {
+  const c = document.getElementById('landing-map');
+  if (!c) return;
+  c.width  = c.offsetWidth;
+  c.height = 120;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+
+  // Background
+  ctx.fillStyle = '#07070F';
+  ctx.fillRect(0, 0, W, H);
+
+  // Glow
+  const g = ctx.createRadialGradient(W*.5,H*.5,0,W*.5,H*.5,W*.5);
+  g.addColorStop(0, 'rgba(0,200,255,0.04)');
+  g.addColorStop(1, 'transparent');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
+
+  // Street grid
+  const streets = [
+    [.05,.25,.95,.25],[.05,.5,.95,.5],[.05,.75,.95,.75],
+    [.2,.05,.2,.95],[.4,.05,.4,.95],[.6,.05,.6,.95],[.8,.05,.8,.95],
+    [.05,.4,.5,.05],[.5,.95,.95,.4],
+  ];
+  streets.forEach(s => {
+    ctx.beginPath();
+    ctx.moveTo(s[0]*W, s[1]*H);
+    ctx.lineTo(s[2]*W, s[3]*H);
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Move couriers with lerp
+  const t = Date.now() * .001;
+  LANDING_COURIERS.forEach((co, i) => {
+    co.x += (co.tx - co.x) * .008;
+    co.y += (co.ty - co.y) * .008;
+    if (Math.abs(co.tx - co.x) < .01 && Math.abs(co.ty - co.y) < .01) {
+      co.tx = Math.random() * .9 + .05;
+      co.ty = Math.random() * .9 + .05;
+    }
+
+    const cx = co.x * W, cy = co.y * H;
+    const pr = 6 + Math.sin(t * 1.5 + i) * 2;
+
+    // Pulse ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, pr, 0, Math.PI*2);
+    ctx.strokeStyle = co.color + '30';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Dot
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3.5, 0, Math.PI*2);
+    ctx.fillStyle = co.color;
+    ctx.fill();
+  });
+
+  // Vignette
+  const v = ctx.createRadialGradient(W*.5,H*.5,H*.05,W*.5,H*.5,H*.8);
+  v.addColorStop(0,'transparent');
+  v.addColorStop(1,'rgba(3,3,10,.65)');
+  ctx.fillStyle = v;
+  ctx.fillRect(0,0,W,H);
+}
+
+// ── Live stats pulse ──────────────────────
+function pulseLandingStats() {
+  const units   = Math.floor(rand(22, 31));
+  const eta     = Math.floor(rand(6, 14));
+  const rate    = Math.floor(rand(95, 99));
+  const onRoute = Math.floor(rand(10, 22));
+
+  const u = document.getElementById('ls-units');
+  const e = document.getElementById('ls-eta');
+  const r = document.getElementById('ls-rate');
+  const o = document.getElementById('ls-orders');
+  if (u) u.textContent = units;
+  if (e) e.textContent = eta + ' min';
+  if (r) r.textContent = rate + '%';
+  if (o) o.textContent = onRoute;
+}
+
+// ── Map animation loop ────────────────────
+let mapLoopId;
+function startLandingMapLoop() {
+  cancelAnimationFrame(mapLoopId);
+  function loop() {
+    drawLandingMap();
+    mapLoopId = requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+// ── Init landing ──────────────────────────
+function initLanding() {
+  initLandingCanvas();
+  startLandingMapLoop();
+  pulseLandingStats();
+  setInterval(pulseLandingStats, 4500);
+  window.addEventListener('resize', () => {
+    const c = document.getElementById('landing-canvas');
+    if (c) { c.width = window.innerWidth; c.height = window.innerHeight; }
+  });
+}
+
+// Start on load
+document.addEventListener('DOMContentLoaded', initLanding);
+
+// Initialize 60 drivers
+function initDrivers(){
+  drivers = DRIVER_NAMES.map((name,i)=>({
+    id: i,
+    name,
+    status: 'offline', // offline | online | busy
+    x: rand(.05,.95),
+    y: rand(.05,.95),
+    vx: (Math.random()-.5)*.003,
+    vy: (Math.random()-.5)*.003,
+    earnings: 0,
+    completedToday: 0,
+    rating: (rand(4.2,5.0)).toFixed(1),
+    vehicle: pick(['🚗 Sedan','🚙 SUV','🛻 Pickup']),
+    platform: pick(PLATFORMS),
+  }));
+}
+
+function updateAdminCounts(){
+  const online  = drivers.filter(d=>d.status==='online').length;
+  const busy    = drivers.filter(d=>d.status==='busy').length;
+  const offline = drivers.filter(d=>d.status==='offline').length;
+  const pending = orders.filter(o=>o.status==='pending').length;
+  const done    = orders.filter(o=>o.status==='delivered').length;
+  const active  = orders.filter(o=>o.status==='active').length;
+
+  setEl('a-online', online);
+  setEl('a-busy', busy);
+  setEl('a-offline', offline);
+  setEl('a-pending', pending);
+  setEl('a-completed-cnt', done+' done');
+  setEl('a-active-cnt', active+' active');
+  setEl('admin-fleet-badge', `${online+busy}/${drivers.length} online`);
+}
+
+function setEl(id, val){
+  const el = document.getElementById(id);
+  if(el) el.textContent = val;
+}
+
+/* ══════════════════════════════════════════
+   ROLE SWITCHING
+══════════════════════════════════════════ */
+let currentRole = null;
+
+function enterApp(role){
+  // Stop landing animations to save memory
+  cancelAnimationFrame(landingAnimFrame);
+  cancelAnimationFrame(mapLoopId);
+  document.getElementById('role-screen').style.display = 'none';
+  document.querySelectorAll('.app-shell').forEach(el=>el.classList.remove('active'));
+  document.getElementById(role+'-app').classList.add('active');
+  currentRole = role;
+  if(role==='admin') startAdminSim();
+  if(role==='driver'){
+    // pick a random driver name for demo
+    const names = ['Carlos R.','Ana M.','José G.','María L.','Pedro S.'];
+    setEl('driver-name-display', pick(names));
+    startDriverMap();
+  }
+  if(role==='customer') startTrackMap();
+}
+
+function goHome(){
+  document.querySelectorAll('.app-shell').forEach(el=>el.classList.remove('active'));
+  document.getElementById('role-screen').style.display = 'flex';
+  clearInterval(adminInterval);
+  clearInterval(orderInterval);
+  clearInterval(mapInterval);
+  // Restart landing animations
+  setTimeout(initLanding, 50);
+}
+
+/* ══════════════════════════════════════════
+   DRIVER APP LOGIC
+══════════════════════════════════════════ */
+function toggleOnline(){
+  driverOnline = !driverOnline;
+  const tog = document.getElementById('online-toggle');
+  const lbl = document.getElementById('online-label');
+  const badge = document.getElementById('driver-status-badge');
+  if(driverOnline){
+    tog.classList.add('on');
+    lbl.textContent = 'Online — Ready';
+    badge.textContent = '● ONLINE';
+    badge.style.background = 'var(--green-dim)';
+    badge.style.color = 'var(--green)';
+    // Start simulating incoming orders
+    scheduleIncomingOrder();
+  } else {
+    tog.classList.remove('on');
+    lbl.textContent = 'Go Online';
+    badge.textContent = '● OFFLINE';
+    badge.style.background = '';
+    badge.style.color = '';
+    clearTimeout(pendingOrderTimer);
+    hideIncoming();
+  }
+}
+
+function driverTab(pageId, btnId){
+  document.querySelectorAll('#driver-app .page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  document.querySelectorAll('#driver-app .bn-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById(btnId).classList.add('active');
+}
+
+function scheduleIncomingOrder(){
+  if(!driverOnline || currentOrder) return;
+  const delay = rand(4000, 10000);
+  pendingOrderTimer = setTimeout(showIncomingOrder, delay);
+}
+
+const SAMPLE_ORDERS = [
+  {title:'Package Delivery',from:'San Pedro',to:'Del Valle',earn:'$89',dist:'4.2 km',eta:'18 min',src:'traza'},
+  {title:'Food Delivery',from:'Tecnológico',to:'Cumbres',earn:'$65',dist:'6.1 km',eta:'25 min',src:'rappi'},
+  {title:'Document Express',from:'Centro MTY',to:'Garza García',earn:'$110',dist:'7.8 km',eta:'32 min',src:'traza'},
+  {title:'Grocery Delivery',from:'Obispado',to:'Mitras',earn:'$72',dist:'3.5 km',eta:'15 min',src:'uber'},
+  {title:'Restaurant Order',from:'Contry',to:'Apodaca',earn:'$58',dist:'9.2 km',eta:'38 min',src:'didi'},
+  {title:'Pharmacy Run',from:'San Nicolás',to:'Guadalupe',earn:'$95',dist:'5.0 km',eta:'21 min',src:'traza'},
+];
+
+let incomingData = null;
+let timerInterval = null;
+let timerSecs = 30;
+
+function showIncomingOrder(){
+  if(!driverOnline || currentOrder) return;
+  incomingData = pick(SAMPLE_ORDERS);
+  incomingData.id = orderId();
+
+  setEl('ip-title', incomingData.title);
+  setEl('ip-from',  incomingData.from);
+  setEl('ip-to',    incomingData.to);
+  setEl('ip-earn',  incomingData.earn);
+  setEl('ip-dist',  incomingData.dist);
+  setEl('ip-eta',   incomingData.eta);
+
+  const srcBadge = document.getElementById('ip-source-badge');
+  srcBadge.textContent = PLATFORM_LABELS[incomingData.src];
+  srcBadge.className = 'oc-source src-' + incomingData.src;
+
+  document.getElementById('incoming-popup').classList.add('show');
+
+  timerSecs = 30;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(()=>{
+    timerSecs--;
+    setEl('ip-timer', `Expires in ${timerSecs}s`);
+    if(timerSecs <= 0){
+      clearInterval(timerInterval);
+      rejectOrder();
+    }
+  }, 1000);
+}
+
+function hideIncoming(){
+  document.getElementById('incoming-popup').classList.remove('show');
+  clearInterval(timerInterval);
+}
+
+function acceptOrder(){
+  hideIncoming();
+  currentOrder = incomingData;
+  incomingData = null;
+
+  // Show active order
+  document.getElementById('current-order-section').style.display = 'block';
+  document.getElementById('no-order-section').style.display = 'none';
+  setEl('co-id', currentOrder.id);
+  document.getElementById('co-from').textContent = '📍 Pickup: ' + currentOrder.from;
+  document.getElementById('co-to').textContent   = '📬 Drop: ' + currentOrder.to;
+  setEl('co-dist', currentOrder.dist);
+  setEl('co-earn', currentOrder.earn);
+}
+
+function rejectOrder(){
+  hideIncoming();
+  incomingData = null;
+  if(driverOnline) scheduleIncomingOrder();
+}
+
+function completeOrder(){
+  if(!currentOrder) return;
+  const earn = parseInt(currentOrder.earn.replace('$',''));
+  driverEarnings += earn;
+  driverOrderCount++;
+  driverCompletedOrders.push({...currentOrder, completedAt: new Date().toLocaleTimeString()});
+
+  setEl('d-earn', '$'+driverEarnings);
+  setEl('d-orders', driverOrderCount);
+  setEl('d-km', (driverOrderCount * rand(3,8)).toFixed(1));
+  setEl('d-rating', '4.'+Math.floor(rand(7,9)));
+  setEl('week-earn', '$'+driverEarnings);
+
+  // Update history
+  renderDriverHistory();
+
+  currentOrder = null;
+  document.getElementById('current-order-section').style.display = 'none';
+  document.getElementById('no-order-section').style.display = 'block';
+
+  if(driverOnline) scheduleIncomingOrder();
+}
+
+function renderDriverHistory(){
+  const list = document.getElementById('history-list');
+  if(!driverCompletedOrders.length){
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No completed orders yet</div>';
+    return;
+  }
+  list.innerHTML = driverCompletedOrders.slice().reverse().map(o=>`
+    <div class="order-card">
+      <div class="oc-header">
+        <span class="oc-id">${o.id}</span>
+        <span class="pill pill-green">✓ Delivered</span>
+      </div>
+      <div class="oc-route">
+        <div class="from">📍 ${o.from}</div>
+        <div style="margin-top:3px">📬 ${o.to}</div>
+      </div>
+      <div class="oc-meta">
+        <span>💰 <span class="val" style="color:var(--green)">${o.earn}</span></span>
+        <span>📏 <span class="val">${o.dist}</span></span>
+        <span>⏰ <span class="val">${o.completedAt}</span></span>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ══════════════════════════════════════════
+   ADMIN LOGIC
+══════════════════════════════════════════ */
+let adminInterval, orderInterval, mapInterval;
+
+// ── SphereGT Bridge config ────────────────────────────────
+// Change this to your bridge server IP once running
+// e.g. 'http://192.168.1.10:4000' if on same network
+const BRIDGE_URL = 'http://localhost:4000';
+let bridgeConnected = false;
+let bridgePollInterval = null;
+
+function startAdminSim(){
+  initDrivers();
+  const onlineCount = 18;
+  for(let i=0;i<onlineCount;i++) drivers[i].status = 'online';
+  for(let i=0;i<5;i++) drivers[i].status = 'busy';
+
+  renderAdminDriversList();
+  updateAdminCounts();
+  startAdminMap();
+  renderAdminQueue();
+
+  // Try live GPS from SphereGT bridge
+  connectBridge();
+
+  // Simulate orders periodically
+  orderInterval = setInterval(()=>{
+    if(Math.random() > 0.5) generateAdminOrder();
+  }, 5000);
+
+  // Fallback: animate positions when bridge is offline
+  adminInterval = setInterval(()=>{
+    if(!bridgeConnected){
+      drivers.forEach(d=>{
+        if(d.status !== 'offline'){
+          d.x = Math.max(.02, Math.min(.98, d.x + d.vx));
+          d.y = Math.max(.02, Math.min(.98, d.y + d.vy));
+          if(d.x<=.02||d.x>=.98) d.vx*=-1;
+          if(d.y<=.02||d.y>=.98) d.vy*=-1;
+        }
+      });
+    }
+    drawAdminMap();
+    updateAdminCounts();
+    renderAdminOrdersList();
+    renderAdminQueue();
+  }, 1200);
+
+  for(let i=0;i<3;i++) generateAdminOrder();
+}
+
+// ── Bridge connection ─────────────────────────────────────
+async function connectBridge(){
+  showBridgeBanner('connecting');
+  try {
+    const res  = await fetch(BRIDGE_URL + '/status', { signal: AbortSignal.timeout(4000) });
+    const data = await res.json();
+    bridgeConnected = true;
+    showBridgeBanner('connected', data.vehicleCount || 0);
+    await fetchVehiclesFromBridge();
+    clearInterval(bridgePollInterval);
+    bridgePollInterval = setInterval(fetchVehiclesFromBridge, 10000);
+  } catch(e){
+    bridgeConnected = false;
+    showBridgeBanner('offline');
+    setTimeout(connectBridge, 30000);
+  }
+}
+
+async function fetchVehiclesFromBridge(){
+  try {
+    const res  = await fetch(BRIDGE_URL + '/vehicles', { signal: AbortSignal.timeout(8000) });
+    const data = await res.json();
+    if(!data.ok || !data.vehicles?.length) return;
+
+    // Monterrey bounding box for coordinate mapping
+    const LAT_MIN=25.55, LAT_MAX=25.85, LNG_MIN=-100.55, LNG_MAX=-100.15;
+
+    data.vehicles.forEach((v, i) => {
+      const d = drivers[i % drivers.length];
+      if(!d) return;
+      // Map real GPS coords to 0-1 canvas space
+      d.x = Math.max(0.01, Math.min(0.99, (v.lng - LNG_MIN) / (LNG_MAX - LNG_MIN)));
+      d.y = Math.max(0.01, Math.min(0.99, 1 - (v.lat - LAT_MIN) / (LAT_MAX - LAT_MIN)));
+      d.name   = v.name  || d.name;
+      d.speed  = v.speed || 0;
+      d.status = v.speed > 2 ? 'busy' : 'online';
+      d.realGPS = { lat: v.lat, lng: v.lng };
+    });
+
+    bridgeConnected = true;
+    showBridgeBanner('connected', data.vehicles.length);
+    renderAdminDriversList();
+    updateAdminCounts();
+  } catch(e){
+    bridgeConnected = false;
+    showBridgeBanner('offline');
+  }
+}
+
+// ── Bridge status banner ──────────────────────────────────
+function showBridgeBanner(state, count){
+  let el = document.getElementById('bridge-banner');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'bridge-banner';
+    el.style.cssText = [
+      'position:fixed', 'bottom:70px', 'right:12px', 'z-index:300',
+      'padding:8px 14px', 'border-radius:8px',
+      'font-family:var(--font-mono)', 'font-size:10px',
+      'letter-spacing:.08em', 'text-transform:uppercase',
+      'display:flex', 'align-items:center', 'gap:7px',
+      'border:1px solid', 'transition:all .3s',
+      'box-shadow:0 4px 20px rgba(0,0,0,.4)',
+    ].join(';');
+    document.body.appendChild(el);
+  }
+  const cfg = {
+    connecting: ['rgba(255,212,38,.08)','rgba(255,212,38,.3)','#FFD426','SphereGT Connecting...'],
+    connected:  ['rgba(0,224,150,.08)', 'rgba(0,224,150,.3)', '#00E096','SphereGT Live · ' + count + ' units'],
+    offline:    ['rgba(255,59,92,.08)', 'rgba(255,59,92,.3)', '#FF3B5C','SphereGT Offline — Simulation'],
+  }[state] || ['rgba(255,59,92,.08)','rgba(255,59,92,.3)','#FF3B5C','Bridge Offline'];
+  el.style.background  = cfg[0];
+  el.style.borderColor = cfg[1];
+  el.style.color       = cfg[2];
+  const anim = state==='connecting' ? 'animation:blink 1s infinite' : '';
+  el.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:'+cfg[2]+';'+anim+'"></span>' + cfg[3];
+}
+
+function generateAdminOrder(){
+  const src = pick(PLATFORMS);
+  const order = {
+    id: orderId(),
+    from: pick(LOCATIONS_MTY),
+    to: pick(LOCATIONS_MTY),
+    source: src,
+    status: 'pending',
+    earn: Math.floor(rand(60,150)),
+    dist: rand(2,12).toFixed(1)+' km',
+    eta: Math.floor(rand(10,45))+' min',
+    driver: null,
+    createdAt: new Date().toLocaleTimeString(),
+  };
+  orders.push(order);
+  // Auto-assign if online driver available
+  setTimeout(()=> autoAssign(order), 800);
+}
+
+function autoAssign(order){
+  if(order.status !== 'pending') return;
+  const available = drivers.filter(d=>d.status==='online');
+  if(!available.length) return;
+
+  // Pick nearest (simulate by random for demo)
+  const driver = available[Math.floor(Math.random()*available.length)];
+  driver.status = 'busy';
+  order.status  = 'active';
+  order.driver  = driver.name;
+  order.assignedAt = new Date().toLocaleTimeString();
+
+  // Simulate delivery completion
+  const delivTime = rand(15000, 35000);
+  setTimeout(()=>{
+    order.status = 'delivered';
+    order.deliveredAt = new Date().toLocaleTimeString();
+    driver.status = 'online';
+    driver.completedToday++;
+    driver.earnings += order.earn;
+  }, delivTime);
+}
+
+function autoAssignAll(){
+  const pending = orders.filter(o=>o.status==='pending');
+  pending.forEach(o=>autoAssign(o));
+  // Flash feedback
+  const btn = event.target;
+  btn.textContent = '✓ Assigning...';
+  setTimeout(()=>{ btn.textContent='⚡ Auto-Assign All'; }, 1500);
+}
+
+function renderAdminQueue(){
+  const pending = orders.filter(o=>o.status==='pending');
+  const el = document.getElementById('admin-queue');
+  if(!pending.length){
+    el.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">No pending orders</div>';
+    return;
+  }
+  el.innerHTML = pending.map(o=>`
+    <div class="order-card">
+      <div class="oc-header">
+        <span class="oc-id">${o.id}</span>
+        <span class="oc-source src-${o.source}">${PLATFORM_LABELS[o.source]}</span>
+      </div>
+      <div class="oc-route">
+        <div class="from">📍 ${o.from}</div>
+        <div style="margin-top:3px">📬 ${o.to}</div>
+      </div>
+      <div class="oc-meta" style="margin-top:8px">
+        <span>💰 <span class="val">$${o.earn}</span></span>
+        <span>📏 <span class="val">${o.dist}</span></span>
+        <span>⏱ <span class="val">${o.eta}</span></span>
+      </div>
+      <div style="margin-top:10px">
+        <button class="btn btn-primary btn-sm" onclick="manualAssign('${o.id}')">⚡ Assign Driver</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderAdminOrdersList(){
+  const el = document.getElementById('admin-orders-list');
+  if(!orders.length){
+    el.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted);font-size:13px">No orders yet</div>';
+    return;
+  }
+  el.innerHTML = orders.slice().reverse().slice(0,20).map(o=>{
+    const pillClass = {pending:'pill-yellow',active:'pill-blue',delivered:'pill-green'}[o.status]||'pill-muted';
+    const pillLabel = {pending:'Pending',active:'In Transit',delivered:'Delivered'}[o.status]||o.status;
+    return `
+    <div class="order-card">
+      <div class="oc-header">
+        <span class="oc-id">${o.id}</span>
+        <span class="pill ${pillClass}">${pillLabel}</span>
+      </div>
+      <div class="oc-route">
+        <div class="from">📍 ${o.from}</div>
+        <div style="margin-top:3px">📬 ${o.to}</div>
+      </div>
+      <div class="oc-meta" style="margin-top:6px">
+        <span>Platform <span class="val">${PLATFORM_LABELS[o.source]}</span></span>
+        ${o.driver ? `<span>Driver <span class="val">${o.driver}</span></span>` : ''}
+        <span>💰 <span class="val">$${o.earn}</span></span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function manualAssign(orderId){
+  const order = orders.find(o=>o.id===orderId);
+  if(order) autoAssign(order);
+}
+
+function renderAdminDriversList(){
+  const el = document.getElementById('drivers-list');
+  el.innerHTML = drivers.map(d=>`
+    <div class="card" style="padding:12px;margin-bottom:6px">
+      <div class="row-between">
+        <div class="row" style="gap:10px">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--muted2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">
+            ${d.name.charAt(0)}
+          </div>
+          <div>
+            <div style="font-weight:600;font-size:14px">${d.name}</div>
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">${d.vehicle} · ⭐ ${d.rating}</div>
+          </div>
+        </div>
+        <span class="pill ${d.status==='online'?'pill-green':d.status==='busy'?'pill-blue':'pill-muted'}">
+          ${d.status}
+        </span>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ══════════════════════════════════════════
+   CUSTOMER LOGIC
+══════════════════════════════════════════ */
+let selectedService = { id:'express', price:149, name:'Express', time:'1-2 hrs' };
+
+function selectService(el, id, price, icon, time){
+  document.querySelectorAll('.svc-opt').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedService = { id, price, name: el.querySelector('.so-name').textContent, time };
+  setEl('c-svc-name',  selectedService.name);
+  setEl('c-svc-time',  selectedService.time);
+  setEl('c-svc-price', '$'+selectedService.price);
+}
+
+function customerTab(pageId, btnId){
+  document.querySelectorAll('#customer-app .page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  document.querySelectorAll('#customer-app .bn-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById(btnId).classList.add('active');
+}
+
+function placeOrder(){
+  const from = document.getElementById('c-from').value.trim();
+  const to   = document.getElementById('c-to').value.trim();
+  const name = document.getElementById('c-name').value.trim();
+  if(!from||!to||!name){ alert('Please fill in all required fields.'); return; }
+
+  const id = orderId();
+  const newOrder = {
+    id, from, to,
+    source: 'traza',
+    status: 'active',
+    earn: selectedService.price,
+    dist: rand(2,10).toFixed(1)+' km',
+    eta: Math.floor(rand(10,40))+' min',
+    driver: pick(DRIVER_NAMES),
+    service: selectedService.name,
+  };
+  orders.push(newOrder);
+
+  setEl('modal-order-id', id);
+  document.getElementById('success-modal').style.display='flex';
+
+  // Pre-fill tracking
+  document.getElementById('track-input').value = id;
+}
+
+function closeModal(){
+  document.getElementById('success-modal').style.display='none';
+  customerTab('c-track','c-track-btn');
+  trackOrder();
+}
+
+function trackOrder(){
+  const id = document.getElementById('track-input').value.trim();
+  const order = orders.find(o=>o.id===id);
+  const el = document.getElementById('track-result');
+
+  if(!order){
+    alert('Order not found. Try a valid order ID.');
+    return;
+  }
+
+  el.style.display = 'block';
+  setEl('tr-id', order.id);
+  document.getElementById('tr-from').textContent = '📍 From: ' + order.from;
+  document.getElementById('tr-to').textContent   = '📬 To: '   + order.to;
+  setEl('tr-driver', order.driver || 'Assigning...');
+  setEl('tr-eta', order.eta || '—');
+
+  const statusMap = {
+    pending:   { label:'Pending',    cls:'pill-yellow', progress:'8%' },
+    active:    { label:'In Transit', cls:'pill-blue',   progress:'58%'},
+    delivered: { label:'Delivered',  cls:'pill-green',  progress:'100%'},
+  };
+  const s = statusMap[order.status] || statusMap.active;
+  const pill = document.getElementById('tr-status-pill');
+  pill.textContent = s.label;
+  pill.className   = 'pill ' + s.cls;
+  document.getElementById('tr-progress').style.width = s.progress;
+
+  drawTrackMap(order);
+}
+
+/* ══════════════════════════════════════════
+   CANVAS MAPS
+══════════════════════════════════════════ */
+
+// Streets of Monterrey grid
+const STREETS = [
+  [.05,.2,.95,.2],[.05,.4,.95,.4],[.05,.6,.95,.6],[.05,.8,.95,.8],
+  [.15,.02,.15,.98],[.3,.02,.3,.98],[.45,.02,.45,.98],[.6,.02,.6,.98],[.75,.02,.75,.98],[.9,.02,.9,.98],
+  [.05,.5,.4,.1],[.55,.9,.95,.4],
+];
+
+function drawMapBase(ctx, W, H, bgColor='#0A0A0F'){
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0,0,W,H);
+
+  // Grid glow
+  const g = ctx.createRadialGradient(W*.5,H*.5,0,W*.5,H*.5,W*.6);
+  g.addColorStop(0,'rgba(45,126,255,0.04)');
+  g.addColorStop(1,'transparent');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
+
+  // Streets
+  STREETS.forEach(s=>{
+    ctx.beginPath();
+    ctx.moveTo(s[0]*W, s[1]*H);
+    ctx.lineTo(s[2]*W, s[3]*H);
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Vignette
+  const v = ctx.createRadialGradient(W*.5,H*.5,H*.15,W*.5,H*.5,H*.8);
+  v.addColorStop(0,'transparent');
+  v.addColorStop(1,'rgba(10,10,15,.7)');
+  ctx.fillStyle = v;
+  ctx.fillRect(0,0,W,H);
+}
+
+// DRIVER MAP
+let driverMapAnimFrame;
+let driverPos = { x:.45, y:.5 };
+
+function startDriverMap(){
+  const c = document.getElementById('driver-map');
+  if(!c) return;
+  const ctx = c.getContext('2d');
+  c.width  = c.offsetWidth;
+  c.height = 200;
+
+  function draw(){
+    const W=c.width, H=c.height;
+    drawMapBase(ctx,W,H,'#111118');
+
+    // Move driver slightly
+    driverPos.x += (Math.random()-.5)*.004;
+    driverPos.y += (Math.random()-.5)*.004;
+    driverPos.x = Math.max(.05,Math.min(.95,driverPos.x));
+    driverPos.y = Math.max(.05,Math.min(.95,driverPos.y));
+
+    const dx=driverPos.x*W, dy=driverPos.y*H;
+    const t=Date.now()*.002;
+    const pr=10+Math.sin(t)*3;
+    ctx.beginPath(); ctx.arc(dx,dy,pr,0,Math.PI*2);
+    ctx.strokeStyle='rgba(45,126,255,0.35)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.beginPath(); ctx.arc(dx,dy,5,0,Math.PI*2);
+    ctx.fillStyle='#2D7EFF'; ctx.fill();
+
+    // Accuracy circle
+    ctx.beginPath(); ctx.arc(dx,dy,20,0,Math.PI*2);
+    ctx.strokeStyle='rgba(45,126,255,0.1)'; ctx.lineWidth=8; ctx.stroke();
+
+    driverMapAnimFrame = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ADMIN MAP
+function startAdminMap(){
+  const c = document.getElementById('admin-map-canvas');
+  if(!c) return;
+  c.width = c.offsetWidth;
+  drawAdminMap();
+}
+
+function drawAdminMap(){
+  const c = document.getElementById('admin-map-canvas');
+  if(!c) return;
+  const ctx=c.getContext('2d');
+  const W=c.width, H=340;
+  c.height=H;
+
+  drawMapBase(ctx,W,H,'#111118');
+
+  // Draw all drivers
+  drivers.forEach(d=>{
+    if(d.status==='offline') return;
+    const x=d.x*W, y=d.y*H;
+    const col = d.status==='busy' ? '#2D7EFF' : '#00E096';
+    const t=Date.now()*.001;
+    const pr=7+Math.sin(t+d.id)*.5;
+    ctx.beginPath(); ctx.arc(x,y,pr,0,Math.PI*2);
+    ctx.strokeStyle=col+'40'; ctx.lineWidth=1; ctx.stroke();
+    ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fillStyle=col; ctx.fill();
+  });
+
+  // Active order routes
+  orders.filter(o=>o.status==='active').slice(0,5).forEach(o=>{
+    const d = drivers.find(dr=>dr.name===o.driver);
+    if(!d) return;
+    ctx.beginPath();
+    ctx.moveTo(d.x*W, d.y*H);
+    ctx.lineTo(rand(.1,.9)*W, rand(.1,.9)*H);
+    ctx.strokeStyle='rgba(45,126,255,0.15)';
+    ctx.setLineDash([3,4]); ctx.lineWidth=1; ctx.stroke(); ctx.setLineDash([]);
+  });
+
+  // Legend
+  ctx.font='10px JetBrains Mono, monospace';
+  ctx.fillStyle='#00E096';
+  ctx.fillText('● Online', 10, H-28);
+  ctx.fillStyle='#2D7EFF';
+  ctx.fillText('● Busy', 70, H-28);
+
+  // Online count
+  const online=drivers.filter(d=>d.status!=='offline').length;
+  ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.font='9px JetBrains Mono, monospace';
+  ctx.fillText(`${online}/60 active`, W-80, H-28);
+}
+
+// TRACK MAP
+let trackAnimFrame;
+function startTrackMap(){}
+function drawTrackMap(order){
+  const c = document.getElementById('track-map');
+  if(!c) return;
+  const ctx=c.getContext('2d');
+  c.width=c.offsetWidth; c.height=160;
+  const W=c.width, H=160;
+
+  let px=rand(.2,.5), py=rand(.2,.8);
+  const tx=rand(.5,.8), ty=rand(.2,.8);
+
+  function draw(){
+    drawMapBase(ctx,W,H,'#111118');
+
+    // Route line
+    ctx.beginPath();
+    ctx.moveTo(px*W,py*H);
+    ctx.lineTo(tx*W,ty*H);
+    ctx.strokeStyle='rgba(45,126,255,0.2)';
+    ctx.setLineDash([4,4]); ctx.lineWidth=1; ctx.stroke(); ctx.setLineDash([]);
+
+    // Destination
+    ctx.beginPath(); ctx.arc(tx*W,ty*H,6,0,Math.PI*2);
+    ctx.fillStyle='#00E096'; ctx.fill();
+
+    // Driver dot
+    const t=Date.now()*.002;
+    px+=(tx-px)*.006; py+=(ty-py)*.006;
+    const pr=8+Math.sin(t)*2;
+    ctx.beginPath(); ctx.arc(px*W,py*H,pr,0,Math.PI*2);
+    ctx.strokeStyle='rgba(45,126,255,0.3)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.beginPath(); ctx.arc(px*W,py*H,4,0,Math.PI*2);
+    ctx.fillStyle='#2D7EFF'; ctx.fill();
+
+    trackAnimFrame=requestAnimationFrame(draw);
+  }
+  cancelAnimationFrame(trackAnimFrame);
+  draw();
+}
+
+/* ══════════════════════════════════════════
+   TAB HELPERS
+══════════════════════════════════════════ */
+function adminTab(pageId, btnId){
+  document.querySelectorAll('#admin-app .page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  document.querySelectorAll('#admin-app .bn-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById(btnId).classList.add('active');
+  if(pageId==='a-orders') renderAdminOrdersList();
+  if(pageId==='a-drivers') renderAdminDriversList();
+}
+
+/* ══════════════════════════════════════════
+   RESIZE CANVASES
+══════════════════════════════════════════ */
+window.addEventListener('resize', ()=>{
+  const dm=document.getElementById('driver-map');
+  if(dm) dm.width=dm.offsetWidth;
+  const am=document.getElementById('admin-map-canvas');
+  if(am){ am.width=am.offsetWidth; drawAdminMap(); }
+  const tm=document.getElementById('track-map');
+  if(tm) tm.width=tm.offsetWidth;
+});
+</script>
+</body>
+</html>
