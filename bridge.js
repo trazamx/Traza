@@ -76,6 +76,70 @@ app.post('/refresh', async (req, res) => {
   res.json({ ok: true, vehicleCount: vehicles.length, lastSync });
 });
 
+
+// ─── Chatbot proxy — keeps API key server-side ────────────
+app.post('/chat', async (req, res) => {
+  const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
+  if (!ANTHROPIC_KEY) {
+    return res.status(500).json({ ok: false, error: 'ANTHROPIC_API_KEY not set in Railway variables' });
+  }
+
+  const { message, history } = req.body;
+  if (!message) return res.status(400).json({ ok: false, error: 'No message provided' });
+
+  // Build messages array — include conversation history for context
+  const messages = [];
+  if (Array.isArray(history)) {
+    history.slice(-6).forEach(m => {  // last 6 turns max
+      messages.push({ role: m.role, content: m.content });
+    });
+  }
+  messages.push({ role: 'user', content: message });
+
+  try {
+    const https = require('https');
+    const body = JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 400,
+      system: 'Eres el asistente virtual de TRAZA Logística Inteligente, empresa de entregas en Monterrey, México. Responde siempre en español de manera concisa y amable. Info clave: Servicios: Express $149 menos de 2hrs, Same-Day $99 mismo día, Programado $199 agenda anticipada. Cobertura: ZMM completa (MTY, San Pedro, San Nicolás, Guadalupe, Apodaca, Escobedo, Santa Catarina, Juárez, García). GPS satelital en tiempo real actualización cada 15s. Flota 60+ unidades. Contacto: trazalogisticamx@gmail.com | 811 555 0619 | Lun-Sáb 7am-10pm. Respuestas máximo 3-4 oraciones cortas.',
+      messages,
+    });
+
+    const options = {
+      hostname: 'api.anthropic.com',
+      path: '/v1/messages',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+        'Content-Length': Buffer.byteLength(body),
+      },
+    };
+
+    const apiReq = https.request(options, apiRes => {
+      let data = '';
+      apiRes.on('data', chunk => data += chunk);
+      apiRes.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          const text = parsed.content?.[0]?.text || 'Sin respuesta del asistente.';
+          res.json({ ok: true, reply: text });
+        } catch(e) {
+          res.status(500).json({ ok: false, error: 'Parse error: ' + e.message });
+        }
+      });
+    });
+
+    apiReq.on('error', e => res.status(500).json({ ok: false, error: e.message }));
+    apiReq.write(body);
+    apiReq.end();
+
+  } catch(e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // ─── Bridge dashboard ─────────────────────────────────────
 app.get('/dashboard', (req, res) => {
   res.send(`<!DOCTYPE html><html>
