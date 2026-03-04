@@ -824,6 +824,44 @@ input::placeholder { color: var(--muted); }
   .incoming-order { max-width: 400px; }
 }
 </style>
+<!-- Leaflet for satellite map -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+#satellite-map { width:100%; height:100%; }
+#satellite-map .leaflet-container { background:#03030A; }
+/* Custom taxi marker */
+.taxi-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+.taxi-marker .taxi-icon {
+  font-size: 22px;
+  filter: drop-shadow(0 0 4px rgba(0,200,255,0.8));
+  line-height: 1;
+}
+.taxi-marker.moving .taxi-icon {
+  filter: drop-shadow(0 0 4px rgba(180,255,71,0.9));
+}
+.taxi-marker .taxi-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  color: #00C8FF;
+  background: rgba(3,3,10,0.85);
+  border: 1px solid rgba(0,200,255,0.3);
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+.taxi-marker.moving .taxi-num {
+  color: #B4FF47;
+  border-color: rgba(180,255,71,0.3);
+}
+</style>
 </head>
 <body>
 
@@ -868,7 +906,7 @@ input::placeholder { color: var(--muted); }
 
   <!-- RIGHT: full map -->
   <div class="landing-right">
-    <canvas id="landing-map"></canvas>
+    <div id="satellite-map"></div>
     <div class="traza-map-label">Monterrey · GPS en vivo</div>
     <div class="traza-map-dot">Live</div>
     <div class="map-vehicle-count" id="ls-units">—</div>
@@ -1633,20 +1671,92 @@ function startLandingMapLoop() {
   loop();
 }
 
+// ── Satellite map (Leaflet) ──────────────
+let satMap = null;
+let taxiMarkers = {}; // id -> L.marker
+
+function initSatelliteMap() {
+  if (satMap) return;
+  const el = document.getElementById('satellite-map');
+  if (!el) return;
+
+  // Center on Monterrey
+  satMap = L.map('satellite-map', {
+    center: [25.6866, -100.3161],
+    zoom: 13,
+    zoomControl: false,
+    attributionControl: false,
+  });
+
+  // ESRI satellite tiles — free, no API key
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19,
+  }).addTo(satMap);
+
+  // Subtle dark overlay to match TRAZA theme
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19,
+    opacity: 0.5,
+  }).addTo(satMap);
+}
+
+function updateSatMarkers(vehicles) {
+  if (!satMap || !vehicles || !vehicles.length) return;
+
+  const seen = new Set();
+  vehicles.forEach(v => {
+    if (!v.lat || !v.lng) return;
+    const id = String(v.id);
+    seen.add(id);
+
+    // Extract concession number
+    const raw = v.name || v.eco || '';
+    const match = raw.match(/^0*(\d+)/);
+    const num = match ? match[1] : (v.eco || id.slice(-4));
+    const moving = (v.speed || 0) > 2;
+    const cls = moving ? 'taxi-marker moving' : 'taxi-marker';
+
+    const iconHtml = `<div class="${cls}"><div class="taxi-icon">🚕</div><div class="taxi-num">${num}</div></div>`;
+    const icon = L.divIcon({ html: iconHtml, className: '', iconSize: [40, 40], iconAnchor: [20, 20] });
+
+    if (taxiMarkers[id]) {
+      taxiMarkers[id].setLatLng([v.lat, v.lng]);
+      taxiMarkers[id].setIcon(icon);
+    } else {
+      taxiMarkers[id] = L.marker([v.lat, v.lng], { icon }).addTo(satMap);
+      taxiMarkers[id].bindTooltip(`<b>${num}</b><br>${v.name || ''}<br>${v.speed || 0} km/h`, { className: 'traza-tooltip' });
+    }
+  });
+
+  // Remove markers for vehicles no longer in list
+  Object.keys(taxiMarkers).forEach(id => {
+    if (!seen.has(id)) {
+      satMap.removeLayer(taxiMarkers[id]);
+      delete taxiMarkers[id];
+    }
+  });
+
+  // Update count
+  const el = document.getElementById('ls-units');
+  if (el) el.textContent = vehicles.length;
+
+  // Auto-fit to fleet if we have positions
+  const pts = vehicles.filter(v => v.lat && v.lng).map(v => [v.lat, v.lng]);
+  if (pts.length > 1) {
+    satMap.fitBounds(pts, { padding: [40, 40], maxZoom: 15 });
+  } else if (pts.length === 1) {
+    satMap.setView(pts[0], 14);
+  }
+}
+
 // ── Init landing ──────────────────────────
 function initLanding() {
   initLandingCanvas();
-  startLandingMapLoop();
-  pulseLandingStats();
-  setInterval(pulseLandingStats, 4500);
+  initSatelliteMap();
   window.addEventListener('resize', () => {
     const lc = document.getElementById('landing-canvas');
     if (lc) { lc.width = window.innerWidth; lc.height = window.innerHeight; }
-    const mc = document.getElementById('landing-map');
-    if (mc && mc.parentElement) {
-      mc.width  = mc.parentElement.offsetWidth;
-      mc.height = mc.parentElement.offsetHeight;
-    }
+    if (satMap) satMap.invalidateSize();
   });
 }
 
@@ -1979,8 +2089,8 @@ async function fetchVehiclesFromBridge(){
     renderAdminDriversList();
     updateAdminCounts();
 
-    // Sync landing map with real GPS positions + unit numbers
-    syncLandingCouriers(data.vehicles);
+    // Update satellite map markers with real GPS positions
+    updateSatMarkers(data.vehicles);
   } catch(e){
     bridgeConnected = false;
     showBridgeBanner('offline');
