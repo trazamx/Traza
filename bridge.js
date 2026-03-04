@@ -87,19 +87,18 @@ app.post('/chat', async (req, res) => {
   const { message, history } = req.body;
   if (!message) return res.status(400).json({ ok: false, error: 'No message provided' });
 
-  // Build messages array — include conversation history for context
   const messages = [];
   if (Array.isArray(history)) {
-    history.slice(-6).forEach(m => {  // last 6 turns max
-      messages.push({ role: m.role, content: m.content });
+    history.slice(-6).forEach(m => {
+      if (m.role && m.content) messages.push({ role: m.role, content: m.content });
     });
   }
   messages.push({ role: 'user', content: message });
 
   try {
     const https = require('https');
-    const body = JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+    const payload = JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 400,
       system: 'Eres el asistente virtual de TRAZA Logística Inteligente, empresa de entregas en Monterrey, México. Responde siempre en español de manera concisa y amable. Info clave: Servicios: Express $149 menos de 2hrs, Same-Day $99 mismo día, Programado $199 agenda anticipada. Cobertura: ZMM completa (MTY, San Pedro, San Nicolás, Guadalupe, Apodaca, Escobedo, Santa Catarina, Juárez, García). GPS satelital en tiempo real actualización cada 15s. Flota 60+ unidades. Contacto: trazalogisticamx@gmail.com | 811 555 0619 | Lun-Sáb 7am-10pm. Respuestas máximo 3-4 oraciones cortas.',
       messages,
@@ -113,7 +112,7 @@ app.post('/chat', async (req, res) => {
         'Content-Type': 'application/json',
         'x-api-key': ANTHROPIC_KEY,
         'anthropic-version': '2023-06-01',
-        'Content-Length': Buffer.byteLength(body),
+        'Content-Length': Buffer.byteLength(payload),
       },
     };
 
@@ -121,21 +120,36 @@ app.post('/chat', async (req, res) => {
       let data = '';
       apiRes.on('data', chunk => data += chunk);
       apiRes.on('end', () => {
+        console.log('Anthropic status:', apiRes.statusCode, '| body:', data.substring(0, 200));
         try {
           const parsed = JSON.parse(data);
-          const text = parsed.content?.[0]?.text || 'Sin respuesta del asistente.';
+          // Check for API-level errors (invalid key, quota, etc.)
+          if (parsed.error) {
+            console.error('Anthropic API error:', parsed.error);
+            return res.status(500).json({ ok: false, error: parsed.error.message || parsed.error.type || 'API error' });
+          }
+          const text = parsed.content?.[0]?.text;
+          if (!text) {
+            console.error('No text in response:', data);
+            return res.status(500).json({ ok: false, error: 'Respuesta vacía de la API' });
+          }
           res.json({ ok: true, reply: text });
         } catch(e) {
+          console.error('Parse error:', e.message, '| raw:', data.substring(0,100));
           res.status(500).json({ ok: false, error: 'Parse error: ' + e.message });
         }
       });
     });
 
-    apiReq.on('error', e => res.status(500).json({ ok: false, error: e.message }));
-    apiReq.write(body);
+    apiReq.on('error', e => {
+      console.error('HTTPS request error:', e.message);
+      res.status(500).json({ ok: false, error: e.message });
+    });
+    apiReq.write(payload);
     apiReq.end();
 
   } catch(e) {
+    console.error('/chat error:', e.message);
     res.status(500).json({ ok: false, error: e.message });
   }
 });
