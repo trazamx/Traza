@@ -164,28 +164,78 @@ async function launchBrowser() {
 }
 
 async function login() {
-  console.log('🔐 Logging into SphereGT...');
+  console.log('Logging into SphereGT...');
   syncStatus = 'syncing';
   try {
-    await page.goto(SPHEREGT_URL, { waitUntil: 'networkidle2', timeout: 30000 });
-    const userSelectors = ['input[name="username"]','input[name="email"]','input[name="user"]','input[type="email"]','input[type="text"]','#username','#email'];
-    const passSelectors = ['input[name="password"]','input[type="password"]','#password','#pass'];
-    let userField = null, passField = null;
-    for (const s of userSelectors) { userField = await page.$(s); if (userField) break; }
-    for (const s of passSelectors) { passField = await page.$(s); if (passField) break; }
-    if (!userField || !passField) throw new Error('Login fields not found');
-    await userField.click({ clickCount: 3 });
-    await userField.type(SPHEREGT_USER, { delay: 40 });
-    await passField.click({ clickCount: 3 });
-    await passField.type(SPHEREGT_PASS, { delay: 40 });
-    const btn = await page.$('button[type="submit"],input[type="submit"],.btn-login');
-    if (btn) await btn.click(); else await passField.press('Enter');
-    await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
-    console.log('✅ Logged in');
+    await page.goto(SPHEREGT_URL, { waitUntil: 'domcontentloaded', timeout: 40000 });
+    // Wait a bit for JS-rendered forms
+    await new Promise(r => setTimeout(r, 3000));
+
+    // Dump all inputs for debugging
+    const inputInfo = await page.evaluate(() => {
+      const inputs = Array.from(document.querySelectorAll('input'));
+      return inputs.map(i => ({ type: i.type, name: i.name, id: i.id, placeholder: i.placeholder, className: i.className }));
+    });
+    console.log('Inputs found on page:', JSON.stringify(inputInfo));
+
+    // Try to fill using evaluate (bypasses clickability issues)
+    const filled = await page.evaluate((user, pass) => {
+      const inputs = Array.from(document.querySelectorAll('input'));
+      const userInput = inputs.find(i =>
+        ['email','text','username','user'].includes(i.type) ||
+        ['email','username','user','login','correo','usuario'].includes((i.name||'').toLowerCase()) ||
+        ['email','username','user','login'].includes((i.id||'').toLowerCase()) ||
+        (i.placeholder||'').toLowerCase().includes('user') ||
+        (i.placeholder||'').toLowerCase().includes('email') ||
+        (i.placeholder||'').toLowerCase().includes('correo') ||
+        (i.placeholder||'').toLowerCase().includes('usuario')
+      );
+      const passInput = inputs.find(i =>
+        i.type === 'password' ||
+        ['password','pass','contrasena','clave'].includes((i.name||'').toLowerCase()) ||
+        (i.placeholder||'').toLowerCase().includes('password') ||
+        (i.placeholder||'').toLowerCase().includes('contrase')
+      );
+      if (!userInput || !passInput) return { ok: false, reason: 'fields not found' };
+      // Set value and trigger React/Vue events
+      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+      nativeInputValueSetter.call(userInput, user);
+      userInput.dispatchEvent(new Event('input', { bubbles: true }));
+      userInput.dispatchEvent(new Event('change', { bubbles: true }));
+      nativeInputValueSetter.call(passInput, pass);
+      passInput.dispatchEvent(new Event('input', { bubbles: true }));
+      passInput.dispatchEvent(new Event('change', { bubbles: true }));
+      return { ok: true, userField: userInput.name || userInput.id, passField: passInput.name || passInput.id };
+    }, SPHEREGT_USER, SPHEREGT_PASS);
+
+    console.log('Fill result:', JSON.stringify(filled));
+    if (!filled.ok) throw new Error('Could not fill login fields: ' + filled.reason);
+
+    await new Promise(r => setTimeout(r, 500));
+
+    // Click submit button
+    const submitted = await page.evaluate(() => {
+      const btn = document.querySelector('button[type="submit"],input[type="submit"],button.login,button.btn-login,.btn-primary,button');
+      if (btn) { btn.click(); return btn.textContent || btn.type; }
+      // Try submitting the form directly
+      const form = document.querySelector('form');
+      if (form) { form.submit(); return 'form.submit()'; }
+      return null;
+    });
+    console.log('Submit via:', submitted);
+
+    await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 25000 }).catch(() => {});
+    const finalUrl = page.url();
+    console.log('After login URL:', finalUrl);
+
+    if (finalUrl.includes('login')) {
+      throw new Error('Still on login page after submit — check credentials');
+    }
+    console.log('Logged in successfully');
     return true;
   } catch (err) {
     syncStatus = 'error'; syncError = err.message;
-    console.error('❌ Login failed:', err.message);
+    console.error('Login failed:', err.message);
     return false;
   }
 }
