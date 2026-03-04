@@ -763,8 +763,590 @@ input::placeholder { color: var(--muted); }
 @media (min-width: 480px) {
   .incoming-order { max-width: 400px; }
 }
+
+/* ── Dots menu button ─────────────────── */
+#dots-btn {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background .2s;
+}
+#dots-btn:hover { background: rgba(255,252,245,0.06); }
+#dots-btn span {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255,252,245,0.55);
+  transition: background .2s, transform .2s;
+}
+#dots-btn:hover span { background: rgba(255,252,245,0.9); }
+
+/* ── Slide-out nav panel ──────────────── */
+#nav-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+#nav-overlay.open { display: block; }
+
+#nav-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0);
+  transition: background .35s ease;
+}
+#nav-overlay.open #nav-backdrop { background: rgba(0,3,12,0.65); }
+
+#nav-panel {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 280px;
+  background: rgba(5,10,28,0.97);
+  border-right: 1px solid rgba(255,252,245,0.07);
+  backdrop-filter: blur(24px);
+  transform: translateX(-100%);
+  transition: transform .38s cubic-bezier(.25,.8,.25,1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#nav-overlay.open #nav-panel { transform: translateX(0); }
+
+/* Top shimmer */
+#nav-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,200,255,0.3), transparent);
+}
+
+#nav-header {
+  padding: 36px 28px 24px;
+  border-bottom: 1px solid rgba(255,252,245,0.05);
+}
+#nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: .12em;
+  color: rgba(255,252,245,0.9);
+}
+#nav-logo span { color: #00C8FF; }
+#nav-tagline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .28em;
+  color: rgba(255,252,245,0.25);
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+#nav-links {
+  flex: 1;
+  padding: 20px 0;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 28px;
+  cursor: pointer;
+  position: relative;
+  transition: background .22s;
+  text-decoration: none;
+}
+.nav-item::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0; width: 2px;
+  background: #00C8FF;
+  transform: scaleY(0);
+  transition: transform .25s ease;
+}
+.nav-item:hover { background: rgba(0,200,255,0.05); }
+.nav-item:hover::after { transform: scaleY(1); }
+.nav-icon {
+  font-size: 15px;
+  opacity: 0.55;
+  transition: opacity .2s;
+  width: 20px;
+  text-align: center;
+}
+.nav-item:hover .nav-icon { opacity: 1; }
+.nav-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nav-label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: .18em;
+  color: rgba(255,252,245,0.72);
+  text-transform: uppercase;
+  transition: color .22s;
+}
+.nav-desc {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .1em;
+  color: rgba(255,252,245,0.25);
+  text-transform: uppercase;
+  transition: color .22s;
+}
+.nav-item:hover .nav-label { color: rgba(255,252,245,0.95); }
+.nav-item:hover .nav-desc  { color: rgba(255,252,245,0.45); }
+
+.nav-sep {
+  height: 1px;
+  background: rgba(255,252,245,0.05);
+  margin: 8px 28px;
+}
+
+#nav-footer {
+  padding: 24px 28px;
+  border-top: 1px solid rgba(255,252,245,0.05);
+}
+#nav-contact-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .22em;
+  color: rgba(255,252,245,0.22);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+#nav-contact-phone {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: rgba(255,252,245,0.7);
+  letter-spacing: .04em;
+  margin-bottom: 4px;
+}
+#nav-contact-email {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: rgba(0,200,255,0.55);
+  letter-spacing: .06em;
+}
+
+/* Close button */
+#nav-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: rgba(255,252,245,0.35);
+  font-size: 16px;
+  transition: all .2s;
+}
+#nav-close:hover {
+  background: rgba(255,252,245,0.07);
+  color: rgba(255,252,245,0.8);
+}
+
 </style>
 <style>
+
+/* ══════════════════════════════════════
+   LANDING PAGES
+══════════════════════════════════════ */
+.lp-screen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  flex-direction: column;
+  background: #00030C;
+  overflow-y: auto;
+  animation: lp-in .4s ease both;
+}
+@keyframes lp-in {
+  from { opacity:0; transform: translateX(30px); }
+  to   { opacity:1; transform: translateX(0); }
+}
+.lp-topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255,252,245,0.06);
+  position: sticky; top: 0;
+  background: rgba(0,3,12,0.92);
+  backdrop-filter: blur(16px);
+  z-index: 10;
+  flex-shrink: 0;
+}
+.lp-back {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,252,245,0.1);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: rgba(255,252,245,0.55);
+  font-size: 16px;
+  transition: all .2s;
+  flex-shrink: 0;
+}
+.lp-back:hover { border-color: rgba(0,200,255,0.4); color: #00C8FF; }
+.lp-topbar-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: .18em;
+  color: rgba(255,252,245,0.8);
+  text-transform: uppercase;
+}
+.lp-topbar-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .15em;
+  color: rgba(255,252,245,0.25);
+  text-transform: uppercase;
+  margin-left: auto;
+}
+.lp-body { padding: 0 24px 60px; flex: 1; max-width: 680px; margin: 0 auto; width: 100%; }
+
+/* Hero section */
+.lp-hero {
+  padding: 48px 0 36px;
+  border-bottom: 1px solid rgba(255,252,245,0.05);
+  margin-bottom: 36px;
+}
+.lp-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .32em;
+  color: #00C8FF;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  opacity: .75;
+}
+.lp-h1 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(28px, 7vw, 48px);
+  line-height: 1.05;
+  color: rgba(255,252,245,0.92);
+  margin-bottom: 16px;
+}
+.lp-h1 span { color: #00C8FF; }
+.lp-lead {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+  color: rgba(255,252,245,0.45);
+  max-width: 520px;
+}
+
+/* Stat row */
+.lp-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 36px;
+}
+.lp-stat {
+  background: rgba(255,252,245,0.03);
+  border: 1px solid rgba(255,252,245,0.07);
+  border-radius: 6px;
+  padding: 18px 16px;
+  text-align: center;
+}
+.lp-stat-val {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 26px;
+  color: #00C8FF;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.lp-stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .14em;
+  color: rgba(255,252,245,0.3);
+  text-transform: uppercase;
+}
+
+/* Content blocks */
+.lp-section { margin-bottom: 32px; }
+.lp-section-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: .22em;
+  color: rgba(255,252,245,0.4);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,252,245,0.06);
+}
+.lp-card {
+  background: rgba(255,252,245,0.03);
+  border: 1px solid rgba(255,252,245,0.07);
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 10px;
+  transition: border-color .2s;
+}
+.lp-card:hover { border-color: rgba(0,200,255,0.18); }
+.lp-card-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: rgba(255,252,245,0.85);
+  margin-bottom: 6px;
+}
+.lp-card-body {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255,252,245,0.42);
+}
+.lp-card-accent {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .1em;
+  color: #B4FF47;
+  background: rgba(180,255,71,0.08);
+  border: 1px solid rgba(180,255,71,0.2);
+  border-radius: 20px;
+  padding: 3px 10px;
+  margin-top: 8px;
+}
+
+/* Service price cards */
+.lp-price-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.lp-price-card {
+  background: rgba(255,252,245,0.03);
+  border: 1px solid rgba(255,252,245,0.08);
+  border-radius: 6px;
+  padding: 20px 16px;
+  transition: all .25s;
+  cursor: default;
+}
+.lp-price-card:hover {
+  border-color: rgba(0,200,255,0.25);
+  background: rgba(0,200,255,0.04);
+}
+.lp-price-card .price {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 28px;
+  color: rgba(255,252,245,0.9);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.lp-price-card .price sup {
+  font-size: 14px;
+  color: #00C8FF;
+  vertical-align: super;
+}
+.lp-price-card .plan-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .16em;
+  color: rgba(255,252,245,0.35);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.lp-price-card .plan-feat {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 12px;
+  color: rgba(255,252,245,0.5);
+  line-height: 1.7;
+}
+
+/* Tech feature list */
+.lp-feature-list { list-style: none; padding: 0; margin: 0; }
+.lp-feature-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,252,245,0.05);
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 13px;
+  color: rgba(255,252,245,0.5);
+  line-height: 1.5;
+}
+.lp-feature-list li:last-child { border-bottom: none; }
+.lp-feat-icon {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: #00C8FF;
+  opacity: .7;
+  margin-top: 2px;
+  flex-shrink: 0;
+  width: 16px;
+}
+
+/* Chatbot */
+#chatbot-wrap {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 140px);
+  min-height: 400px;
+}
+#chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chat-msg {
+  display: flex;
+  gap: 10px;
+  animation: msg-in .25s ease both;
+}
+@keyframes msg-in {
+  from { opacity:0; transform: translateY(8px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.chat-msg.user { flex-direction: row-reverse; }
+.chat-avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.chat-msg.bot .chat-avatar {
+  background: rgba(0,200,255,0.12);
+  border: 1px solid rgba(0,200,255,0.25);
+  color: #00C8FF;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 9px;
+  letter-spacing: .05em;
+}
+.chat-msg.user .chat-avatar {
+  background: rgba(180,255,71,0.1);
+  border: 1px solid rgba(180,255,71,0.2);
+  color: #B4FF47;
+}
+.chat-bubble {
+  max-width: 78%;
+  padding: 11px 15px;
+  border-radius: 4px;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.chat-msg.bot .chat-bubble {
+  background: rgba(255,252,245,0.04);
+  border: 1px solid rgba(255,252,245,0.08);
+  color: rgba(255,252,245,0.78);
+  border-top-left-radius: 0;
+}
+.chat-msg.user .chat-bubble {
+  background: rgba(0,200,255,0.1);
+  border: 1px solid rgba(0,200,255,0.2);
+  color: rgba(255,252,245,0.85);
+  border-top-right-radius: 0;
+}
+.chat-typing {
+  display: flex; gap: 4px; align-items: center; padding: 4px 0;
+}
+.chat-typing span {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(0,200,255,0.5);
+  animation: blink 1.2s ease infinite;
+}
+.chat-typing span:nth-child(2) { animation-delay: .2s; }
+.chat-typing span:nth-child(3) { animation-delay: .4s; }
+@keyframes blink { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
+
+#chat-input-row {
+  display: flex;
+  gap: 8px;
+  padding: 14px 0 0;
+  border-top: 1px solid rgba(255,252,245,0.07);
+  flex-shrink: 0;
+}
+#chat-input {
+  flex: 1;
+  background: rgba(255,252,245,0.04);
+  border: 1px solid rgba(255,252,245,0.1);
+  border-radius: 4px;
+  padding: 11px 14px;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 13px;
+  color: rgba(255,252,245,0.85);
+  outline: none;
+  transition: border-color .2s;
+}
+#chat-input:focus { border-color: rgba(0,200,255,0.35); }
+#chat-input::placeholder { color: rgba(255,252,245,0.2); }
+#chat-send {
+  width: 42px; height: 42px;
+  background: rgba(0,200,255,0.12);
+  border: 1px solid rgba(0,200,255,0.25);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: #00C8FF;
+  font-size: 16px;
+  transition: all .2s;
+  flex-shrink: 0;
+}
+#chat-send:hover { background: rgba(0,200,255,0.22); }
+
+/* Contact info cards */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+.contact-card {
+  background: rgba(255,252,245,0.03);
+  border: 1px solid rgba(255,252,245,0.07);
+  border-radius: 6px;
+  padding: 18px;
+}
+.contact-card-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .2em;
+  color: rgba(255,252,245,0.28);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.contact-card-val {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: rgba(255,252,245,0.8);
+}
+.contact-card-val a {
+  color: #00C8FF;
+  text-decoration: none;
+}
+
 .mapa-pill {
   background: rgba(5,10,25,0.85);
   border: 1px solid rgba(255,255,255,0.1);
@@ -824,6 +1406,84 @@ input::placeholder { color: var(--muted); }
 ══════════════════════════════════════ -->
 <div id="role-screen">
   <canvas id="landing-canvas"></canvas>
+
+  <!-- 3-dots menu trigger -->
+  <div id="dots-btn" onclick="openNav()" title="Menú">
+    <span></span><span></span><span></span>
+  </div>
+
+  <!-- Slide-out navigation panel -->
+  <div id="nav-overlay">
+    <div id="nav-backdrop" onclick="closeNav()"></div>
+    <div id="nav-panel">
+      <div id="nav-close" onclick="closeNav()">✕</div>
+
+      <div id="nav-header">
+        <div id="nav-logo">TRA<span>Z</span>A</div>
+        <div id="nav-tagline">Logística Inteligente · Monterrey</div>
+      </div>
+
+      <div id="nav-links">
+        <div class="nav-item" onclick="showNavPage('nosotros')">
+          <span class="nav-icon">◈</span>
+          <div class="nav-text">
+            <span class="nav-label">Quiénes Somos</span>
+            <span class="nav-desc">Nuestra historia y misión</span>
+          </div>
+        </div>
+
+        <div class="nav-item" onclick="showNavPage('servicios')">
+          <span class="nav-icon">◉</span>
+          <div class="nav-text">
+            <span class="nav-label">Servicios</span>
+            <span class="nav-desc">Express · Same-Day · Programado</span>
+          </div>
+        </div>
+
+        <div class="nav-item" onclick="showNavPage('tecnologia')">
+          <span class="nav-icon">◎</span>
+          <div class="nav-text">
+            <span class="nav-label">Tecnología</span>
+            <span class="nav-desc">GPS en tiempo real · IA routing</span>
+          </div>
+        </div>
+
+        <div class="nav-sep"></div>
+
+        <div class="nav-item" onclick="enterApp('customer'); closeNav();">
+          <span class="nav-icon">▷</span>
+          <div class="nav-text">
+            <span class="nav-label">Rastrear Pedido</span>
+            <span class="nav-desc">Sigue tu entrega en vivo</span>
+          </div>
+        </div>
+
+        <div class="nav-item" onclick="enterApp('mapa'); closeNav();">
+          <span class="nav-icon">◈</span>
+          <div class="nav-text">
+            <span class="nav-label">Mapa de Flota</span>
+            <span class="nav-desc">Vista satelital en tiempo real</span>
+          </div>
+        </div>
+
+        <div class="nav-sep"></div>
+
+        <div class="nav-item" onclick="showNavPage('contacto')">
+          <span class="nav-icon">◇</span>
+          <div class="nav-text">
+            <span class="nav-label">Contacto</span>
+            <span class="nav-desc">Habla con nosotros</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="nav-footer">
+        <div id="nav-contact-title">Contacto directo</div>
+        <div id="nav-contact-phone">811 555 0619</div>
+        <div id="nav-contact-email">felix@traza.mx</div>
+      </div>
+    </div>
+  </div>
 
   <div class="traza-city">Monterrey</div>
 
@@ -2622,7 +3282,335 @@ document.addEventListener('click', function(e) {
   }
 });
 
+
+// ── Navigation panel ──────────────────────────────────
+function openNav() {
+  var overlay = document.getElementById('nav-overlay');
+  if (!overlay) return;
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeNav() {
+  var overlay = document.getElementById('nav-overlay');
+  if (!overlay) return;
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function showNavPage(page) {
+  closeNav();
+  // Hide landing, hide all apps
+  document.getElementById('role-screen').style.display = 'none';
+  document.querySelectorAll('.app-shell').forEach(function(el){ el.classList.remove('active'); });
+  // Hide all landing pages first
+  document.querySelectorAll('.lp-screen').forEach(function(el){ el.style.display = 'none'; });
+  var target = document.getElementById('lp-' + page);
+  if (target) {
+    target.style.display = 'flex';
+    if (page === 'contacto') initChatbot();
+  }
+}
+
+function closeLandingPage() {
+  document.querySelectorAll('.lp-screen').forEach(function(el){ el.style.display = 'none'; });
+  document.getElementById('role-screen').style.display = 'flex';
+}
+
+// Close with Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeNav();
+});
+
+
+// ══════════════════════════════════════════
+//  AI CHATBOT — Contacto
+// ══════════════════════════════════════════
+var chatReady = false;
+
+function initChatbot() {
+  if (chatReady) return;
+  chatReady = true;
+  var msgs = document.getElementById('chat-messages');
+  if (!msgs) return;
+  msgs.innerHTML = '';
+  addBotMsg('Hola! Soy el asistente de TRAZA. Puedo resolver dudas sobre servicios, precios, cobertura o la plataforma. En que puedo ayudarte?');
+  var input = document.getElementById('chat-input');
+  if (input) {
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+    });
+  }
+}
+
+function addBotMsg(text) {
+  var msgs = document.getElementById('chat-messages');
+  if (!msgs) return;
+  var div = document.createElement('div');
+  div.className = 'chat-msg bot';
+  div.innerHTML = '<div class="chat-avatar">TZ</div><div class="chat-bubble">' + text + '</div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addUserMsg(text) {
+  var msgs = document.getElementById('chat-messages');
+  if (!msgs) return;
+  var div = document.createElement('div');
+  div.className = 'chat-msg user';
+  div.innerHTML = '<div class="chat-avatar">u</div><div class="chat-bubble">' + escapeHtml(text) + '</div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function showTyping() {
+  var msgs = document.getElementById('chat-messages');
+  if (!msgs) return;
+  var div = document.createElement('div');
+  div.className = 'chat-msg bot';
+  div.id = 'chat-typing-indicator';
+  div.innerHTML = '<div class="chat-avatar">TZ</div><div class="chat-bubble"><div class="chat-typing"><span></span><span></span><span></span></div></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() {
+  var el = document.getElementById('chat-typing-indicator');
+  if (el) el.remove();
+}
+
+async function sendChat() {
+  var input = document.getElementById('chat-input');
+  if (!input) return;
+  var text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.disabled = true;
+  addUserMsg(text);
+  showTyping();
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        system: 'Eres el asistente virtual de TRAZA Logistica Inteligente, empresa de entregas en Monterrey Mexico. Responde siempre en espanol de manera concisa y amable. Info clave: Servicios: Express $149 menos de 2hrs, Same-Day $99 mismo dia, Programado $199 agenda anticipada. Cobertura: ZMM completa. GPS satelital en tiempo real actualizacion cada 15s. Flota 60+ unidades. Contacto: trazalogisticamx@gmail.com | 811 555 0619 | Lun-Sab 7am-10pm. Respuestas de maximo 3-4 oraciones.',
+        messages: [{ role: 'user', content: text }]
+      })
+    });
+    removeTyping();
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var data = await res.json();
+    var reply = (data.content && data.content[0] && data.content[0].text)
+      ? data.content[0].text
+      : 'No pude procesar tu mensaje. Contactanos en trazalogisticamx@gmail.com';
+    addBotMsg(reply);
+  } catch(err) {
+    removeTyping();
+    addBotMsg('Error de conexion. Contactanos en <strong style="color:#00C8FF">trazalogisticamx@gmail.com</strong> o al <strong style="color:#00C8FF">811 555 0619</strong>');
+  }
+  input.disabled = false;
+  input.focus();
+}
+
 </script>
+<!-- ══════════════════════════════════════
+     LANDING PAGE: QUIÉNES SOMOS
+══════════════════════════════════════ -->
+<div class="lp-screen" id="lp-nosotros">
+  <div class="lp-topbar">
+    <div class="lp-back" onclick="closeLandingPage()">←</div>
+    <div class="lp-topbar-title">Quiénes Somos</div>
+    <span class="lp-topbar-sub">TRAZA · MTY</span>
+  </div>
+  <div class="lp-body">
+    <div class="lp-hero">
+      <div class="lp-eyebrow">Monterrey, NL · Fundada 2024</div>
+      <h1 class="lp-h1">Logística que <span>mueve</span><br>a Monterrey</h1>
+      <p class="lp-lead">TRAZA nació para resolver un problema real: la entrega de última milla en el área metropolitana de Monterrey es lenta, opaca y cara. Lo cambiamos con tecnología.</p>
+    </div>
+
+    <div class="lp-stats">
+      <div class="lp-stat"><div class="lp-stat-val">60+</div><div class="lp-stat-label">Unidades activas</div></div>
+      <div class="lp-stat"><div class="lp-stat-val">15s</div><div class="lp-stat-label">Actualización GPS</div></div>
+      <div class="lp-stat"><div class="lp-stat-val">ZMM</div><div class="lp-stat-label">Cobertura total</div></div>
+    </div>
+
+    <div class="lp-section">
+      <div class="lp-section-title">Nuestra misión</div>
+      <div class="lp-card">
+        <div class="lp-card-title">Tecnología de primer nivel, hecha en Monterrey</div>
+        <div class="lp-card-body">Combinamos GPS satelital en tiempo real, inteligencia artificial para ruteo y una plataforma operativa que conecta conductores, despachadores y clientes en un solo sistema. La misma tecnología que usan las grandes empresas de Silicon Valley, adaptada para el ecosistema logístico de Monterrey.</div>
+      </div>
+    </div>
+
+    <div class="lp-section">
+      <div class="lp-section-title">Valores</div>
+      <div class="lp-card">
+        <div class="lp-card-title">Transparencia total</div>
+        <div class="lp-card-body">El cliente sabe exactamente dónde está su paquete en todo momento. El conductor tiene las herramientas para ser eficiente. El negocio tiene datos reales para tomar decisiones.</div>
+        <span class="lp-card-accent">GPS en vivo 24/7</span>
+      </div>
+      <div class="lp-card">
+        <div class="lp-card-title">Rapidez sin sacrificar cuidado</div>
+        <div class="lp-card-body">Nuestros conductores son verificados y entrenados. Cada entrega importa. Express no significa descuidado — significa eficiente.</div>
+        <span class="lp-card-accent">Conductores verificados</span>
+      </div>
+      <div class="lp-card">
+        <div class="lp-card-title">Tecnología como ventaja</div>
+        <div class="lp-card-body">Ruteo inteligente por IA reduce tiempos de entrega hasta 35%. WhatsApp integrado para notificaciones. Dashboard en tiempo real para operadores y clientes.</div>
+        <span class="lp-card-accent">IA routing activo</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     LANDING PAGE: SERVICIOS
+══════════════════════════════════════ -->
+<div class="lp-screen" id="lp-servicios">
+  <div class="lp-topbar">
+    <div class="lp-back" onclick="closeLandingPage()">←</div>
+    <div class="lp-topbar-title">Servicios</div>
+    <span class="lp-topbar-sub">Precios · Cobertura</span>
+  </div>
+  <div class="lp-body">
+    <div class="lp-hero">
+      <div class="lp-eyebrow">3 modalidades de entrega</div>
+      <h1 class="lp-h1">El servicio que<br>tu negocio <span>necesita</span></h1>
+      <p class="lp-lead">Desde entregas urgentes hasta logística programada. Toda la Zona Metropolitana de Monterrey cubierta.</p>
+    </div>
+
+    <div class="lp-section">
+      <div class="lp-section-title">Planes disponibles</div>
+      <div class="lp-price-grid">
+        <div class="lp-price-card">
+          <div class="plan-name">Express</div>
+          <div class="price"><sup>$</sup>149</div>
+          <div class="plan-feat">Entrega en menos de 2 horas<br>Rastreo en tiempo real<br>Notificación WhatsApp<br>Confirmación con foto</div>
+        </div>
+        <div class="lp-price-card">
+          <div class="plan-name">Same-Day</div>
+          <div class="price"><sup>$</sup>99</div>
+          <div class="plan-feat">Entrega mismo día<br>Ventana horaria flexible<br>Rastreo en tiempo real<br>Notificación WhatsApp</div>
+        </div>
+        <div class="lp-price-card">
+          <div class="plan-name">Programado</div>
+          <div class="price"><sup>$</sup>199</div>
+          <div class="plan-feat">Agenda con anticipación<br>Horario garantizado<br>Prioridad en asignación<br>Reporte de entrega</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lp-section">
+      <div class="lp-section-title">Incluido en todos los servicios</div>
+      <ul class="lp-feature-list">
+        <li><span class="lp-feat-icon">◈</span>GPS satelital en tiempo real — el cliente ve al conductor moverse en el mapa</li>
+        <li><span class="lp-feat-icon">◈</span>Conductores verificados con antecedentes revisados</li>
+        <li><span class="lp-feat-icon">◈</span>Notificaciones automáticas vía WhatsApp en cada etapa</li>
+        <li><span class="lp-feat-icon">◈</span>Confirmación fotográfica de entrega</li>
+        <li><span class="lp-feat-icon">◈</span>Soporte directo por WhatsApp durante el proceso</li>
+        <li><span class="lp-feat-icon">◈</span>Historial completo de entregas en dashboard</li>
+      </ul>
+    </div>
+
+    <div class="lp-section">
+      <div class="lp-section-title">Cobertura</div>
+      <div class="lp-card">
+        <div class="lp-card-title">Zona Metropolitana de Monterrey</div>
+        <div class="lp-card-body">Monterrey · San Pedro Garza García · San Nicolás · Guadalupe · Apodaca · Escobedo · Santa Catarina · Juárez · García</div>
+        <span class="lp-card-accent">Expansión Q2 2025</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     LANDING PAGE: TECNOLOGÍA
+══════════════════════════════════════ -->
+<div class="lp-screen" id="lp-tecnologia">
+  <div class="lp-topbar">
+    <div class="lp-back" onclick="closeLandingPage()">←</div>
+    <div class="lp-topbar-title">Tecnología</div>
+    <span class="lp-topbar-sub">Stack · Infraestructura</span>
+  </div>
+  <div class="lp-body">
+    <div class="lp-hero">
+      <div class="lp-eyebrow">Plataforma propietaria</div>
+      <h1 class="lp-h1">Infraestructura<br>de <span>nivel enterprise</span></h1>
+      <p class="lp-lead">No usamos apps de terceros. TRAZA construyó su propia plataforma tecnológica desde cero para tener control total sobre la operación.</p>
+    </div>
+
+    <div class="lp-stats">
+      <div class="lp-stat"><div class="lp-stat-val">15s</div><div class="lp-stat-label">Refresh GPS</div></div>
+      <div class="lp-stat"><div class="lp-stat-val">99%</div><div class="lp-stat-label">Uptime</div></div>
+      <div class="lp-stat"><div class="lp-stat-val">35%</div><div class="lp-stat-label">Menos tiempo IA</div></div>
+    </div>
+
+    <div class="lp-section">
+      <div class="lp-section-title">Componentes del sistema</div>
+      <ul class="lp-feature-list">
+        <li><span class="lp-feat-icon">01</span><div><strong style="color:rgba(255,252,245,0.8)">GPS Satelital en Tiempo Real</strong><br>Integración directa con GlobalTrack. Posición de cada unidad actualizada cada 15 segundos. Velocidad, dirección y estado de la unidad visibles en mapa satelital.</div></li>
+        <li><span class="lp-feat-icon">02</span><div><strong style="color:rgba(255,252,245,0.8)">Ruteo Inteligente por IA</strong><br>Algoritmo propio que calcula la ruta óptima en tiempo real considerando tráfico, distancia y disponibilidad de conductores. Reduce tiempos hasta 35%.</div></li>
+        <li><span class="lp-feat-icon">03</span><div><strong style="color:rgba(255,252,245,0.8)">WhatsApp Business API</strong><br>Notificaciones automáticas al cliente en cada etapa: confirmación, en camino, entregado. Sin apps adicionales — directo al teléfono.</div></li>
+        <li><span class="lp-feat-icon">04</span><div><strong style="color:rgba(255,252,245,0.8)">Dashboard de Despacho</strong><br>Dispatcher ve toda la flota en tiempo real. Auto-asignación de pedidos al conductor más cercano. Cola de pedidos pendientes con prioridad.</div></li>
+        <li><span class="lp-feat-icon">05</span><div><strong style="color:rgba(255,252,245,0.8)">App de Conductor</strong><br>Interfaz simple para el chofer: recibir asignación, navegar, confirmar entrega con foto. Sin fricción, sin complicaciones.</div></li>
+        <li><span class="lp-feat-icon">06</span><div><strong style="color:rgba(255,252,245,0.8)">Infraestructura Cloud</strong><br>Desplegado en Railway con Node.js + Express. Alta disponibilidad, escalable automáticamente según demanda.</div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     LANDING PAGE: CONTACTO + CHATBOT AI
+══════════════════════════════════════ -->
+<div class="lp-screen" id="lp-contacto">
+  <div class="lp-topbar">
+    <div class="lp-back" onclick="closeLandingPage()">←</div>
+    <div class="lp-topbar-title">Contacto</div>
+    <span class="lp-topbar-sub">Soporte · Ventas</span>
+  </div>
+  <div class="lp-body">
+    <div class="lp-hero" style="padding-bottom:24px;">
+      <div class="lp-eyebrow">Estamos aquí para ayudarte</div>
+      <h1 class="lp-h1">Habla con<br><span>TRAZA</span></h1>
+    </div>
+
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div class="contact-card-label">Email</div>
+        <div class="contact-card-val"><a href="mailto:trazalogisticamx@gmail.com">trazalogisticamx<br>@gmail.com</a></div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-card-label">Teléfono</div>
+        <div class="contact-card-val"><a href="tel:8115550619">811 555 0619</a></div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-card-label">Horario</div>
+        <div class="contact-card-val" style="font-size:12px;">Lun – Sáb<br>7am – 10pm</div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-card-label">Ubicación</div>
+        <div class="contact-card-val" style="font-size:12px;">Monterrey<br>Nuevo León, MX</div>
+      </div>
+    </div>
+
+    <div class="lp-section-title">Asistente TRAZA — IA</div>
+    <div id="chatbot-wrap">
+      <div id="chat-messages"></div>
+      <div id="chat-input-row">
+        <input id="chat-input" type="text" placeholder="Escribe tu pregunta..." autocomplete="off" />
+        <div id="chat-send" onclick="sendChat()">→</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 </body>
 </html>
