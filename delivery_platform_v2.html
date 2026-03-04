@@ -57,240 +57,117 @@ body {
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* ═══════════════════════════════════
-   TRAZA LANDING — Split layout
-   Left: logo + tagline + 3 buttons
-   Right: full-height live map
+   TRAZA LANDING — Futuristic minimal
 ═══════════════════════════════════ */
 #role-screen {
   height: 100vh;
   display: flex;
-  flex-direction: row;
-  background: #03030A;
-  position: relative;
-  overflow: hidden;
-}
-
-#landing-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ── Left panel ── */
-.landing-left {
-  position: relative;
-  z-index: 2;
-  width: 260px;
-  min-width: 220px;
-  flex-shrink: 0;
-  display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 40px 28px 40px 32px;
-  border-right: 1px solid rgba(0,200,255,0.08);
-  background: rgba(3,3,10,0.7);
-  backdrop-filter: blur(20px);
-}
-
-/* ── Logo ── */
-.traza-logo {
-  font-family: 'Syne', var(--font-head), sans-serif;
-  font-weight: 800;
-  font-size: 48px;
-  letter-spacing: .1em;
-  color: #EDEDF5;
-  line-height: 1;
-  margin-bottom: 8px;
-}
-.traza-logo .hi { color: #00C8FF; }
-
-.traza-tagline {
-  font-family: 'JetBrains Mono', var(--font-mono), monospace;
-  font-size: 8.5px;
-  letter-spacing: .2em;
-  color: #6E6E88;
-  text-transform: uppercase;
-  margin-bottom: 48px;
-  line-height: 1.6;
-}
-
-/* ── Role buttons (vertical stack) ── */
-.role-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-}
-
-.role-card {
-  width: 100%;
-  background: rgba(14,14,26,0.6);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 12px;
-  padding: 14px 18px;
-  display: flex;
   align-items: center;
-  gap: 14px;
-  cursor: pointer;
-  transition: all .22s cubic-bezier(.34,1.56,.64,1);
-  backdrop-filter: blur(12px);
+  justify-content: center;
+  background: #00050F;
   position: relative;
   overflow: hidden;
-  text-align: left;
 }
-.role-card::before {
-  content: '';
-  position: absolute;
-  left: -20px; top: 50%;
-  transform: translateY(-50%);
-  width: 60px; height: 60px;
-  border-radius: 50%;
-  opacity: 0;
-  transition: opacity .3s;
+#landing-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
 }
-.role-card.rc-chofer::before   { background: radial-gradient(circle, rgba(0,200,255,.2), transparent 70%); }
-.role-card.rc-dispatch::before { background: radial-gradient(circle, rgba(180,255,71,.18), transparent 70%); }
-.role-card.rc-cliente::before  { background: radial-gradient(circle, rgba(255,107,45,.18), transparent 70%); }
-
-.role-card:hover {
-  border-color: rgba(0,200,255,0.28);
-  background: rgba(0,200,255,0.05);
-  transform: translateX(4px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-}
-.role-card:hover::before { opacity: 1; }
-.role-card:active { transform: scale(.97); }
-
-.rc-icon {
-  font-size: 24px;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 1;
-}
-.rc-text { position: relative; z-index: 1; }
-.rc-title {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 13px;
-  letter-spacing: .08em;
-  color: #EDEDF5;
-  text-transform: uppercase;
-  margin-bottom: 2px;
-}
-.rc-desc {
-  font-size: 10px;
-  color: #6E6E88;
-  line-height: 1.4;
-  font-family: 'Instrument Sans', sans-serif;
-}
-
-/* Bottom version tag */
-.landing-ver {
-  margin-top: auto;
-  padding-top: 32px;
+/* City label top */
+.traza-city {
+  position: relative; z-index: 2;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  letter-spacing: .12em;
-  color: rgba(110,110,136,0.4);
+  font-size: clamp(9px, 2vw, 12px);
+  letter-spacing: .45em;
+  color: #00C8FF;
   text-transform: uppercase;
+  margin-bottom: 14px;
+  opacity: .85;
+  animation: land-in .6s ease .05s both;
 }
-
-/* ── Right panel: full map ── */
-.landing-right {
-  position: relative;
-  flex: 1;
-  z-index: 1;
-  overflow: hidden;
+/* Logo canvas wrapper */
+.traza-logo-wrap {
+  position: relative; z-index: 2;
+  margin-bottom: 10px;
+  animation: logo-float 6s ease-in-out infinite;
 }
-
-#landing-map {
-  width: 100%;
-  height: 100%;
-  display: block;
+@keyframes logo-float {
+  0%,100% { transform: translateY(0px); }
+  50%      { transform: translateY(-6px); }
 }
-
-.traza-map-label {
-  position: absolute;
-  bottom: 16px; left: 16px;
+#logo-canvas { display: block; }
+.traza-tagline {
+  position: relative; z-index: 2;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  letter-spacing: .14em;
+  font-size: clamp(8px, 1.8vw, 10px);
+  letter-spacing: .3em;
   color: rgba(110,110,136,0.7);
   text-transform: uppercase;
-  background: rgba(3,3,10,0.6);
-  padding: 4px 8px;
-  border-radius: 4px;
-  backdrop-filter: blur(8px);
+  margin-bottom: 56px;
+  text-align: center;
+  animation: land-in .6s ease .35s both;
 }
-.traza-map-dot {
+/* Menu row — always horizontal, pinned near bottom */
+.role-cards {
   position: absolute;
-  top: 16px; right: 16px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  letter-spacing: .1em;
-  color: #00C8FF;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: row !important;
+  gap: 1px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  overflow: hidden;
+  animation: land-in .6s ease .5s both;
+  white-space: nowrap;
+}
+.role-card {
+  background: transparent;
+  padding: 13px 28px;
   display: flex;
   align-items: center;
-  gap: 5px;
-  background: rgba(3,3,10,0.6);
-  padding: 4px 10px;
-  border-radius: 20px;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(0,200,255,0.15);
+  gap: 7px;
+  cursor: pointer;
+  transition: background .22s ease, transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s ease, border-color .22s ease;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  position: relative;
 }
-.traza-map-dot::before {
-  content: '';
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: #00C8FF;
-  animation: blink-dot 1.2s ease infinite;
+.role-card:last-child { border-right: none; }
+.role-card:hover {
+  background: rgba(0,200,255,0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,200,255,0.15), 0 4px 12px rgba(0,0,0,0.5);
+  border-color: rgba(0,200,255,0.3);
 }
-@keyframes blink-dot { 0%,100%{opacity:1}50%{opacity:.2} }
-
-/* vehicle count overlay */
-.map-vehicle-count {
-  position: absolute;
-  bottom: 16px; right: 16px;
+.role-card:hover .rc-title { color: #00C8FF; }
+.role-card:active { transform: translateY(-1px); background: rgba(0,200,255,0.13); }
+.rc-icon { font-size: 14px; opacity: .9; }
+.rc-title {
   font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 28px;
-  color: rgba(0,200,255,0.18);
-  letter-spacing: .05em;
-  pointer-events: none;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: .1em;
+  color: rgba(237,237,245,0.85);
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color .18s;
 }
+/* hide old unused */
+.traza-stats,.traza-ticker,.landing-left,.landing-right,
+.traza-map-wrap,.landing-ver,.traza-logo { display:none!important; }
 
-/* ── Mobile: stack vertically ── */
-@media (max-width: 600px) {
-  #role-screen { flex-direction: column; }
-  .landing-left {
-    width: 100%;
-    min-width: unset;
-    padding: 32px 24px 20px;
-    border-right: none;
-    border-bottom: 1px solid rgba(0,200,255,0.08);
-  }
-  .traza-logo { font-size: 36px; }
-  .traza-tagline { margin-bottom: 24px; }
-  .role-cards { flex-direction: row; gap: 8px; }
-  .role-card { flex: 1; flex-direction: column; padding: 12px 8px; gap: 6px; text-align: center; }
-  .rc-desc { display: none; }
-  .landing-right { flex: 1; min-height: 200px; }
-  .landing-ver { display: none; }
+@media(max-width:480px){
+  .role-cards { bottom: 24px; }
+  .role-card { padding: 11px 16px; }
 }
-
 @keyframes land-in {
-  from { opacity:0; transform: translateX(-12px); }
-  to   { opacity:1; transform: none; }
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:none; }
 }
-.traza-logo    { animation: land-in .5s ease .1s both; }
-.traza-tagline { animation: land-in .5s ease .2s both; }
-.role-cards    { animation: land-in .5s ease .3s both; }
-
-/* hide old elements we no longer use */
-.traza-stats, .traza-ticker { display: none !important; }
-
 /* ════════════════════════════════════════
    SHARED LAYOUT SHELL
 ════════════════════════════════════════ */
@@ -824,6 +701,20 @@ input::placeholder { color: var(--muted); }
   .incoming-order { max-width: 400px; }
 }
 </style>
+<style>
+.mapa-pill {
+  background: rgba(5,10,25,0.85);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .12em;
+  color: rgba(237,237,245,0.7);
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+}
+</style>
 <!-- Leaflet for satellite map -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -869,47 +760,29 @@ input::placeholder { color: var(--muted); }
      TRAZA LANDING
 ══════════════════════════════════════ -->
 <div id="role-screen">
-  <!-- Particles -->
   <canvas id="landing-canvas"></canvas>
 
-  <!-- LEFT: logo + tagline + buttons -->
-  <div class="landing-left">
-    <div class="traza-logo">TRA<span class="hi">ZA</span></div>
-    <div class="traza-tagline">Logística Inteligente<br>Monterrey, NL</div>
+  <div class="traza-city">Monterrey</div>
 
-    <div class="role-cards">
-      <div class="role-card rc-chofer" onclick="enterApp('driver')">
-        <span class="rc-icon">🚗</span>
-        <div class="rc-text">
-          <div class="rc-title">Chofer</div>
-          <div class="rc-desc">Acepta órdenes en tiempo real</div>
-        </div>
-      </div>
-      <div class="role-card rc-dispatch" onclick="enterApp('admin')">
-        <span class="rc-icon">🗺️</span>
-        <div class="rc-text">
-          <div class="rc-title">Control</div>
-          <div class="rc-desc">Mapa de flota · asignación IA</div>
-        </div>
-      </div>
-      <div class="role-card rc-cliente" onclick="enterApp('customer')">
-        <span class="rc-icon">📦</span>
-        <div class="rc-text">
-          <div class="rc-title">Enviar</div>
-          <div class="rc-desc">Cotiza, paga y rastrea</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="landing-ver">TRAZA v1.0 · GPS Live · Mty</div>
+  <div class="traza-logo-wrap">
+    <canvas id="logo-canvas"></canvas>
   </div>
 
-  <!-- RIGHT: full map -->
-  <div class="landing-right">
-    <div id="satellite-map"></div>
-    <div class="traza-map-label">Monterrey · GPS en vivo</div>
-    <div class="traza-map-dot">Live</div>
-    <div class="map-vehicle-count" id="ls-units">—</div>
+  <div class="traza-tagline">Logística Inteligente</div>
+
+  <div class="role-cards">
+    <div class="role-card" onclick="enterApp('driver')">
+      <span class="rc-icon">🚗</span>
+      <span class="rc-title">Driver Hub</span>
+    </div>
+    <div class="role-card" onclick="enterApp('customer')">
+      <span class="rc-icon">📦</span>
+      <span class="rc-title">Delivery</span>
+    </div>
+    <div class="role-card" onclick="enterApp('mapa')">
+      <span class="rc-icon">🗺️</span>
+      <span class="rc-title">Mapa</span>
+    </div>
   </div>
 </div>
 
@@ -1446,322 +1319,309 @@ function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function orderId(){ return 'ORD-'+String(orderCounter++).padStart(5,'0'); }
 
 /* ══════════════════════════════════════════
-   TRAZA LANDING — PARTICLES + MAP + STATS
+   TRAZA LANDING — FUTURISTIC
 ══════════════════════════════════════════ */
 
-// ── Particle network ─────────────────────
+// ── Background canvas: stars + shooting stars ─────────
 let landingAnimFrame;
-const PARTICLES = [];
-const N_PARTICLES = 55;
+const STARS = [];
+const SHOOTING_STARS = [];
+let lastShoot = 0;
 
-function initLandingCanvas() {
+function initBgCanvas() {
   const c = document.getElementById('landing-canvas');
   if (!c) return;
   c.width  = window.innerWidth;
   c.height = window.innerHeight;
-
-  PARTICLES.length = 0;
-  for (let i = 0; i < N_PARTICLES; i++) {
-    PARTICLES.push({
-      x:  Math.random() * c.width,
-      y:  Math.random() * c.height,
-      vx: (Math.random() - .5) * .5,
-      vy: (Math.random() - .5) * .5,
-      r:  Math.random() * 1.5 + .5,
+  STARS.length = 0;
+  for (let i = 0; i < 160; i++) {
+    STARS.push({
+      x: Math.random() * c.width,
+      y: Math.random() * c.height,
+      r: Math.random() * 1.1 + 0.2,
+      o: Math.random() * 0.5 + 0.1,
+      twinkle: Math.random() * Math.PI * 2,
     });
   }
   cancelAnimationFrame(landingAnimFrame);
-  drawLanding(c);
+  drawBg(c);
 }
 
-function drawLanding(c) {
+function spawnShootingStar(c) {
+  const angle = Math.PI / 6 + Math.random() * Math.PI / 8;
+  const startX = Math.random() * c.width * 0.7;
+  const startY = Math.random() * c.height * 0.4;
+  SHOOTING_STARS.push({
+    x: startX, y: startY,
+    vx: Math.cos(angle) * 18,
+    vy: Math.sin(angle) * 10,
+    len: 90 + Math.random() * 80,
+    life: 1.0,
+    decay: 0.022 + Math.random() * 0.01,
+  });
+}
+
+function drawBg(c) {
   const ctx = c.getContext('2d');
   const W = c.width, H = c.height;
+  const now = Date.now();
 
   ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#00050F';
+  ctx.fillRect(0, 0, W, H);
 
-  // Move + draw particles
-  PARTICLES.forEach(p => {
-    p.x = (p.x + p.vx + W) % W;
-    p.y = (p.y + p.vy + H) % H;
+  // Radial glow
+  const g = ctx.createRadialGradient(W*.5, H*.46, 0, W*.5, H*.46, W*.45);
+  g.addColorStop(0, 'rgba(0,60,180,0.18)');
+  g.addColorStop(1, 'transparent');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+
+  // Twinkling stars
+  const t = now * 0.001;
+  STARS.forEach(s => {
+    const o = s.o * (0.6 + 0.4 * Math.sin(t * 0.9 + s.twinkle));
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(0,200,255,0.25)';
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(200,230,255,${o})`;
     ctx.fill();
   });
 
-  // Connection lines
-  for (let i = 0; i < PARTICLES.length; i++) {
-    for (let j = i + 1; j < PARTICLES.length; j++) {
-      const dx = PARTICLES[i].x - PARTICLES[j].x;
-      const dy = PARTICLES[i].y - PARTICLES[j].y;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist < 110) {
-        ctx.beginPath();
-        ctx.moveTo(PARTICLES[i].x, PARTICLES[i].y);
-        ctx.lineTo(PARTICLES[j].x, PARTICLES[j].y);
-        ctx.strokeStyle = `rgba(0,200,255,${0.06 * (1 - dist/110)})`;
-        ctx.lineWidth = .6;
-        ctx.stroke();
+  // Spawn shooting star every 7s
+  if (now - lastShoot > 7000) {
+    spawnShootingStar(c);
+    lastShoot = now;
+  }
+
+  // Draw & update shooting stars
+  for (let i = SHOOTING_STARS.length - 1; i >= 0; i--) {
+    const s = SHOOTING_STARS[i];
+    const tailX = s.x - Math.cos(Math.atan2(s.vy, s.vx)) * s.len * s.life;
+    const tailY = s.y - Math.sin(Math.atan2(s.vy, s.vx)) * s.len * s.life;
+    const grad = ctx.createLinearGradient(tailX, tailY, s.x, s.y);
+    grad.addColorStop(0, 'rgba(0,200,255,0)');
+    grad.addColorStop(0.6, `rgba(0,200,255,${s.life * 0.4})`);
+    grad.addColorStop(1, `rgba(255,255,255,${s.life * 0.9})`);
+    ctx.beginPath();
+    ctx.moveTo(tailX, tailY);
+    ctx.lineTo(s.x, s.y);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    // Bright head
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, 1.5, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${s.life})`;
+    ctx.fill();
+    s.x += s.vx; s.y += s.vy; s.life -= s.decay;
+    if (s.life <= 0) SHOOTING_STARS.splice(i, 1);
+  }
+
+  landingAnimFrame = requestAnimationFrame(() => drawBg(c));
+}
+
+// ── Logo canvas: TRAZA with inner dots + glow ────────────
+let logoDots = [];
+const LOGO_TEXT  = 'TRAZA';
+const LOGO_COLOR = '#EDEDF5';
+const LOGO_HI    = '#00C8FF'; // middle A (index 2)
+
+function buildLogoDots(canvas) {
+  const ctx = canvas.getContext('2d');
+  const fs  = Math.min(window.innerWidth * 0.18, 130);
+  canvas.width  = Math.min(window.innerWidth * 0.85, 650);
+  canvas.height = fs * 1.35;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Render text off-screen to sample pixels
+  const off = document.createElement('canvas');
+  off.width  = canvas.width;
+  off.height = canvas.height;
+  const octx = off.getContext('2d');
+  octx.fillStyle = '#fff';
+  octx.font = `800 ${fs}px Syne, Arial`;
+  octx.textAlign = 'center';
+  octx.textBaseline = 'middle';
+  octx.letterSpacing = Math.round(fs * 0.09) + 'px';
+  octx.fillText(LOGO_TEXT, off.width / 2, off.height / 2);
+
+  const imgData = octx.getImageData(0, 0, off.width, off.height).data;
+  const W = off.width, H = off.height;
+  const gap = 10; // dot grid spacing — more spaced out
+
+  logoDots = [];
+  for (let y = 0; y < H; y += gap) {
+    for (let x = 0; x < W; x += gap) {
+      const idx = (y * W + x) * 4;
+      if (imgData[idx + 3] > 80) {
+        logoDots.push({
+          ox: x, oy: y,
+          x: x + (Math.random() - .5) * 40,
+          y: y + (Math.random() - .5) * 40,
+          vx: 0, vy: 0,
+          phase: Math.random() * Math.PI * 2,
+        });
       }
     }
   }
-  landingAnimFrame = requestAnimationFrame(() => drawLanding(c));
 }
 
-// ── Mini Monterrey map ────────────────────
-// Landing map couriers — updated with real unit numbers when GPS data arrives
-const LANDING_COURIERS = Array.from({length: 6}, (_, i) => ({
-  x: .1 + Math.random() * .8, y: .1 + Math.random() * .8,
-  tx: .1 + Math.random() * .8, ty: .1 + Math.random() * .8,
-  color: '#00C8FF',
-  num: '···',   // placeholder, filled by real GPS data
-  moving: false,
-}));
+function drawLogoDots(canvas) {
+  const ctx = canvas.getContext('2d');
+  const W   = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
 
-// Sync landing couriers with real GPS vehicles
-function syncLandingCouriers(vehicles) {
-  if (!vehicles || !vehicles.length) return;
-  vehicles.slice(0, 12).forEach((v, i) => {
-    if (!LANDING_COURIERS[i]) {
-      LANDING_COURIERS.push({
-        x: .1 + Math.random() * .8, y: .1 + Math.random() * .8,
-        tx: .1 + Math.random() * .8, ty: .1 + Math.random() * .8,
-        color: '#00C8FF', num: '', moving: false,
-      });
-    }
-    const co = LANDING_COURIERS[i];
-    // Extract concession number from NombreUnidad (e.g. "02683-TRAMOSA" -> "2683")
-    const raw = v.name || v.eco || '';
-    const match = raw.match(/^0*(\d+)/);
-    co.num     = match ? match[1] : (v.eco || String(v.id || '').slice(-4));
-    co.moving  = (v.speed || 0) > 2;
-    co.color   = co.moving ? '#B4FF47' : '#00C8FF';
-    // If we have real lat/lng, map them to canvas coords (Monterrey bounding box)
-    if (v.lat && v.lng) {
-      const latMin=25.55, latMax=25.85, lngMin=-100.55, lngMax=-100.20;
-      co.tx = Math.min(.95, Math.max(.05, (v.lng - lngMin) / (lngMax - lngMin)));
-      co.ty = Math.min(.95, Math.max(.05, 1 - (v.lat - latMin) / (latMax - latMin)));
-    }
+  const t   = Date.now() * 0.001;
+  const fs  = Math.min(window.innerWidth * 0.18, 130);
+  const lsp = Math.round(fs * 0.09);
+
+  // Per-letter widths for mid-A detection
+  ctx.font          = `800 ${fs}px Syne, Arial`;
+  ctx.textAlign     = 'center';
+  ctx.textBaseline  = 'middle';
+  const totalW  = ctx.measureText(LOGO_TEXT).width;
+  const startX  = W/2 - totalW/2;
+  const letterW = totalW / LOGO_TEXT.length;
+  const midAL   = startX + letterW * 2;
+  const midAR   = startX + letterW * 3;
+
+  // ── 1. Crisp letter outlines ──────────────────────────
+  ctx.save();
+  ctx.textAlign    = 'left';
+  ctx.textBaseline = 'middle';
+  let cx = startX;
+  for (let i = 0; i < LOGO_TEXT.length; i++) {
+    const ch   = LOGO_TEXT[i];
+    const chW  = ctx.measureText(ch).width;
+    const isMid = i === 2;
+    ctx.strokeStyle  = isMid ? 'rgba(0,200,255,0.65)' : 'rgba(220,235,255,0.28)';
+    ctx.lineWidth    = 1.1;
+    ctx.shadowColor  = isMid ? 'rgba(0,200,255,0.5)' : 'transparent';
+    ctx.shadowBlur   = isMid ? 10 : 0;
+    ctx.strokeText(ch, cx, H/2);
+    cx += chW + lsp;
+  }
+  ctx.restore();
+
+  // ── 2. Sandy fill inside letters ─────────────────────
+  const offFill = document.createElement('canvas');
+  offFill.width = W; offFill.height = H;
+  const fctx = offFill.getContext('2d');
+  fctx.font         = `800 ${fs}px Syne, Arial`;
+  fctx.textAlign    = 'left';
+  fctx.textBaseline = 'middle';
+  fctx.fillStyle    = 'rgba(210,185,145,0.18)'; // sand tone, subtle
+  let fx = startX;
+  for (let i = 0; i < LOGO_TEXT.length; i++) {
+    const ch  = LOGO_TEXT[i];
+    const chW = fctx.measureText(ch).width;
+    fctx.fillText(ch, fx, H/2);
+    fx += chW + lsp;
+  }
+  ctx.drawImage(offFill, 0, 0);
+
+  // ── 3. Inner dots — clipped strictly inside letters ────
+  // Build clip path from filled text
+  ctx.save();
+  ctx.beginPath();
+  ctx.font          = `800 ${fs}px Syne, Arial`;
+  ctx.textBaseline  = 'middle';
+  ctx.textAlign     = 'left';
+  let clipX = startX;
+  for (let i = 0; i < LOGO_TEXT.length; i++) {
+    const ch  = LOGO_TEXT[i];
+    const chW = ctx.measureText(ch).width;
+    ctx.fillText(ch, clipX, H/2);
+    clipX += chW + lsp;
+  }
+  // Use compositing to keep dots inside letters only
+  // Draw dots to offscreen, then mask with filled text
+  const offDots = document.createElement('canvas');
+  offDots.width = W; offDots.height = H;
+  const dctx = offDots.getContext('2d');
+
+  logoDots.forEach(d => {
+    const wave = Math.sin(t * 0.8 + d.phase) * 0.3;
+    d.vx += (d.ox - d.x) * 0.15 + wave * 0.1;
+    d.vy += (d.oy - d.y) * 0.15 + wave * 0.08;
+    d.vx *= 0.78; d.vy *= 0.78;
+    d.x += d.vx; d.y += d.vy;
+
+    const isMidA = d.ox >= midAL && d.ox <= midAR;
+    const pulse  = 0.6 + 0.4 * Math.sin(t * 2 + d.phase);
+    const alpha  = isMidA ? (0.55 + 0.2 * pulse) : (0.22 + 0.12 * Math.sin(t*1.5 + d.phase));
+
+    dctx.shadowColor = isMidA ? '#00C8FF' : 'transparent';
+    dctx.shadowBlur  = isMidA ? 3 : 0;
+    dctx.fillStyle   = isMidA ? `rgba(0,200,255,${alpha})` : `rgba(200,220,255,${alpha})`;
+    dctx.beginPath();
+    dctx.arc(d.x, d.y, 1.0, 0, Math.PI*2);
+    dctx.fill();
   });
-  // Update vehicle count overlay
-  const el = document.getElementById('ls-units');
-  if (el) el.textContent = vehicles.length;
+  dctx.shadowBlur = 0;
+
+  // Mask: draw filled text as mask using destination-in
+  const offMask = document.createElement('canvas');
+  offMask.width = W; offMask.height = H;
+  const mctx = offMask.getContext('2d');
+  mctx.font         = `800 ${fs}px Syne, Arial`;
+  mctx.textAlign    = 'left';
+  mctx.textBaseline = 'middle';
+  mctx.fillStyle    = '#fff';
+  let mx = startX;
+  for (let i = 0; i < LOGO_TEXT.length; i++) {
+    const ch  = LOGO_TEXT[i];
+    const chW = mctx.measureText(ch).width;
+    mctx.fillText(ch, mx, H/2);
+    mx += chW + lsp;
+  }
+
+  // Apply mask to dots canvas
+  dctx.globalCompositeOperation = 'destination-in';
+  dctx.drawImage(offMask, 0, 0);
+  dctx.globalCompositeOperation = 'source-over';
+
+  // Draw masked dots onto main canvas
+  ctx.restore();
+  ctx.drawImage(offDots, 0, 0);
+  ctx.shadowBlur = 0;
 }
 
-function drawLandingMap() {
-  const c = document.getElementById('landing-map');
-  if (!c) return;
-  const parent = c.parentElement;
-  c.width  = parent ? parent.offsetWidth  : window.innerWidth  * 0.7;
-  c.height = parent ? parent.offsetHeight : window.innerHeight;
-  const ctx = c.getContext('2d');
-  const W = c.width, H = c.height;
-
-  // Background
-  ctx.fillStyle = '#07070F';
-  ctx.fillRect(0, 0, W, H);
-
-  // Glow
-  const g = ctx.createRadialGradient(W*.5,H*.5,0,W*.5,H*.5,W*.5);
-  g.addColorStop(0, 'rgba(0,200,255,0.04)');
-  g.addColorStop(1, 'transparent');
-  ctx.fillStyle = g;
-  ctx.fillRect(0,0,W,H);
-
-  // Street grid
-  const streets = [
-    [.05,.25,.95,.25],[.05,.5,.95,.5],[.05,.75,.95,.75],
-    [.2,.05,.2,.95],[.4,.05,.4,.95],[.6,.05,.6,.95],[.8,.05,.8,.95],
-    [.05,.4,.5,.05],[.5,.95,.95,.4],
-  ];
-  streets.forEach(s => {
-    ctx.beginPath();
-    ctx.moveTo(s[0]*W, s[1]*H);
-    ctx.lineTo(s[2]*W, s[3]*H);
-    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-  });
-
-  // Move couriers with lerp
-  const t = Date.now() * .001;
-  LANDING_COURIERS.forEach((co, i) => {
-    co.x += (co.tx - co.x) * .008;
-    co.y += (co.ty - co.y) * .008;
-    if (Math.abs(co.tx - co.x) < .01 && Math.abs(co.ty - co.y) < .01) {
-      co.tx = Math.random() * .9 + .05;
-      co.ty = Math.random() * .9 + .05;
-    }
-
-    const cx = co.x * W, cy = co.y * H;
-
-    // Pulse ring
-    const pr = 14 + Math.sin(t * 1.5 + i) * 2;
-    ctx.beginPath();
-    ctx.arc(cx, cy, pr, 0, Math.PI*2);
-    ctx.strokeStyle = co.color + '25';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // Taxi icon background circle
-    ctx.beginPath();
-    ctx.arc(cx, cy, 10, 0, Math.PI*2);
-    ctx.fillStyle = co.moving ? 'rgba(180,255,71,0.15)' : 'rgba(0,200,255,0.15)';
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(cx, cy, 10, 0, Math.PI*2);
-    ctx.strokeStyle = co.color;
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    // Taxi emoji
-    ctx.font = '11px serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('🚕', cx, cy);
-
-    // Concession number label below
-    const label = co.num || '···';
-    const labelW = label.length * 5.5 + 8;
-    ctx.fillStyle = 'rgba(3,3,10,0.8)';
-    ctx.beginPath();
-    ctx.roundRect(cx - labelW/2, cy + 13, labelW, 13, 3);
-    ctx.fill();
-    ctx.fillStyle = co.color;
-    ctx.font = 'bold 8px JetBrains Mono, monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(label, cx, cy + 19.5);
-  });
-
-  // Vignette
-  const v = ctx.createRadialGradient(W*.5,H*.5,H*.05,W*.5,H*.5,H*.8);
-  v.addColorStop(0,'transparent');
-  v.addColorStop(1,'rgba(3,3,10,.65)');
-  ctx.fillStyle = v;
-  ctx.fillRect(0,0,W,H);
-}
-
-// ── Live stats pulse ──────────────────────
-function pulseLandingStats() {
-  const units   = Math.floor(rand(22, 31));
-  const eta     = Math.floor(rand(6, 14));
-  const rate    = Math.floor(rand(95, 99));
-  const onRoute = Math.floor(rand(10, 22));
-
-  const u = document.getElementById('ls-units');
-  const e = document.getElementById('ls-eta');
-  const r = document.getElementById('ls-rate');
-  const o = document.getElementById('ls-orders');
-  if (u) u.textContent = units;
-  if (e) e.textContent = eta + ' min';
-  if (r) r.textContent = rate + '%';
-  if (o) o.textContent = onRoute;
-}
-
-// ── Map animation loop ────────────────────
-let mapLoopId;
-function startLandingMapLoop() {
-  cancelAnimationFrame(mapLoopId);
+let logoAnimId;
+function startLogoAnim() {
+  cancelAnimationFrame(logoAnimId);
   function loop() {
-    drawLandingMap();
-    mapLoopId = requestAnimationFrame(loop);
+    const c = document.getElementById('logo-canvas');
+    if (c) drawLogoDots(c);
+    logoAnimId = requestAnimationFrame(loop);
   }
   loop();
 }
 
-// ── Satellite map (Leaflet) ──────────────
-let satMap = null;
-let taxiMarkers = {}; // id -> L.marker
-
-function initSatelliteMap() {
-  if (satMap) return;
-  const el = document.getElementById('satellite-map');
-  if (!el) return;
-
-  // Center on Monterrey
-  satMap = L.map('satellite-map', {
-    center: [25.6866, -100.3161],
-    zoom: 13,
-    zoomControl: false,
-    attributionControl: false,
-  });
-
-  // ESRI satellite tiles — free, no API key
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 19,
-  }).addTo(satMap);
-
-  // Subtle dark overlay to match TRAZA theme
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 19,
-    opacity: 0.5,
-  }).addTo(satMap);
-}
-
-function updateSatMarkers(vehicles) {
-  if (!satMap || !vehicles || !vehicles.length) return;
-
-  const seen = new Set();
-  vehicles.forEach(v => {
-    if (!v.lat || !v.lng) return;
-    const id = String(v.id);
-    seen.add(id);
-
-    // Extract concession number
-    const raw = v.name || v.eco || '';
-    const match = raw.match(/^0*(\d+)/);
-    const num = match ? match[1] : (v.eco || id.slice(-4));
-    const moving = (v.speed || 0) > 2;
-    const cls = moving ? 'taxi-marker moving' : 'taxi-marker';
-
-    const iconHtml = `<div class="${cls}"><div class="taxi-icon">🚕</div><div class="taxi-num">${num}</div></div>`;
-    const icon = L.divIcon({ html: iconHtml, className: '', iconSize: [40, 40], iconAnchor: [20, 20] });
-
-    if (taxiMarkers[id]) {
-      taxiMarkers[id].setLatLng([v.lat, v.lng]);
-      taxiMarkers[id].setIcon(icon);
-    } else {
-      taxiMarkers[id] = L.marker([v.lat, v.lng], { icon }).addTo(satMap);
-      taxiMarkers[id].bindTooltip(`<b>${num}</b><br>${v.name || ''}<br>${v.speed || 0} km/h`, { className: 'traza-tooltip' });
-    }
-  });
-
-  // Remove markers for vehicles no longer in list
-  Object.keys(taxiMarkers).forEach(id => {
-    if (!seen.has(id)) {
-      satMap.removeLayer(taxiMarkers[id]);
-      delete taxiMarkers[id];
-    }
-  });
-
-  // Update count
-  const el = document.getElementById('ls-units');
-  if (el) el.textContent = vehicles.length;
-
-  // Auto-fit to fleet if we have positions
-  const pts = vehicles.filter(v => v.lat && v.lng).map(v => [v.lat, v.lng]);
-  if (pts.length > 1) {
-    satMap.fitBounds(pts, { padding: [40, 40], maxZoom: 15 });
-  } else if (pts.length === 1) {
-    satMap.setView(pts[0], 14);
-  }
-}
-
 // ── Init landing ──────────────────────────
 function initLanding() {
-  initLandingCanvas();
-  initSatelliteMap();
+  const lc = document.getElementById('landing-canvas');
+  if (lc) { lc.width = window.innerWidth; lc.height = window.innerHeight; }
+
+  const logo = document.getElementById('logo-canvas');
+  if (logo) {
+    buildLogoDots(logo);
+    startLogoAnim();
+  }
+
+  initBgCanvas();
+
   window.addEventListener('resize', () => {
-    const lc = document.getElementById('landing-canvas');
-    if (lc) { lc.width = window.innerWidth; lc.height = window.innerHeight; }
-    if (satMap) satMap.invalidateSize();
+    const lc2 = document.getElementById('landing-canvas');
+    if (lc2) { lc2.width = window.innerWidth; lc2.height = window.innerHeight; }
+    const logo2 = document.getElementById('logo-canvas');
+    if (logo2) buildLogoDots(logo2);
   });
 }
 
 // Start on load
 document.addEventListener('DOMContentLoaded', initLanding);
+
 
 // Initialize 60 drivers
 function initDrivers(){
@@ -1814,7 +1674,8 @@ function enterApp(role){
   cancelAnimationFrame(mapLoopId);
   document.getElementById('role-screen').style.display = 'none';
   document.querySelectorAll('.app-shell').forEach(el=>el.classList.remove('active'));
-  document.getElementById(role+'-app').classList.add('active');
+  const appEl = document.getElementById(role+'-app') || document.getElementById('customer-app');
+  appEl.classList.add('active');
   currentRole = role;
   if(role==='admin') startAdminSim();
   if(role==='driver'){
@@ -1824,6 +1685,8 @@ function enterApp(role){
     startDriverMap();
   }
   if(role==='customer') startTrackMap();
+  if(role==='food') startTrackMap(); // Food uses customer view for now
+  if(role==='mapa') { setTimeout(initMapaApp, 80); }
 }
 
 function goHome(){
@@ -2091,6 +1954,9 @@ async function fetchVehiclesFromBridge(){
 
     // Update satellite map markers with real GPS positions
     updateSatMarkers(data.vehicles);
+    // Update mapa fleet view
+    window._lastVehicles = data.vehicles;
+    updateMapaMarkers(data.vehicles);
   } catch(e){
     bridgeConnected = false;
     showBridgeBanner('offline');
@@ -2544,5 +2410,42 @@ window.addEventListener('resize', ()=>{
   if(tm) tm.width=tm.offsetWidth;
 });
 </script>
+
+<!-- ══════════════════════════════════════
+     MAPA APP — Satellite live fleet view
+══════════════════════════════════════ -->
+<div class="app-shell" id="mapa-app">
+  <div class="topbar">
+    <div class="tb-back" onclick="goHome()">←</div>
+    <div class="tb-title">Mapa de Flota</div>
+    <span class="tb-badge badge-admin" id="mapa-fleet-badge">— unidades</span>
+  </div>
+
+  <div style="position:relative;flex:1;overflow:hidden;">
+    <div id="mapa-satellite" style="width:100%;height:100%;"></div>
+
+    <!-- Info bar overlay -->
+    <div id="mapa-infobar" style="
+      position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
+      display:flex;gap:8px;z-index:500;pointer-events:none;">
+      <div class="mapa-pill" id="mapa-moving">— en movimiento</div>
+      <div class="mapa-pill" id="mapa-stopped">— detenidos</div>
+    </div>
+
+    <!-- Unit detail popup -->
+    <div id="mapa-popup" style="display:none;position:absolute;top:60px;right:12px;
+      z-index:600;background:rgba(5,10,25,0.95);border:1px solid rgba(0,200,255,0.2);
+      border-radius:10px;padding:14px 18px;min-width:180px;backdrop-filter:blur(12px);">
+      <div style="font-family:Syne,sans-serif;font-weight:800;font-size:15px;color:#EDEDF5;margin-bottom:4px;" id="pp-name">—</div>
+      <div style="font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:.12em;color:#6E6E88;text-transform:uppercase;margin-bottom:8px;" id="pp-plate">—</div>
+      <div style="display:flex;gap:12px;">
+        <div><div style="font-size:18px;font-weight:800;color:#00C8FF;font-family:Syne,sans-serif;" id="pp-speed">0</div><div style="font-size:8px;color:#6E6E88;font-family:JetBrains Mono,monospace;text-transform:uppercase;">km/h</div></div>
+        <div><div style="font-size:18px;font-weight:800;color:#B4FF47;font-family:Syne,sans-serif;" id="pp-status">—</div><div style="font-size:8px;color:#6E6E88;font-family:JetBrains Mono,monospace;text-transform:uppercase;">estado</div></div>
+      </div>
+      <div style="font-size:10px;color:#6E6E88;margin-top:8px;font-family:Instrument Sans,sans-serif;" id="pp-location">—</div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
