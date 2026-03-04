@@ -767,52 +767,55 @@ input::placeholder { color: var(--muted); }
 /* ── Dots menu button ─────────────────── */
 #dots-btn {
   position: absolute;
-  top: 24px;
-  left: 24px;
+  top: 22px;
+  left: 22px;
   z-index: 20;
   display: flex;
   flex-direction: column;
   gap: 4px;
   padding: 10px;
   cursor: pointer;
-  border-radius: 50%;
-  transition: background .2s;
+  border-radius: 8px;
+  border: 1px solid rgba(255,252,245,0.08);
+  background: rgba(255,252,245,0.03);
+  backdrop-filter: blur(10px);
+  transition: all .22s ease;
 }
-#dots-btn:hover { background: rgba(255,252,245,0.06); }
+#dots-btn:hover {
+  background: rgba(255,252,245,0.07);
+  border-color: rgba(0,200,255,0.25);
+}
 #dots-btn span {
   display: block;
-  width: 4px;
-  height: 4px;
+  width: 4px; height: 4px;
   border-radius: 50%;
-  background: rgba(255,252,245,0.55);
-  transition: background .2s, transform .2s;
+  background: rgba(255,252,245,0.45);
+  transition: background .2s;
 }
-#dots-btn:hover span { background: rgba(255,252,245,0.9); }
+#dots-btn:hover span { background: #00C8FF; }
 
-/* ── Slide-out nav panel ──────────────── */
+/* ── Nav overlay ────────────────────────── */
 #nav-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: 500;
 }
 #nav-overlay.open { display: block; }
 
 #nav-backdrop {
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background: rgba(0,0,0,0);
-  transition: background .35s ease;
+  transition: background .4s ease;
 }
-#nav-overlay.open #nav-backdrop { background: rgba(0,3,12,0.65); }
+#nav-overlay.open #nav-backdrop { background: rgba(0,2,10,0.7); backdrop-filter: blur(4px); }
 
 #nav-panel {
   position: absolute;
   top: 0; left: 0; bottom: 0;
-  width: 280px;
-  background: rgba(5,10,28,0.97);
-  border-right: 1px solid rgba(255,252,245,0.07);
-  backdrop-filter: blur(24px);
+  width: 300px;
+  background: #030810;
+  border-right: 1px solid rgba(0,200,255,0.1);
   transform: translateX(-100%);
   transition: transform .38s cubic-bezier(.25,.8,.25,1);
   display: flex;
@@ -821,531 +824,749 @@ input::placeholder { color: var(--muted); }
 }
 #nav-overlay.open #nav-panel { transform: translateX(0); }
 
-/* Top shimmer */
+/* Animated top accent line */
 #nav-panel::before {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0,200,255,0.3), transparent);
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, #00C8FF, #B4FF47, #00C8FF);
+  background-size: 200% 100%;
+  animation: nav-line-move 3s linear infinite;
 }
+@keyframes nav-line-move { to { background-position: 200% 0; } }
 
+/* ── Header ─────────────────────────────── */
 #nav-header {
-  padding: 36px 28px 24px;
+  padding: 28px 24px 20px;
   border-bottom: 1px solid rgba(255,252,245,0.05);
+  flex-shrink: 0;
+}
+#nav-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
 }
 #nav-logo {
   font-family: 'Syne', sans-serif;
   font-weight: 800;
-  font-size: 22px;
-  letter-spacing: .12em;
-  color: rgba(255,252,245,0.9);
+  font-size: 20px;
+  letter-spacing: .14em;
+  color: rgba(255,252,245,0.92);
 }
 #nav-logo span { color: #00C8FF; }
-#nav-tagline {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  letter-spacing: .28em;
-  color: rgba(255,252,245,0.25);
-  text-transform: uppercase;
-  margin-top: 4px;
-}
-
-#nav-links {
-  flex: 1;
-  padding: 20px 0;
-}
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 28px;
+#nav-close {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,252,245,0.1);
+  display: flex; align-items: center; justify-content: center;
   cursor: pointer;
-  position: relative;
-  transition: background .22s;
-  text-decoration: none;
+  color: rgba(255,252,245,0.35);
+  transition: all .2s;
+  flex-shrink: 0;
 }
-.nav-item::after {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0; width: 2px;
-  background: #00C8FF;
-  transform: scaleY(0);
-  transition: transform .25s ease;
-}
-.nav-item:hover { background: rgba(0,200,255,0.05); }
-.nav-item:hover::after { transform: scaleY(1); }
-.nav-icon {
-  font-size: 15px;
-  opacity: 0.55;
-  transition: opacity .2s;
-  width: 20px;
-  text-align: center;
-}
-.nav-item:hover .nav-icon { opacity: 1; }
-.nav-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.nav-label {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: .18em;
-  color: rgba(255,252,245,0.72);
-  text-transform: uppercase;
-  transition: color .22s;
-}
-.nav-desc {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  letter-spacing: .1em;
-  color: rgba(255,252,245,0.25);
-  text-transform: uppercase;
-  transition: color .22s;
-}
-.nav-item:hover .nav-label { color: rgba(255,252,245,0.95); }
-.nav-item:hover .nav-desc  { color: rgba(255,252,245,0.45); }
-
-.nav-sep {
-  height: 1px;
-  background: rgba(255,252,245,0.05);
-  margin: 8px 28px;
-}
-
-#nav-footer {
-  padding: 24px 28px;
-  border-top: 1px solid rgba(255,252,245,0.05);
-}
-#nav-contact-title {
+#nav-close:hover { border-color: rgba(255,252,245,0.3); color: rgba(255,252,245,0.8); }
+#nav-tagline {
   font-family: 'JetBrains Mono', monospace;
   font-size: 8px;
   letter-spacing: .22em;
   color: rgba(255,252,245,0.22);
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
-#nav-contact-phone {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 14px;
-  color: rgba(255,252,245,0.7);
-  letter-spacing: .04em;
-  margin-bottom: 4px;
+#nav-status-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
 }
-#nav-contact-email {
+.nav-status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #B4FF47;
+  box-shadow: 0 0 6px #B4FF47;
+  animation: pulse-dot 2s ease infinite;
+  flex-shrink: 0;
+}
+@keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
+.nav-status-txt {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  color: rgba(0,200,255,0.55);
-  letter-spacing: .06em;
+  font-size: 8px;
+  letter-spacing: .12em;
+  color: rgba(180,255,71,0.6);
+  text-transform: uppercase;
 }
 
-/* Close button */
-#nav-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
+/* ── Section labels ─────────────────────── */
+#nav-section-label, .nav-section-label-2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7px;
+  letter-spacing: .3em;
+  color: rgba(255,252,245,0.18);
+  text-transform: uppercase;
+  padding: 16px 24px 6px;
+  flex-shrink: 0;
+}
+
+/* ── Nav items ──────────────────────────── */
+#nav-links { flex-shrink: 0; }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 20px 11px 24px;
   cursor: pointer;
-  color: rgba(255,252,245,0.35);
-  font-size: 16px;
+  position: relative;
+  transition: background .2s;
+}
+.nav-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0; width: 2px;
+  background: #00C8FF;
+  transform: scaleY(0);
+  transition: transform .22s ease;
+  transform-origin: center;
+}
+.nav-item:hover { background: rgba(0,200,255,0.04); }
+.nav-item:hover::before { transform: scaleY(1); }
+.nav-item-icon {
+  width: 30px; height: 30px;
+  border-radius: 6px;
+  background: rgba(0,200,255,0.06);
+  border: 1px solid rgba(0,200,255,0.12);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
   transition: all .2s;
 }
-#nav-close:hover {
-  background: rgba(255,252,245,0.07);
-  color: rgba(255,252,245,0.8);
+.nav-item:hover .nav-item-icon {
+  background: rgba(0,200,255,0.12);
+  border-color: rgba(0,200,255,0.3);
+}
+.nav-text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.nav-label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: .1em;
+  color: rgba(255,252,245,0.7);
+  text-transform: uppercase;
+  transition: color .2s;
+  line-height: 1;
+}
+.nav-desc {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .08em;
+  color: rgba(255,252,245,0.22);
+  text-transform: uppercase;
+  transition: color .2s;
+  line-height: 1;
+}
+.nav-chevron {
+  color: rgba(255,252,245,0.15);
+  transition: all .2s;
+  flex-shrink: 0;
+}
+.nav-item:hover .nav-label  { color: rgba(255,252,245,0.95); }
+.nav-item:hover .nav-desc   { color: rgba(255,252,245,0.4); }
+.nav-item:hover .nav-chevron { color: rgba(0,200,255,0.6); transform: translateX(2px); }
+
+/* ── Platform grid ──────────────────────── */
+.nav-platform-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 8px 24px 0;
+  flex-shrink: 0;
+}
+.nav-platform-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 14px 8px;
+  background: rgba(180,255,71,0.03);
+  border: 1px solid rgba(180,255,71,0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all .22s;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: .12em;
+  color: rgba(180,255,71,0.5);
+  text-transform: uppercase;
+}
+.nav-platform-btn:hover {
+  background: rgba(180,255,71,0.08);
+  border-color: rgba(180,255,71,0.3);
+  color: rgba(180,255,71,0.9);
 }
 
-</style>
-<style>
+/* ── Footer ─────────────────────────────── */
+#nav-footer {
+  margin-top: auto;
+  padding: 18px 24px 28px;
+  border-top: 1px solid rgba(255,252,245,0.05);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+#nav-footer-brand {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7px;
+  letter-spacing: .22em;
+  color: rgba(255,252,245,0.16);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.lp-card-icon { margin-bottom: 12px; }
+#nav-footer-email, #nav-footer-phone {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  color: rgba(0,200,255,0.55);
+  text-decoration: none;
+  transition: color .2s;
+  letter-spacing: .04em;
+}
+#nav-footer-email:hover, #nav-footer-phone:hover { color: #00C8FF; }
 
 /* ══════════════════════════════════════
-   LANDING PAGES
+   LANDING PAGES — Editorial Design
 ══════════════════════════════════════ */
 .lp-screen {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 150;
   flex-direction: column;
   background: #00030C;
   overflow-y: auto;
-  animation: lp-in .4s ease both;
+  overflow-x: hidden;
 }
-@keyframes lp-in {
-  from { opacity:0; transform: translateX(30px); }
-  to   { opacity:1; transform: translateX(0); }
+.lp-screen.lp-visible {
+  display: flex;
+  animation: lp-slide-in .4s cubic-bezier(.25,.8,.25,1) both;
 }
+@keyframes lp-slide-in {
+  from { opacity:0; transform:translateX(24px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+
+/* Staggered children reveal */
+.lp-screen.lp-visible .lp-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: lp-reveal .5s ease both;
+}
+.lp-screen.lp-visible .lp-reveal:nth-child(1) { animation-delay:.08s; }
+.lp-screen.lp-visible .lp-reveal:nth-child(2) { animation-delay:.15s; }
+.lp-screen.lp-visible .lp-reveal:nth-child(3) { animation-delay:.22s; }
+.lp-screen.lp-visible .lp-reveal:nth-child(4) { animation-delay:.29s; }
+.lp-screen.lp-visible .lp-reveal:nth-child(5) { animation-delay:.36s; }
+@keyframes lp-reveal {
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* Topbar */
 .lp-topbar {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 20px 24px;
-  border-bottom: 1px solid rgba(255,252,245,0.06);
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(255,252,245,0.05);
   position: sticky; top: 0;
-  background: rgba(0,3,12,0.92);
-  backdrop-filter: blur(16px);
+  background: rgba(0,3,12,0.95);
+  backdrop-filter: blur(20px);
   z-index: 10;
   flex-shrink: 0;
 }
 .lp-back {
-  width: 36px; height: 36px;
+  width: 34px; height: 34px;
   border-radius: 50%;
   border: 1px solid rgba(255,252,245,0.1);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
-  color: rgba(255,252,245,0.55);
-  font-size: 16px;
+  color: rgba(255,252,245,0.4);
   transition: all .2s;
   flex-shrink: 0;
 }
 .lp-back:hover { border-color: rgba(0,200,255,0.4); color: #00C8FF; }
+.lp-back svg { width:14px; height:14px; }
 .lp-topbar-title {
   font-family: 'Syne', sans-serif;
   font-weight: 800;
-  font-size: 13px;
-  letter-spacing: .18em;
-  color: rgba(255,252,245,0.8);
+  font-size: 12px;
+  letter-spacing: .2em;
+  color: rgba(255,252,245,0.75);
   text-transform: uppercase;
 }
-.lp-topbar-sub {
+.lp-topbar-tag {
+  margin-left: auto;
   font-family: 'JetBrains Mono', monospace;
   font-size: 8px;
-  letter-spacing: .15em;
-  color: rgba(255,252,245,0.25);
+  letter-spacing: .14em;
+  color: rgba(0,200,255,0.45);
   text-transform: uppercase;
-  margin-left: auto;
+  background: rgba(0,200,255,0.06);
+  border: 1px solid rgba(0,200,255,0.15);
+  border-radius: 20px;
+  padding: 3px 10px;
 }
-.lp-body { padding: 0 24px 60px; flex: 1; max-width: 680px; margin: 0 auto; width: 100%; }
 
-/* Hero section */
+/* Body container */
+.lp-body {
+  flex: 1;
+  padding: 0;
+  max-width: 100%;
+}
+
+/* ── HERO ─────────────────────────────── */
 .lp-hero {
-  padding: 48px 0 36px;
+  position: relative;
+  padding: 44px 28px 36px;
   border-bottom: 1px solid rgba(255,252,245,0.05);
-  margin-bottom: 36px;
+  overflow: hidden;
+}
+/* Hero bg graphic */
+.lp-hero::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 280px; height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,200,255,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+.lp-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,200,255,0.2), transparent);
 }
 .lp-eyebrow {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  letter-spacing: .32em;
+  font-size: 8px;
+  letter-spacing: .35em;
   color: #00C8FF;
   text-transform: uppercase;
-  margin-bottom: 14px;
-  opacity: .75;
+  opacity: .7;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lp-eyebrow::before {
+  content: '';
+  display: block;
+  width: 20px; height: 1px;
+  background: #00C8FF;
+  opacity: .5;
 }
 .lp-h1 {
   font-family: 'Syne', sans-serif;
   font-weight: 800;
-  font-size: clamp(28px, 7vw, 48px);
-  line-height: 1.05;
-  color: rgba(255,252,245,0.92);
-  margin-bottom: 16px;
+  font-size: clamp(30px, 8vw, 52px);
+  line-height: 1.03;
+  color: rgba(255,252,245,0.93);
+  margin-bottom: 18px;
+  letter-spacing: -.01em;
 }
 .lp-h1 span { color: #00C8FF; }
 .lp-lead {
   font-family: 'Instrument Sans', sans-serif;
-  font-size: 15px;
-  line-height: 1.65;
-  color: rgba(255,252,245,0.45);
-  max-width: 520px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(255,252,245,0.4);
+  max-width: 480px;
 }
 
-/* Stat row */
+/* ── STATS ROW ───────────────────────── */
 .lp-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 36px;
+  border-bottom: 1px solid rgba(255,252,245,0.05);
 }
 .lp-stat {
-  background: rgba(255,252,245,0.03);
-  border: 1px solid rgba(255,252,245,0.07);
-  border-radius: 6px;
-  padding: 18px 16px;
+  padding: 24px 20px;
   text-align: center;
+  border-right: 1px solid rgba(255,252,245,0.05);
+  position: relative;
+  overflow: hidden;
+}
+.lp-stat:last-child { border-right: none; }
+.lp-stat::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 20%; right: 20%; height: 1px;
+  background: rgba(0,200,255,0.15);
 }
 .lp-stat-val {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 26px;
-  color: #00C8FF;
-  line-height: 1;
-  margin-bottom: 6px;
-}
-.lp-stat-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  letter-spacing: .14em;
-  color: rgba(255,252,245,0.3);
-  text-transform: uppercase;
-}
-
-/* Content blocks */
-.lp-section { margin-bottom: 32px; }
-.lp-section-title {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: .22em;
-  color: rgba(255,252,245,0.4);
-  text-transform: uppercase;
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255,252,245,0.06);
-}
-.lp-card {
-  background: rgba(255,252,245,0.03);
-  border: 1px solid rgba(255,252,245,0.07);
-  border-radius: 6px;
-  padding: 20px;
-  margin-bottom: 10px;
-  transition: border-color .2s;
-}
-.lp-card:hover { border-color: rgba(0,200,255,0.18); }
-.lp-card-title {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 13px;
-  color: rgba(255,252,245,0.85);
-  margin-bottom: 6px;
-}
-.lp-card-body {
-  font-family: 'Instrument Sans', sans-serif;
-  font-size: 13px;
-  line-height: 1.6;
-  color: rgba(255,252,245,0.42);
-}
-.lp-card-accent {
-  display: inline-block;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  letter-spacing: .1em;
-  color: #B4FF47;
-  background: rgba(180,255,71,0.08);
-  border: 1px solid rgba(180,255,71,0.2);
-  border-radius: 20px;
-  padding: 3px 10px;
-  margin-top: 8px;
-}
-
-/* Service price cards */
-.lp-price-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.lp-price-card {
-  background: rgba(255,252,245,0.03);
-  border: 1px solid rgba(255,252,245,0.08);
-  border-radius: 6px;
-  padding: 20px 16px;
-  transition: all .25s;
-  cursor: default;
-}
-.lp-price-card:hover {
-  border-color: rgba(0,200,255,0.25);
-  background: rgba(0,200,255,0.04);
-}
-.lp-price-card .price {
   font-family: 'Syne', sans-serif;
   font-weight: 800;
   font-size: 28px;
   color: rgba(255,252,245,0.9);
   line-height: 1;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  letter-spacing: -.02em;
 }
-.lp-price-card .price sup {
+.lp-stat-val span { color: #00C8FF; font-size: 0.6em; vertical-align: super; }
+.lp-stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7px;
+  letter-spacing: .18em;
+  color: rgba(255,252,245,0.25);
+  text-transform: uppercase;
+}
+
+/* ── CONTENT SECTIONS ────────────────── */
+.lp-content { padding: 0 28px 60px; }
+
+.lp-section { margin-bottom: 36px; padding-top: 28px; }
+.lp-section-hd {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.lp-section-hd-line {
+  flex: 1; height: 1px;
+  background: rgba(255,252,245,0.06);
+}
+.lp-section-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .26em;
+  color: rgba(255,252,245,0.28);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Cards */
+.lp-card {
+  background: rgba(255,252,245,0.025);
+  border: 1px solid rgba(255,252,245,0.07);
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 8px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .25s, background .25s;
+}
+.lp-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,200,255,0.15), transparent);
+  opacity: 0;
+  transition: opacity .25s;
+}
+.lp-card:hover { border-color: rgba(0,200,255,0.18); background: rgba(0,200,255,0.03); }
+.lp-card:hover::before { opacity: 1; }
+.lp-card-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
   font-size: 14px;
+  color: rgba(255,252,245,0.85);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+.lp-card-body {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 13px;
+  line-height: 1.65;
+  color: rgba(255,252,245,0.38);
+}
+.lp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .12em;
+  color: #B4FF47;
+  background: rgba(180,255,71,0.07);
+  border: 1px solid rgba(180,255,71,0.18);
+  border-radius: 20px;
+  padding: 4px 10px;
+  margin-top: 12px;
+}
+.lp-badge::before { content: '●'; font-size: 5px; }
+
+/* Price cards */
+.lp-price-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+.lp-price-card {
+  background: rgba(255,252,245,0.025);
+  border: 1px solid rgba(255,252,245,0.08);
+  border-radius: 6px;
+  padding: 22px 18px;
+  position: relative;
+  overflow: hidden;
+  transition: all .28s;
+}
+.lp-price-card.featured {
+  border-color: rgba(0,200,255,0.25);
+  background: rgba(0,200,255,0.04);
+}
+.lp-price-card:hover { border-color: rgba(0,200,255,0.3); transform: translateY(-2px); }
+.lp-price-card .plan-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .18em;
+  color: rgba(255,252,245,0.3);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.lp-price-card .plan-price {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 36px;
+  color: rgba(255,252,245,0.92);
+  line-height: 1;
+  margin-bottom: 4px;
+  letter-spacing: -.02em;
+}
+.lp-price-card .plan-price sup {
+  font-size: 16px;
   color: #00C8FF;
   vertical-align: super;
+  font-weight: 700;
 }
-.lp-price-card .plan-name {
+.lp-price-card .plan-time {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  letter-spacing: .16em;
-  color: rgba(255,252,245,0.35);
+  font-size: 8px;
+  letter-spacing: .1em;
+  color: rgba(0,200,255,0.55);
+  margin-bottom: 16px;
   text-transform: uppercase;
-  margin-bottom: 12px;
 }
 .lp-price-card .plan-feat {
   font-family: 'Instrument Sans', sans-serif;
   font-size: 12px;
-  color: rgba(255,252,245,0.5);
-  line-height: 1.7;
+  color: rgba(255,252,245,0.38);
+  line-height: 1.8;
 }
 
-/* Tech feature list */
-.lp-feature-list { list-style: none; padding: 0; margin: 0; }
-.lp-feature-list li {
+/* Feature list */
+.lp-feat-list { list-style: none; padding: 0; margin: 0; }
+.lp-feat-item {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(255,252,245,0.05);
-  font-family: 'Instrument Sans', sans-serif;
-  font-size: 13px;
-  color: rgba(255,252,245,0.5);
-  line-height: 1.5;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,252,245,0.04);
 }
-.lp-feature-list li:last-child { border-bottom: none; }
-.lp-feat-icon {
+.lp-feat-item:last-child { border-bottom: none; }
+.lp-feat-num {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: #00C8FF;
-  opacity: .7;
-  margin-top: 2px;
+  font-size: 9px;
+  color: rgba(0,200,255,0.4);
+  letter-spacing: .05em;
   flex-shrink: 0;
-  width: 16px;
+  width: 20px;
+  margin-top: 2px;
+}
+.lp-feat-content strong {
+  display: block;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: rgba(255,252,245,0.8);
+  margin-bottom: 4px;
+}
+.lp-feat-content span {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 12px;
+  color: rgba(255,252,245,0.35);
+  line-height: 1.6;
 }
 
-/* Chatbot */
-#chatbot-wrap {
+/* Includes checklist */
+.lp-check-list { list-style: none; padding: 0; margin: 0; }
+.lp-check-item {
   display: flex;
-  flex-direction: column;
-  height: calc(100vh - 140px);
-  min-height: 400px;
-}
-#chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px 0;
-  display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 12px;
-}
-.chat-msg {
-  display: flex;
-  gap: 10px;
-  animation: msg-in .25s ease both;
-}
-@keyframes msg-in {
-  from { opacity:0; transform: translateY(8px); }
-  to   { opacity:1; transform: translateY(0); }
-}
-.chat-msg.user { flex-direction: row-reverse; }
-.chat-avatar {
-  width: 30px; height: 30px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-.chat-msg.bot .chat-avatar {
-  background: rgba(0,200,255,0.12);
-  border: 1px solid rgba(0,200,255,0.25);
-  color: #00C8FF;
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 9px;
-  letter-spacing: .05em;
-}
-.chat-msg.user .chat-avatar {
-  background: rgba(180,255,71,0.1);
-  border: 1px solid rgba(180,255,71,0.2);
-  color: #B4FF47;
-}
-.chat-bubble {
-  max-width: 78%;
-  padding: 11px 15px;
-  border-radius: 4px;
+  padding: 10px 0;
   font-family: 'Instrument Sans', sans-serif;
   font-size: 13px;
-  line-height: 1.55;
+  color: rgba(255,252,245,0.48);
+  border-bottom: 1px solid rgba(255,252,245,0.04);
 }
-.chat-msg.bot .chat-bubble {
+.lp-check-item:last-child { border-bottom: none; }
+.lp-check-icon {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: rgba(0,200,255,0.08);
+  border: 1px solid rgba(0,200,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.lp-check-icon svg { width:8px; height:8px; }
+
+/* Coverage tag row */
+.lp-coverage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.lp-coverage-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .1em;
+  color: rgba(255,252,245,0.4);
   background: rgba(255,252,245,0.04);
   border: 1px solid rgba(255,252,245,0.08);
-  color: rgba(255,252,245,0.78);
-  border-top-left-radius: 0;
-}
-.chat-msg.user .chat-bubble {
-  background: rgba(0,200,255,0.1);
-  border: 1px solid rgba(0,200,255,0.2);
-  color: rgba(255,252,245,0.85);
-  border-top-right-radius: 0;
-}
-.chat-typing {
-  display: flex; gap: 4px; align-items: center; padding: 4px 0;
-}
-.chat-typing span {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: rgba(0,200,255,0.5);
-  animation: blink 1.2s ease infinite;
-}
-.chat-typing span:nth-child(2) { animation-delay: .2s; }
-.chat-typing span:nth-child(3) { animation-delay: .4s; }
-@keyframes blink { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
-
-#chat-input-row {
-  display: flex;
-  gap: 8px;
-  padding: 14px 0 0;
-  border-top: 1px solid rgba(255,252,245,0.07);
-  flex-shrink: 0;
-}
-#chat-input {
-  flex: 1;
-  background: rgba(255,252,245,0.04);
-  border: 1px solid rgba(255,252,245,0.1);
   border-radius: 4px;
-  padding: 11px 14px;
-  font-family: 'Instrument Sans', sans-serif;
-  font-size: 13px;
-  color: rgba(255,252,245,0.85);
-  outline: none;
-  transition: border-color .2s;
+  padding: 4px 9px;
+  text-transform: uppercase;
 }
-#chat-input:focus { border-color: rgba(0,200,255,0.35); }
-#chat-input::placeholder { color: rgba(255,252,245,0.2); }
-#chat-send {
-  width: 42px; height: 42px;
-  background: rgba(0,200,255,0.12);
-  border: 1px solid rgba(0,200,255,0.25);
-  border-radius: 4px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  color: #00C8FF;
-  font-size: 16px;
-  transition: all .2s;
-  flex-shrink: 0;
-}
-#chat-send:hover { background: rgba(0,200,255,0.22); }
 
-/* Contact info cards */
+/* ── CONTACT ─────────────────────────── */
 .contact-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 28px;
 }
 .contact-card {
-  background: rgba(255,252,245,0.03);
+  background: rgba(255,252,245,0.025);
   border: 1px solid rgba(255,252,245,0.07);
   border-radius: 6px;
   padding: 18px;
+  transition: border-color .2s;
 }
+.contact-card:hover { border-color: rgba(0,200,255,0.2); }
+.contact-card-icon { margin-bottom: 10px; opacity: .5; }
 .contact-card-label {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  letter-spacing: .2em;
-  color: rgba(255,252,245,0.28);
+  font-size: 7px;
+  letter-spacing: .22em;
+  color: rgba(255,252,245,0.22);
   text-transform: uppercase;
   margin-bottom: 6px;
 }
 .contact-card-val {
   font-family: 'Syne', sans-serif;
   font-weight: 700;
-  font-size: 13px;
-  color: rgba(255,252,245,0.8);
+  font-size: 12px;
+  color: rgba(255,252,245,0.72);
+  line-height: 1.4;
 }
-.contact-card-val a {
-  color: #00C8FF;
-  text-decoration: none;
+.contact-card-val a { color: #00C8FF; text-decoration: none; }
+
+/* ── CHATBOT ─────────────────────────── */
+#chatbot-wrap {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 320px);
+  min-height: 360px;
+  background: rgba(255,252,245,0.02);
+  border: 1px solid rgba(255,252,245,0.06);
+  border-radius: 8px;
+  overflow: hidden;
 }
+#chat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255,252,245,0.05);
+  background: rgba(0,200,255,0.04);
+  flex-shrink: 0;
+}
+#chat-header-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(0,200,255,0.12);
+  border: 1px solid rgba(0,200,255,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 8px;
+  color: #00C8FF; letter-spacing: .05em;
+}
+#chat-header-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700; font-size: 11px;
+  letter-spacing: .1em;
+  color: rgba(255,252,245,0.7);
+  text-transform: uppercase;
+}
+#chat-header-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  color: rgba(0,200,255,0.45);
+  margin-left: auto;
+  letter-spacing: .08em;
+}
+#chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#chat-messages::-webkit-scrollbar { width: 3px; }
+#chat-messages::-webkit-scrollbar-track { background: transparent; }
+#chat-messages::-webkit-scrollbar-thumb { background: rgba(0,200,255,0.2); border-radius: 2px; }
+.chat-msg { display: flex; gap: 8px; animation: msg-in .25s ease both; }
+@keyframes msg-in { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.chat-msg.user { flex-direction: row-reverse; }
+.chat-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; flex-shrink: 0; margin-top: 2px;
+}
+.chat-msg.bot .chat-avatar {
+  background: rgba(0,200,255,0.1);
+  border: 1px solid rgba(0,200,255,0.2);
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: 7px; color: #00C8FF; letter-spacing: .04em;
+}
+.chat-msg.user .chat-avatar {
+  background: rgba(180,255,71,0.08);
+  border: 1px solid rgba(180,255,71,0.18);
+}
+.chat-bubble {
+  max-width: 80%; padding: 10px 14px; border-radius: 6px;
+  font-family: 'Instrument Sans', sans-serif; font-size: 13px; line-height: 1.55;
+}
+.chat-msg.bot  .chat-bubble { background: rgba(255,252,245,0.04); border: 1px solid rgba(255,252,245,0.07); color: rgba(255,252,245,0.75); border-top-left-radius: 0; }
+.chat-msg.user .chat-bubble { background: rgba(0,200,255,0.09); border: 1px solid rgba(0,200,255,0.2); color: rgba(255,252,245,0.85); border-top-right-radius: 0; }
+.chat-typing { display:flex; gap:4px; align-items:center; padding:3px 0; }
+.chat-typing span { width:5px; height:5px; border-radius:50%; background:rgba(0,200,255,0.5); animation:blink 1.2s ease infinite; }
+.chat-typing span:nth-child(2){animation-delay:.2s} .chat-typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+#chat-input-row {
+  display: flex; gap: 0;
+  border-top: 1px solid rgba(255,252,245,0.06);
+  flex-shrink: 0;
+}
+#chat-input {
+  flex: 1;
+  background: rgba(255,252,245,0.03);
+  border: none;
+  padding: 13px 16px;
+  font-family: 'Instrument Sans', sans-serif; font-size: 13px;
+  color: rgba(255,252,245,0.85); outline: none;
+}
+#chat-input::placeholder { color: rgba(255,252,245,0.18); }
+#chat-send {
+  width: 48px;
+  background: rgba(0,200,255,0.1);
+  border: none; border-left: 1px solid rgba(255,252,245,0.06);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: rgba(0,200,255,0.6); font-size: 16px;
+  transition: all .2s; flex-shrink: 0;
+}
+#chat-send:hover { background: rgba(0,200,255,0.18); color: #00C8FF; }
 
 .mapa-pill {
   background: rgba(5,10,25,0.85);
@@ -1407,83 +1628,9 @@ input::placeholder { color: var(--muted); }
 <div id="role-screen">
   <canvas id="landing-canvas"></canvas>
 
-  <!-- 3-dots menu trigger -->
-  <div id="dots-btn" onclick="openNav()" title="Menú">
-    <span></span><span></span><span></span>
-  </div>
+  <!-- nav-overlay moved to body level -->
 
-  <!-- Slide-out navigation panel -->
-  <div id="nav-overlay">
-    <div id="nav-backdrop" onclick="closeNav()"></div>
-    <div id="nav-panel">
-      <div id="nav-close" onclick="closeNav()">✕</div>
-
-      <div id="nav-header">
-        <div id="nav-logo">TRA<span>Z</span>A</div>
-        <div id="nav-tagline">Logística Inteligente · Monterrey</div>
-      </div>
-
-      <div id="nav-links">
-        <div class="nav-item" onclick="showNavPage('nosotros')">
-          <span class="nav-icon">◈</span>
-          <div class="nav-text">
-            <span class="nav-label">Quiénes Somos</span>
-            <span class="nav-desc">Nuestra historia y misión</span>
-          </div>
-        </div>
-
-        <div class="nav-item" onclick="showNavPage('servicios')">
-          <span class="nav-icon">◉</span>
-          <div class="nav-text">
-            <span class="nav-label">Servicios</span>
-            <span class="nav-desc">Express · Same-Day · Programado</span>
-          </div>
-        </div>
-
-        <div class="nav-item" onclick="showNavPage('tecnologia')">
-          <span class="nav-icon">◎</span>
-          <div class="nav-text">
-            <span class="nav-label">Tecnología</span>
-            <span class="nav-desc">GPS en tiempo real · IA routing</span>
-          </div>
-        </div>
-
-        <div class="nav-sep"></div>
-
-        <div class="nav-item" onclick="enterApp('customer'); closeNav();">
-          <span class="nav-icon">▷</span>
-          <div class="nav-text">
-            <span class="nav-label">Rastrear Pedido</span>
-            <span class="nav-desc">Sigue tu entrega en vivo</span>
-          </div>
-        </div>
-
-        <div class="nav-item" onclick="enterApp('mapa'); closeNav();">
-          <span class="nav-icon">◈</span>
-          <div class="nav-text">
-            <span class="nav-label">Mapa de Flota</span>
-            <span class="nav-desc">Vista satelital en tiempo real</span>
-          </div>
-        </div>
-
-        <div class="nav-sep"></div>
-
-        <div class="nav-item" onclick="showNavPage('contacto')">
-          <span class="nav-icon">◇</span>
-          <div class="nav-text">
-            <span class="nav-label">Contacto</span>
-            <span class="nav-desc">Habla con nosotros</span>
-          </div>
-        </div>
-      </div>
-
-      <div id="nav-footer">
-        <div id="nav-contact-title">Contacto directo</div>
-        <div id="nav-contact-phone">811 555 0619</div>
-        <div id="nav-contact-email">felix@traza.mx</div>
-      </div>
-    </div>
-  </div>
+  <div id="dots-btn" onclick="openNav()" title="Menú"><span></span><span></span><span></span></div>
 
   <div class="traza-city">Monterrey</div>
 
@@ -2414,6 +2561,7 @@ function setEl(id, val){
 let currentRole = null;
 
 function enterApp(role){
+  _currentPage = 'app:' + role;
   try {
     // Stop landing animations
     if(typeof landingAnimFrame !== 'undefined') cancelAnimationFrame(landingAnimFrame);
@@ -2449,7 +2597,7 @@ function enterApp(role){
       startDriverMap();
     }
     if(role === 'customer' || role === 'food' || role === 'delivery') startTrackMap();
-    if(role === 'mapa') setTimeout(initMapaApp, 100);
+    if(role === 'mapa') setTimeout(initMapaApp, 50);
 
   } catch(e) {
     console.error('enterApp error:', e);
@@ -2457,9 +2605,11 @@ function enterApp(role){
 }
 
 function goHome(){
+  _currentPage = 'role-screen';
   document.querySelectorAll('.app-shell').forEach(el=>el.classList.remove('active'));
   document.getElementById('role-screen').style.display = 'flex';
   clearInterval(adminInterval);
+  stopMapaGPS();
   clearInterval(orderInterval);
   clearInterval(mapInterval);
   // Restart landing animations
@@ -3184,28 +3334,91 @@ let mapaMap = null;
 let mapaMarkers = {};
 const EXCLUDE_UNITS = ['23170'];
 
+var mapaGPSInterval = null;
+
 function initMapaApp() {
-  const container = document.getElementById('mapa-satellite');
+  var container = document.getElementById('mapa-satellite');
   if (!container) { console.error('mapa-satellite not found'); return; }
+
+  // If already initialized, just fix size and restart polling
   if (mapaMap) {
-    setTimeout(function(){ mapaMap.invalidateSize(); }, 120);
-    if (window._lastVehicles) updateMapaMarkers(window._lastVehicles);
+    [50, 150, 300, 600].forEach(function(d){
+      setTimeout(function(){ mapaMap.invalidateSize(true); }, d);
+    });
+    if (window._lastVehicles) setTimeout(function(){ updateMapaMarkers(window._lastVehicles); }, 350);
+    startMapaGPS();
     return;
   }
-  mapaMap = L.map('mapa-satellite', {
-    center: [25.6866, -100.3161],
-    zoom: 13,
-    zoomControl: true,
-    attributionControl: false,
-  });
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 19,
-  }).addTo(mapaMap);
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 19, opacity: 0.65,
-  }).addTo(mapaMap);
-  setTimeout(function(){ mapaMap.invalidateSize(); }, 200);
-  if (window._lastVehicles) updateMapaMarkers(window._lastVehicles);
+
+  // Wait until container has real pixel dimensions before init
+  function tryInit() {
+    var w = container.offsetWidth;
+    var h = container.offsetHeight;
+    if (w < 10 || h < 10) { setTimeout(tryInit, 60); return; }
+
+    mapaMap = L.map('mapa-satellite', {
+      center: [25.6866, -100.3161],
+      zoom: 13,
+      zoomControl: true,
+      attributionControl: false,
+    });
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19,
+    }).addTo(mapaMap);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19, opacity: 0.6,
+    }).addTo(mapaMap);
+    [100, 300, 600].forEach(function(d){
+      setTimeout(function(){ mapaMap.invalidateSize(true); }, d);
+    });
+    // Start own GPS polling — independent of admin app
+    startMapaGPS();
+  }
+  tryInit();
+}
+
+// ── Mapa GPS polling — standalone ────────────────────────────
+async function fetchMapaVehicles() {
+  var badge = document.getElementById('mapa-fleet-badge');
+  try {
+    var res  = await fetch(BRIDGE_URL + '/vehicles', { signal: AbortSignal.timeout(10000) });
+    var data = await res.json();
+
+    // Show detailed status
+    if (data.status === 'waiting' || data.status === 'error') {
+      if (badge) badge.textContent = '⚠ Bridge: ' + (data.status) + ' — revisa variables Railway';
+      return;
+    }
+    if (!data.vehicles || !data.vehicles.length) {
+      if (badge) badge.textContent = 'Esperando GPS… (' + (data.status || 'syncing') + ')';
+      return;
+    }
+
+    window._lastVehicles = data.vehicles;
+    updateMapaMarkers(data.vehicles);
+    var ts = data.lastSync ? new Date(data.lastSync).toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '';
+    if (badge) badge.textContent = data.vehicles.length + ' unidades · ' + ts;
+  } catch(e) {
+    if (badge) {
+      if (BRIDGE_URL.includes('localhost')) {
+        badge.textContent = '⚠ Abre la app desde /app en Railway';
+      } else {
+        badge.textContent = '⚠ Sin conexión al bridge (' + e.message.substring(0,30) + ')';
+      }
+    }
+  }
+}
+
+function startMapaGPS() {
+  // Clear any existing interval
+  if (mapaGPSInterval) clearInterval(mapaGPSInterval);
+  // Fetch immediately, then every 10s
+  fetchMapaVehicles();
+  mapaGPSInterval = setInterval(fetchMapaVehicles, 10000);
+}
+
+function stopMapaGPS() {
+  if (mapaGPSInterval) { clearInterval(mapaGPSInterval); mapaGPSInterval = null; }
 }
 
 function extractUnitNum(name, eco) {
@@ -3284,6 +3497,9 @@ document.addEventListener('click', function(e) {
 
 
 // ── Navigation panel ──────────────────────────────────
+// Track what page is currently open so nav can return to it
+var _currentPage = 'role-screen'; // 'role-screen' | 'app:driver' | 'app:mapa' | 'lp:nosotros' etc.
+
 function openNav() {
   var overlay = document.getElementById('nav-overlay');
   if (!overlay) return;
@@ -3300,22 +3516,51 @@ function closeNav() {
 
 function showNavPage(page) {
   closeNav();
-  // Hide landing, hide all apps
+  // Hide everything
   document.getElementById('role-screen').style.display = 'none';
   document.querySelectorAll('.app-shell').forEach(function(el){ el.classList.remove('active'); });
-  // Hide all landing pages first
-  document.querySelectorAll('.lp-screen').forEach(function(el){ el.style.display = 'none'; });
+  document.querySelectorAll('.lp-screen').forEach(function(el){
+    el.classList.remove('lp-visible');
+    el.style.display = 'none';
+  });
+  // Show target landing page
   var target = document.getElementById('lp-' + page);
   if (target) {
     target.style.display = 'flex';
+    void target.offsetWidth;
+    target.classList.add('lp-visible');
     if (page === 'contacto') initChatbot();
   }
+  _currentPage = 'lp:' + page;
 }
 
 function closeLandingPage() {
-  document.querySelectorAll('.lp-screen').forEach(function(el){ el.style.display = 'none'; });
-  document.getElementById('role-screen').style.display = 'flex';
+  document.querySelectorAll('.lp-screen').forEach(function(el){
+    el.classList.remove('lp-visible');
+    el.style.display = 'none';
+  });
+  // Reopen the nav panel so user returns to the menu
+  restoreCurrentPage();
+  openNav();
 }
+
+function restoreCurrentPage() {
+  if (_currentPage === 'role-screen' || !_currentPage) {
+    document.getElementById('role-screen').style.display = 'flex';
+  } else if (_currentPage.indexOf('app:') === 0) {
+    var appId = _currentPage.replace('app:', '') + '-app';
+    var appEl = document.getElementById(appId);
+    if (appEl) appEl.classList.add('active');
+    else document.getElementById('role-screen').style.display = 'flex';
+  } else {
+    // Was on another lp page — just go home
+    document.getElementById('role-screen').style.display = 'flex';
+    _currentPage = 'role-screen';
+  }
+}
+
+// Patch enterApp to track current page
+var _origEnterApp = typeof enterApp === 'function' ? enterApp : null;
 
 // Close with Escape key
 document.addEventListener('keydown', function(e) {
@@ -3424,47 +3669,78 @@ async function sendChat() {
 ══════════════════════════════════════ -->
 <div class="lp-screen" id="lp-nosotros">
   <div class="lp-topbar">
-    <div class="lp-back" onclick="closeLandingPage()">←</div>
+    <div class="lp-back" onclick="closeLandingPage()">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M9 1L3 7l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
     <div class="lp-topbar-title">Quiénes Somos</div>
-    <span class="lp-topbar-sub">TRAZA · MTY</span>
+    <span class="lp-topbar-tag">TRAZA · 2024</span>
   </div>
   <div class="lp-body">
-    <div class="lp-hero">
+    <div class="lp-hero lp-reveal">
       <div class="lp-eyebrow">Monterrey, NL · Fundada 2024</div>
-      <h1 class="lp-h1">Logística que <span>mueve</span><br>a Monterrey</h1>
-      <p class="lp-lead">TRAZA nació para resolver un problema real: la entrega de última milla en el área metropolitana de Monterrey es lenta, opaca y cara. Lo cambiamos con tecnología.</p>
+      <h1 class="lp-h1">Logística que<br><span>mueve</span> Monterrey</h1>
+      <p class="lp-lead">Nacimos para resolver un problema real: la última milla en el área metropolitana era lenta, opaca y cara. Lo cambiamos con tecnología propia.</p>
     </div>
 
-    <div class="lp-stats">
-      <div class="lp-stat"><div class="lp-stat-val">60+</div><div class="lp-stat-label">Unidades activas</div></div>
-      <div class="lp-stat"><div class="lp-stat-val">15s</div><div class="lp-stat-label">Actualización GPS</div></div>
-      <div class="lp-stat"><div class="lp-stat-val">ZMM</div><div class="lp-stat-label">Cobertura total</div></div>
-    </div>
-
-    <div class="lp-section">
-      <div class="lp-section-title">Nuestra misión</div>
-      <div class="lp-card">
-        <div class="lp-card-title">Tecnología de primer nivel, hecha en Monterrey</div>
-        <div class="lp-card-body">Combinamos GPS satelital en tiempo real, inteligencia artificial para ruteo y una plataforma operativa que conecta conductores, despachadores y clientes en un solo sistema. La misma tecnología que usan las grandes empresas de Silicon Valley, adaptada para el ecosistema logístico de Monterrey.</div>
+    <div class="lp-stats lp-reveal">
+      <div class="lp-stat">
+        <div class="lp-stat-val">60<span>+</span></div>
+        <div class="lp-stat-label">Unidades activas</div>
+      </div>
+      <div class="lp-stat">
+        <div class="lp-stat-val">15<span>s</span></div>
+        <div class="lp-stat-label">Refresh GPS</div>
+      </div>
+      <div class="lp-stat">
+        <div class="lp-stat-val">ZMM</div>
+        <div class="lp-stat-label">Cobertura total</div>
       </div>
     </div>
 
-    <div class="lp-section">
-      <div class="lp-section-title">Valores</div>
-      <div class="lp-card">
-        <div class="lp-card-title">Transparencia total</div>
-        <div class="lp-card-body">El cliente sabe exactamente dónde está su paquete en todo momento. El conductor tiene las herramientas para ser eficiente. El negocio tiene datos reales para tomar decisiones.</div>
-        <span class="lp-card-accent">GPS en vivo 24/7</span>
+    <div class="lp-content">
+      <div class="lp-section lp-reveal">
+        <div class="lp-section-hd">
+          <span class="lp-section-title">Nuestra misión</span>
+          <div class="lp-section-hd-line"></div>
+        </div>
+        <div class="lp-card">
+          <div class="lp-card-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="12.5" stroke="#00C8FF" stroke-width="1"/><path d="M14 7v7l4 4" stroke="#00C8FF" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div class="lp-card-title">Tecnología enterprise, hecha en Monterrey</div>
+          <div class="lp-card-body">Combinamos GPS satelital en tiempo real, IA para ruteo y una plataforma operativa que conecta conductores, despachadores y clientes en un solo sistema — sin apps de terceros, sin dependencias externas.</div>
+        </div>
       </div>
-      <div class="lp-card">
-        <div class="lp-card-title">Rapidez sin sacrificar cuidado</div>
-        <div class="lp-card-body">Nuestros conductores son verificados y entrenados. Cada entrega importa. Express no significa descuidado — significa eficiente.</div>
-        <span class="lp-card-accent">Conductores verificados</span>
-      </div>
-      <div class="lp-card">
-        <div class="lp-card-title">Tecnología como ventaja</div>
-        <div class="lp-card-body">Ruteo inteligente por IA reduce tiempos de entrega hasta 35%. WhatsApp integrado para notificaciones. Dashboard en tiempo real para operadores y clientes.</div>
-        <span class="lp-card-accent">IA routing activo</span>
+
+      <div class="lp-section lp-reveal">
+        <div class="lp-section-hd">
+          <span class="lp-section-title">Valores</span>
+          <div class="lp-section-hd-line"></div>
+        </div>
+        <div class="lp-card">
+          <div class="lp-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="#00C8FF" stroke-width="1.2" stroke-linejoin="round"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="#00C8FF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="lp-card-title">Transparencia total</div>
+          <div class="lp-card-body">El cliente sabe exactamente dónde está su paquete. El conductor tiene las herramientas para ser eficiente. El negocio tiene datos reales para decidir.</div>
+          <span class="lp-badge">GPS en vivo 24/7</span>
+        </div>
+        <div class="lp-card">
+          <div class="lp-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#00C8FF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="lp-card-title">Rapidez con cuidado</div>
+          <div class="lp-card-body">Express no significa descuidado — significa eficiente. Conductores verificados, entrenados y evaluados. Cada entrega importa.</div>
+          <span class="lp-badge">Conductores verificados</span>
+        </div>
+        <div class="lp-card">
+          <div class="lp-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="#00C8FF" stroke-width="1.2"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" stroke="#00C8FF" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="lp-card-title">Tecnología como ventaja</div>
+          <div class="lp-card-body">IA de ruteo reduce tiempos hasta 35%. WhatsApp integrado para notificaciones automáticas. Dashboard en tiempo real para operadores y clientes.</div>
+          <span class="lp-badge">IA routing activo</span>
+        </div>
       </div>
     </div>
   </div>
@@ -3475,56 +3751,111 @@ async function sendChat() {
 ══════════════════════════════════════ -->
 <div class="lp-screen" id="lp-servicios">
   <div class="lp-topbar">
-    <div class="lp-back" onclick="closeLandingPage()">←</div>
+    <div class="lp-back" onclick="closeLandingPage()">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M9 1L3 7l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
     <div class="lp-topbar-title">Servicios</div>
-    <span class="lp-topbar-sub">Precios · Cobertura</span>
+    <span class="lp-topbar-tag">Precios · ZMM</span>
   </div>
   <div class="lp-body">
-    <div class="lp-hero">
+    <div class="lp-hero lp-reveal">
       <div class="lp-eyebrow">3 modalidades de entrega</div>
       <h1 class="lp-h1">El servicio que<br>tu negocio <span>necesita</span></h1>
-      <p class="lp-lead">Desde entregas urgentes hasta logística programada. Toda la Zona Metropolitana de Monterrey cubierta.</p>
+      <p class="lp-lead">Desde entregas urgentes hasta logística programada. Cobertura completa en la Zona Metropolitana de Monterrey.</p>
     </div>
 
-    <div class="lp-section">
-      <div class="lp-section-title">Planes disponibles</div>
-      <div class="lp-price-grid">
-        <div class="lp-price-card">
-          <div class="plan-name">Express</div>
-          <div class="price"><sup>$</sup>149</div>
-          <div class="plan-feat">Entrega en menos de 2 horas<br>Rastreo en tiempo real<br>Notificación WhatsApp<br>Confirmación con foto</div>
+    <div class="lp-content">
+      <div class="lp-section lp-reveal">
+        <div class="lp-section-hd">
+          <span class="lp-section-title">Planes</span>
+          <div class="lp-section-hd-line"></div>
         </div>
-        <div class="lp-price-card">
-          <div class="plan-name">Same-Day</div>
-          <div class="price"><sup>$</sup>99</div>
-          <div class="plan-feat">Entrega mismo día<br>Ventana horaria flexible<br>Rastreo en tiempo real<br>Notificación WhatsApp</div>
-        </div>
-        <div class="lp-price-card">
-          <div class="plan-name">Programado</div>
-          <div class="price"><sup>$</sup>199</div>
-          <div class="plan-feat">Agenda con anticipación<br>Horario garantizado<br>Prioridad en asignación<br>Reporte de entrega</div>
+        <div class="lp-price-grid">
+          <div class="lp-price-card">
+            <div class="plan-tag">Express</div>
+            <div class="plan-price"><sup>$</sup>149</div>
+            <div class="plan-time">menos de 2 hrs</div>
+            <div class="plan-feat">
+              Rastreo GPS en vivo<br>
+              Notificación WhatsApp<br>
+              Confirmación con foto<br>
+              Soporte en tiempo real
+            </div>
+          </div>
+          <div class="lp-price-card featured">
+            <div class="plan-tag">Same-Day</div>
+            <div class="plan-price"><sup>$</sup>99</div>
+            <div class="plan-time">mismo día</div>
+            <div class="plan-feat">
+              Rastreo GPS en vivo<br>
+              Ventana horaria flexible<br>
+              Notificación WhatsApp<br>
+              Historial de entregas
+            </div>
+          </div>
+          <div class="lp-price-card">
+            <div class="plan-tag">Programado</div>
+            <div class="plan-price"><sup>$</sup>199</div>
+            <div class="plan-time">horario garantizado</div>
+            <div class="plan-feat">
+              Agenda con anticipación<br>
+              Prioridad en asignación<br>
+              Reporte de entrega<br>
+              Factura disponible
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="lp-section">
-      <div class="lp-section-title">Incluido en todos los servicios</div>
-      <ul class="lp-feature-list">
-        <li><span class="lp-feat-icon">◈</span>GPS satelital en tiempo real — el cliente ve al conductor moverse en el mapa</li>
-        <li><span class="lp-feat-icon">◈</span>Conductores verificados con antecedentes revisados</li>
-        <li><span class="lp-feat-icon">◈</span>Notificaciones automáticas vía WhatsApp en cada etapa</li>
-        <li><span class="lp-feat-icon">◈</span>Confirmación fotográfica de entrega</li>
-        <li><span class="lp-feat-icon">◈</span>Soporte directo por WhatsApp durante el proceso</li>
-        <li><span class="lp-feat-icon">◈</span>Historial completo de entregas en dashboard</li>
-      </ul>
-    </div>
+      <div class="lp-section lp-reveal">
+        <div class="lp-section-hd">
+          <span class="lp-section-title">Incluido en todos</span>
+          <div class="lp-section-hd-line"></div>
+        </div>
+        <ul class="lp-check-list">
+          <li class="lp-check-item">
+            <div class="lp-check-icon"><svg viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#00C8FF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            GPS satelital — el cliente ve al conductor moverse en el mapa
+          </li>
+          <li class="lp-check-item">
+            <div class="lp-check-icon"><svg viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#00C8FF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            Conductores verificados con antecedentes revisados
+          </li>
+          <li class="lp-check-item">
+            <div class="lp-check-icon"><svg viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#00C8FF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            Notificaciones automáticas vía WhatsApp en cada etapa
+          </li>
+          <li class="lp-check-item">
+            <div class="lp-check-icon"><svg viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#00C8FF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            Confirmación fotográfica de entrega como evidencia
+          </li>
+          <li class="lp-check-item">
+            <div class="lp-check-icon"><svg viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#00C8FF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            Soporte directo por WhatsApp durante todo el proceso
+          </li>
+          <li class="lp-check-item">
+            <div class="lp-check-icon"><svg viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#00C8FF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            Dashboard con historial completo de entregas
+          </li>
+        </ul>
+      </div>
 
-    <div class="lp-section">
-      <div class="lp-section-title">Cobertura</div>
-      <div class="lp-card">
-        <div class="lp-card-title">Zona Metropolitana de Monterrey</div>
-        <div class="lp-card-body">Monterrey · San Pedro Garza García · San Nicolás · Guadalupe · Apodaca · Escobedo · Santa Catarina · Juárez · García</div>
-        <span class="lp-card-accent">Expansión Q2 2025</span>
+      <div class="lp-section lp-reveal">
+        <div class="lp-section-hd">
+          <span class="lp-section-title">Cobertura ZMM</span>
+          <div class="lp-section-hd-line"></div>
+        </div>
+        <div class="lp-coverage">
+          <span class="lp-coverage-tag">Monterrey</span>
+          <span class="lp-coverage-tag">San Pedro</span>
+          <span class="lp-coverage-tag">San Nicolás</span>
+          <span class="lp-coverage-tag">Guadalupe</span>
+          <span class="lp-coverage-tag">Apodaca</span>
+          <span class="lp-coverage-tag">Escobedo</span>
+          <span class="lp-coverage-tag">Sta. Catarina</span>
+          <span class="lp-coverage-tag">Juárez</span>
+          <span class="lp-coverage-tag">García</span>
+        </div>
       </div>
     </div>
   </div>
@@ -3535,33 +3866,85 @@ async function sendChat() {
 ══════════════════════════════════════ -->
 <div class="lp-screen" id="lp-tecnologia">
   <div class="lp-topbar">
-    <div class="lp-back" onclick="closeLandingPage()">←</div>
+    <div class="lp-back" onclick="closeLandingPage()">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M9 1L3 7l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
     <div class="lp-topbar-title">Tecnología</div>
-    <span class="lp-topbar-sub">Stack · Infraestructura</span>
+    <span class="lp-topbar-tag">Stack · Infra</span>
   </div>
   <div class="lp-body">
-    <div class="lp-hero">
-      <div class="lp-eyebrow">Plataforma propietaria</div>
-      <h1 class="lp-h1">Infraestructura<br>de <span>nivel enterprise</span></h1>
-      <p class="lp-lead">No usamos apps de terceros. TRAZA construyó su propia plataforma tecnológica desde cero para tener control total sobre la operación.</p>
+    <div class="lp-hero lp-reveal">
+      <div class="lp-eyebrow">Plataforma 100% propietaria</div>
+      <h1 class="lp-h1">Infraestructura de<br><span>nivel enterprise</span></h1>
+      <p class="lp-lead">No usamos apps de terceros. Construimos nuestra propia plataforma para tener control total sobre operación, datos y experiencia.</p>
     </div>
 
-    <div class="lp-stats">
-      <div class="lp-stat"><div class="lp-stat-val">15s</div><div class="lp-stat-label">Refresh GPS</div></div>
-      <div class="lp-stat"><div class="lp-stat-val">99%</div><div class="lp-stat-label">Uptime</div></div>
-      <div class="lp-stat"><div class="lp-stat-val">35%</div><div class="lp-stat-label">Menos tiempo IA</div></div>
+    <div class="lp-stats lp-reveal">
+      <div class="lp-stat">
+        <div class="lp-stat-val">15<span>s</span></div>
+        <div class="lp-stat-label">Refresh GPS</div>
+      </div>
+      <div class="lp-stat">
+        <div class="lp-stat-val">99<span>%</span></div>
+        <div class="lp-stat-label">Uptime</div>
+      </div>
+      <div class="lp-stat">
+        <div class="lp-stat-val">35<span>%</span></div>
+        <div class="lp-stat-label">Menos tiempo IA</div>
+      </div>
     </div>
 
-    <div class="lp-section">
-      <div class="lp-section-title">Componentes del sistema</div>
-      <ul class="lp-feature-list">
-        <li><span class="lp-feat-icon">01</span><div><strong style="color:rgba(255,252,245,0.8)">GPS Satelital en Tiempo Real</strong><br>Integración directa con GlobalTrack. Posición de cada unidad actualizada cada 15 segundos. Velocidad, dirección y estado de la unidad visibles en mapa satelital.</div></li>
-        <li><span class="lp-feat-icon">02</span><div><strong style="color:rgba(255,252,245,0.8)">Ruteo Inteligente por IA</strong><br>Algoritmo propio que calcula la ruta óptima en tiempo real considerando tráfico, distancia y disponibilidad de conductores. Reduce tiempos hasta 35%.</div></li>
-        <li><span class="lp-feat-icon">03</span><div><strong style="color:rgba(255,252,245,0.8)">WhatsApp Business API</strong><br>Notificaciones automáticas al cliente en cada etapa: confirmación, en camino, entregado. Sin apps adicionales — directo al teléfono.</div></li>
-        <li><span class="lp-feat-icon">04</span><div><strong style="color:rgba(255,252,245,0.8)">Dashboard de Despacho</strong><br>Dispatcher ve toda la flota en tiempo real. Auto-asignación de pedidos al conductor más cercano. Cola de pedidos pendientes con prioridad.</div></li>
-        <li><span class="lp-feat-icon">05</span><div><strong style="color:rgba(255,252,245,0.8)">App de Conductor</strong><br>Interfaz simple para el chofer: recibir asignación, navegar, confirmar entrega con foto. Sin fricción, sin complicaciones.</div></li>
-        <li><span class="lp-feat-icon">06</span><div><strong style="color:rgba(255,252,245,0.8)">Infraestructura Cloud</strong><br>Desplegado en Railway con Node.js + Express. Alta disponibilidad, escalable automáticamente según demanda.</div></li>
-      </ul>
+    <div class="lp-content">
+      <div class="lp-section lp-reveal">
+        <div class="lp-section-hd">
+          <span class="lp-section-title">Componentes del sistema</span>
+          <div class="lp-section-hd-line"></div>
+        </div>
+        <ul class="lp-feat-list">
+          <li class="lp-feat-item">
+            <span class="lp-feat-num">01</span>
+            <div class="lp-feat-content">
+              <strong>GPS Satelital en Tiempo Real</strong>
+              <span>Integración directa con GlobalTrack. Posición actualizada cada 15s. Velocidad, dirección y estado visible en mapa satelital ESRI.</span>
+            </div>
+          </li>
+          <li class="lp-feat-item">
+            <span class="lp-feat-num">02</span>
+            <div class="lp-feat-content">
+              <strong>Ruteo Inteligente por IA</strong>
+              <span>Calcula la ruta óptima en tiempo real considerando tráfico, distancia y disponibilidad. Reduce tiempos de entrega hasta 35%.</span>
+            </div>
+          </li>
+          <li class="lp-feat-item">
+            <span class="lp-feat-num">03</span>
+            <div class="lp-feat-content">
+              <strong>WhatsApp Business API</strong>
+              <span>Notificaciones automáticas al cliente en cada etapa: confirmación, en camino, entregado. Sin apps adicionales.</span>
+            </div>
+          </li>
+          <li class="lp-feat-item">
+            <span class="lp-feat-num">04</span>
+            <div class="lp-feat-content">
+              <strong>Dashboard de Despacho</strong>
+              <span>Dispatcher ve toda la flota en tiempo real. Auto-asignación al conductor más cercano. Cola de pedidos con prioridad.</span>
+            </div>
+          </li>
+          <li class="lp-feat-item">
+            <span class="lp-feat-num">05</span>
+            <div class="lp-feat-content">
+              <strong>App de Conductor</strong>
+              <span>Recibir asignación, navegar, confirmar entrega con foto. Sin fricción, diseñada para operación en movimiento.</span>
+            </div>
+          </li>
+          <li class="lp-feat-item">
+            <span class="lp-feat-num">06</span>
+            <div class="lp-feat-content">
+              <strong>Cloud Infrastructure</strong>
+              <span>Node.js + Express en Railway. Alta disponibilidad, escalable automáticamente. Backups en tiempo real.</span>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>
@@ -3571,46 +3954,161 @@ async function sendChat() {
 ══════════════════════════════════════ -->
 <div class="lp-screen" id="lp-contacto">
   <div class="lp-topbar">
-    <div class="lp-back" onclick="closeLandingPage()">←</div>
+    <div class="lp-back" onclick="closeLandingPage()">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M9 1L3 7l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
     <div class="lp-topbar-title">Contacto</div>
-    <span class="lp-topbar-sub">Soporte · Ventas</span>
+    <span class="lp-topbar-tag">Soporte · Ventas</span>
   </div>
   <div class="lp-body">
-    <div class="lp-hero" style="padding-bottom:24px;">
-      <div class="lp-eyebrow">Estamos aquí para ayudarte</div>
+    <div class="lp-hero lp-reveal" style="padding-bottom:28px;">
+      <div class="lp-eyebrow">Estamos aquí para ti</div>
       <h1 class="lp-h1">Habla con<br><span>TRAZA</span></h1>
     </div>
 
-    <div class="contact-grid">
-      <div class="contact-card">
-        <div class="contact-card-label">Email</div>
-        <div class="contact-card-val"><a href="mailto:trazalogisticamx@gmail.com">trazalogisticamx<br>@gmail.com</a></div>
+    <div class="lp-content">
+      <div class="lp-section lp-reveal" style="padding-top:20px;">
+        <div class="contact-grid">
+          <div class="contact-card">
+            <div class="contact-card-icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 3h12a1 1 0 011 1v8a1 1 0 01-1 1H5l-3 3V4a1 1 0 011-1z" stroke="#00C8FF" stroke-width="1.2" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="contact-card-label">Email</div>
+            <div class="contact-card-val"><a href="mailto:trazalogisticamx@gmail.com">trazalogisticamx<br>@gmail.com</a></div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-card-icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3.5 2h3l1.5 4-2 1.5c1 2 3 4 5 5L13 11l4 1.5v3C17 16.3 16.3 17 15.5 17 8 17 1 10 1 2.5 1 1.7 1.7 1 2.5 1L3.5 2z" stroke="#00C8FF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="contact-card-label">Teléfono</div>
+            <div class="contact-card-val"><a href="tel:8115550619">811 555 0619</a></div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-card-icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7.5" stroke="#00C8FF" stroke-width="1.2"/><path d="M9 5v4l3 3" stroke="#00C8FF" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </div>
+            <div class="contact-card-label">Horario</div>
+            <div class="contact-card-val" style="font-size:11px;">Lun – Sáb<br>7am – 10pm</div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-card-icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5C6.239 1.5 4 3.739 4 6.5c0 3.75 5 10 5 10s5-6.25 5-10c0-2.761-2.239-5-5-5z" stroke="#00C8FF" stroke-width="1.2"/><circle cx="9" cy="6.5" r="1.5" stroke="#00C8FF" stroke-width="1.2"/></svg>
+            </div>
+            <div class="contact-card-label">Ubicación</div>
+            <div class="contact-card-val" style="font-size:11px;">Monterrey<br>Nuevo León, MX</div>
+          </div>
+        </div>
       </div>
-      <div class="contact-card">
-        <div class="contact-card-label">Teléfono</div>
-        <div class="contact-card-val"><a href="tel:8115550619">811 555 0619</a></div>
-      </div>
-      <div class="contact-card">
-        <div class="contact-card-label">Horario</div>
-        <div class="contact-card-val" style="font-size:12px;">Lun – Sáb<br>7am – 10pm</div>
-      </div>
-      <div class="contact-card">
-        <div class="contact-card-label">Ubicación</div>
-        <div class="contact-card-val" style="font-size:12px;">Monterrey<br>Nuevo León, MX</div>
-      </div>
-    </div>
 
-    <div class="lp-section-title">Asistente TRAZA — IA</div>
-    <div id="chatbot-wrap">
-      <div id="chat-messages"></div>
-      <div id="chat-input-row">
-        <input id="chat-input" type="text" placeholder="Escribe tu pregunta..." autocomplete="off" />
-        <div id="chat-send" onclick="sendChat()">→</div>
+      <div class="lp-section lp-reveal" style="padding-top:0;">
+        <div class="lp-section-hd">
+          <span class="lp-section-title">Asistente IA — TRAZA</span>
+          <div class="lp-section-hd-line"></div>
+        </div>
+        <div id="chatbot-wrap">
+          <div id="chat-header">
+            <div id="chat-header-avatar">TZ</div>
+            <div>
+              <div id="chat-header-title">Asistente TRAZA</div>
+            </div>
+            <span id="chat-header-sub">En línea · IA</span>
+          </div>
+          <div id="chat-messages"></div>
+          <div id="chat-input-row">
+            <input id="chat-input" type="text" placeholder="Escribe tu pregunta aquí..." autocomplete="off"/>
+            <div id="chat-send" onclick="sendChat()">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14 8H2M14 8l-5-5M14 8l-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Global nav overlay -->
+<!-- Slide-out navigation panel -->
+  <div id="nav-overlay">
+    <div id="nav-backdrop" onclick="closeNav()"></div>
+    <div id="nav-panel">
+
+      <div id="nav-header">
+        <div id="nav-header-top">
+          <div id="nav-logo">TR<span>A</span>ZA</div>
+          <div id="nav-close" onclick="closeNav()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div id="nav-tagline">Logística Inteligente · Monterrey</div>
+        <div id="nav-status-row">
+          <span class="nav-status-dot"></span>
+          <span class="nav-status-txt">Flota activa · 60+ unidades</span>
+        </div>
+      </div>
+
+      <div id="nav-section-label">Empresa</div>
+      <div id="nav-links">
+        <div class="nav-item" onclick="showNavPage('nosotros')">
+          <div class="nav-item-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="2.5" stroke="#00C8FF" stroke-width="1.2"/><path d="M2.5 13.5c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="#00C8FF" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="nav-text">
+            <span class="nav-label">Quiénes Somos</span>
+            <span class="nav-desc">Historia · Misión · Valores</span>
+          </div>
+          <svg class="nav-chevron" width="6" height="10" viewBox="0 0 6 10" fill="none"><path d="M1 1l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+
+        <div class="nav-item" onclick="showNavPage('servicios')">
+          <div class="nav-item-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="4.5" width="13" height="9" rx="1.5" stroke="#00C8FF" stroke-width="1.2"/><path d="M5 4.5V3a3 3 0 016 0v1.5" stroke="#00C8FF" stroke-width="1.2" stroke-linecap="round"/><path d="M1.5 8.5h13" stroke="#00C8FF" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="nav-text">
+            <span class="nav-label">Servicios</span>
+            <span class="nav-desc">Express · Same-Day · Programado</span>
+          </div>
+          <svg class="nav-chevron" width="6" height="10" viewBox="0 0 6 10" fill="none"><path d="M1 1l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+
+        <div class="nav-item" onclick="showNavPage('tecnologia')">
+          <div class="nav-item-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#00C8FF" stroke-width="1.2"/><circle cx="8" cy="8" r="2.5" stroke="#00C8FF" stroke-width="1.2"/><path d="M8 1.5v3M8 11.5v3M1.5 8h3M11.5 8h3" stroke="#00C8FF" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="nav-text">
+            <span class="nav-label">Tecnología</span>
+            <span class="nav-desc">GPS · IA Routing · Cloud</span>
+          </div>
+          <svg class="nav-chevron" width="6" height="10" viewBox="0 0 6 10" fill="none"><path d="M1 1l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+
+      <div id="nav-section-label" class="nav-section-label-2">Plataforma</div>
+      <div class="nav-platform-grid">
+        <div class="nav-platform-btn" onclick="enterApp('customer'); closeNav();">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2L3 6v10h12V6L9 2z" stroke="#B4FF47" stroke-width="1.2" stroke-linejoin="round"/><rect x="6.5" y="10" width="5" height="6" rx="0.5" stroke="#B4FF47" stroke-width="1.2"/></svg>
+          <span>Rastrear</span>
+        </div>
+        <div class="nav-platform-btn" onclick="enterApp('mapa'); closeNav();">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5C6.239 1.5 4 3.739 4 6.5c0 3.75 5 10 5 10s5-6.25 5-10c0-2.761-2.239-5-5-5z" stroke="#B4FF47" stroke-width="1.2"/><circle cx="9" cy="6.5" r="1.5" stroke="#B4FF47" stroke-width="1.2"/></svg>
+          <span>Mapa GPS</span>
+        </div>
+        <div class="nav-platform-btn" onclick="enterApp('driver'); closeNav();">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1.5" y="5.5" width="15" height="9" rx="2" stroke="#B4FF47" stroke-width="1.2"/><path d="M5 5.5V4a4 4 0 018 0v1.5" stroke="#B4FF47" stroke-width="1.2" stroke-linecap="round"/><circle cx="6" cy="10" r="1" fill="#B4FF47"/><circle cx="12" cy="10" r="1" fill="#B4FF47"/></svg>
+          <span>Driver Hub</span>
+        </div>
+        <div class="nav-platform-btn" onclick="showNavPage('contacto');">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 3h12a1 1 0 011 1v8a1 1 0 01-1 1H5l-3 3V4a1 1 0 011-1z" stroke="#B4FF47" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          <span>Contacto</span>
+        </div>
+      </div>
+
+      <div id="nav-footer">
+        <div id="nav-footer-brand">TRAZA · Logística Inteligente</div>
+        <a href="mailto:trazalogisticamx@gmail.com" id="nav-footer-email">trazalogisticamx@gmail.com</a>
+        <a href="tel:8115550619" id="nav-footer-phone">811 555 0619</a>
+      </div>
+    </div>
+  </div></div>
 
 </body>
 </html>
