@@ -186,17 +186,13 @@ async function login() {
     // Try to fill using evaluate (bypasses clickability issues)
     const filled = await page.evaluate((user, pass) => {
       const inputs = Array.from(document.querySelectorAll('input'));
-      // SphereGT exact field names (confirmed from logs)
+      // SphereGT: always use txtUser (first form), not txtUsuario_login (second form)
       const userInput =
-        document.getElementById('txtUsuario_login') ||
         document.getElementById('txtUser') ||
-        document.querySelector('input[name="txtUsuario_login"]') ||
-        document.querySelector('input[name="txtUser"]') ||
-        inputs.find(i => (i.placeholder||'').toLowerCase().includes('usuario') && i.type !== 'password');
+        document.querySelector('input[name="txtUser"]');
       const passInput =
         document.getElementById('txtClave') ||
-        document.querySelector('input[name="txtClave"]') ||
-        inputs.find(i => i.type === 'password');
+        document.querySelector('input[name="txtClave"]');
       if (!userInput || !passInput) return { ok: false, reason: 'fields not found' };
       // Set value and trigger React/Vue events
       const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
