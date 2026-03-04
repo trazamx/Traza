@@ -269,20 +269,21 @@ async function pollVehicles() {
 
 // ─── Boot ─────────────────────────────────────────────────
 async function start() {
-  if (!SPHEREGT_USER || !SPHEREGT_PASS) {
-    console.error('\n❌  Missing credentials!\n');
-    console.error('    Go to Railway → your service → Variables and set:');
-    console.error('    SPHEREGT_USER = your GlobalTrack email');
-    console.error('    SPHEREGT_PASS = your GlobalTrack password\n');
-    process.exit(1);
-  }
-
+  // Always start HTTP server first — never crash on missing credentials
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`\n✅ TRAZA running on port ${PORT}`);
-    console.log(`   App:       /app`);
-    console.log(`   Dashboard: /dashboard`);
-    console.log(`   API:       /vehicles\n`);
+    console.log('TRAZA running on port ' + PORT);
+    console.log('   App:       /app');
+    console.log('   Dashboard: /dashboard');
+    console.log('   API:       /vehicles');
   });
+
+  if (!SPHEREGT_USER || !SPHEREGT_PASS) {
+    console.warn('WARNING: SPHEREGT_USER / SPHEREGT_PASS not set.');
+    console.warn('App is running but GPS bridge is disabled.');
+    console.warn('Add them in Railway -> your service -> Variables tab.');
+    syncStatus = 'waiting';
+    return;
+  }
 
   await launchBrowser();
   const ok = await login();
