@@ -150,14 +150,19 @@ async function launchBrowser() {
 
   page.on('response', async response => {
     const url = response.url();
-    if (/unit|vehicle|position|gps|device|asset|tracker/i.test(url)) {
+    const ct  = response.headers()['content-type'] || '';
+    // Log ALL non-static responses so we can find vehicle data endpoint
+    if (ct.includes('json') || ct.includes('text/plain')) {
       try {
-        const ct = response.headers()['content-type'] || '';
-        if (ct.includes('json')) {
-          const body = await response.json().catch(() => null);
+        const text = await response.text().catch(() => null);
+        if (text && text.length > 10 && text.length < 50000) {
+          console.log('NET ' + url.split('?')[0] + ' | ' + text.substring(0, 200));
+          const body = JSON.parse(text);
           if (body) parseVehicleResponse(url, body);
         }
       } catch (_) {}
+    } else if (/unit|vehicle|position|gps|device|asset|tracker|map|fleet/i.test(url)) {
+      console.log('URL-MATCH (non-json): ' + url.substring(0, 150));
     }
   });
   console.log('✅ Browser ready');
@@ -181,21 +186,17 @@ async function login() {
     // Try to fill using evaluate (bypasses clickability issues)
     const filled = await page.evaluate((user, pass) => {
       const inputs = Array.from(document.querySelectorAll('input'));
-      const userInput = inputs.find(i =>
-        ['email','text','username','user'].includes(i.type) ||
-        ['email','username','user','login','correo','usuario'].includes((i.name||'').toLowerCase()) ||
-        ['email','username','user','login'].includes((i.id||'').toLowerCase()) ||
-        (i.placeholder||'').toLowerCase().includes('user') ||
-        (i.placeholder||'').toLowerCase().includes('email') ||
-        (i.placeholder||'').toLowerCase().includes('correo') ||
-        (i.placeholder||'').toLowerCase().includes('usuario')
-      );
-      const passInput = inputs.find(i =>
-        i.type === 'password' ||
-        ['password','pass','contrasena','clave'].includes((i.name||'').toLowerCase()) ||
-        (i.placeholder||'').toLowerCase().includes('password') ||
-        (i.placeholder||'').toLowerCase().includes('contrase')
-      );
+      // SphereGT exact field names (confirmed from logs)
+      const userInput =
+        document.getElementById('txtUsuario_login') ||
+        document.getElementById('txtUser') ||
+        document.querySelector('input[name="txtUsuario_login"]') ||
+        document.querySelector('input[name="txtUser"]') ||
+        inputs.find(i => (i.placeholder||'').toLowerCase().includes('usuario') && i.type !== 'password');
+      const passInput =
+        document.getElementById('txtClave') ||
+        document.querySelector('input[name="txtClave"]') ||
+        inputs.find(i => i.type === 'password');
       if (!userInput || !passInput) return { ok: false, reason: 'fields not found' };
       // Set value and trigger React/Vue events
       const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
