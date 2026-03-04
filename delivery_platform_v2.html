@@ -3572,20 +3572,26 @@ document.addEventListener('keydown', function(e) {
 //  AI CHATBOT — Contacto
 // ══════════════════════════════════════════
 var chatReady = false;
+var chatHistory = [];  // conversation memory
 
 function initChatbot() {
   if (chatReady) return;
   chatReady = true;
+  chatHistory = [];
   var msgs = document.getElementById('chat-messages');
   if (!msgs) return;
   msgs.innerHTML = '';
-  addBotMsg('Hola! Soy el asistente de TRAZA. Puedo resolver dudas sobre servicios, precios, cobertura o la plataforma. En que puedo ayudarte?');
+  addBotMsg('¡Hola! Soy el asistente de TRAZA 👋 Puedo resolver dudas sobre servicios, precios, cobertura o la plataforma. ¿En qué te ayudo?');
   var input = document.getElementById('chat-input');
   if (input) {
-    input.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
-    });
+    input.removeEventListener('keydown', chatKeyHandler);
+    input.addEventListener('keydown', chatKeyHandler);
+    setTimeout(function(){ input.focus(); }, 300);
   }
+}
+
+function chatKeyHandler(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
 }
 
 function addBotMsg(text) {
@@ -3603,13 +3609,13 @@ function addUserMsg(text) {
   if (!msgs) return;
   var div = document.createElement('div');
   div.className = 'chat-msg user';
-  div.innerHTML = '<div class="chat-avatar">u</div><div class="chat-bubble">' + escapeHtml(text) + '</div>';
+  div.innerHTML = '<div class="chat-avatar">→</div><div class="chat-bubble">' + escapeHtml(text) + '</div>';
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
 
 function escapeHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function showTyping() {
@@ -3635,30 +3641,59 @@ async function sendChat() {
   if (!text) return;
   input.value = '';
   input.disabled = true;
+
   addUserMsg(text);
   showTyping();
+
+  // Save user message to history
+  chatHistory.push({ role: 'user', content: text });
+
   try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
+    var endpoint = BRIDGE_URL + '/chat';
+    var res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 400,
-        system: 'Eres el asistente virtual de TRAZA Logistica Inteligente, empresa de entregas en Monterrey Mexico. Responde siempre en espanol de manera concisa y amable. Info clave: Servicios: Express $149 menos de 2hrs, Same-Day $99 mismo dia, Programado $199 agenda anticipada. Cobertura: ZMM completa. GPS satelital en tiempo real actualizacion cada 15s. Flota 60+ unidades. Contacto: trazalogisticamx@gmail.com | 811 555 0619 | Lun-Sab 7am-10pm. Respuestas de maximo 3-4 oraciones.',
-        messages: [{ role: 'user', content: text }]
+        message: text,
+        history: chatHistory.slice(0, -1)  // history without current msg
       })
     });
+
     removeTyping();
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    if (!res.ok) {
+      var errData = await res.json().catch(function(){ return {}; });
+      throw new Error(errData.error || 'HTTP ' + res.status);
+    }
+
     var data = await res.json();
-    var reply = (data.content && data.content[0] && data.content[0].text)
-      ? data.content[0].text
-      : 'No pude procesar tu mensaje. Contactanos en trazalogisticamx@gmail.com';
+    if (!data.ok) throw new Error(data.error || 'Error del servidor');
+
+    var reply = data.reply || 'Sin respuesta.';
     addBotMsg(reply);
+
+    // Save assistant reply to history
+    chatHistory.push({ role: 'assistant', content: reply });
+
+    // Keep history lean — max 10 turns
+    if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+
   } catch(err) {
     removeTyping();
-    addBotMsg('Error de conexion. Contactanos en <strong style="color:#00C8FF">trazalogisticamx@gmail.com</strong> o al <strong style="color:#00C8FF">811 555 0619</strong>');
+    var errMsg = err.message || '';
+    if (errMsg.includes('ANTHROPIC_API_KEY')) {
+      addBotMsg('El chatbot necesita configuración. Agrega <strong style="color:#00C8FF">ANTHROPIC_API_KEY</strong> en las variables de Railway.');
+    } else if (errMsg.includes('fetch') || errMsg.includes('network') || errMsg.toLowerCase().includes('failed')) {
+      addBotMsg('Sin conexión al servidor. Contáctanos en <strong style="color:#00C8FF">trazalogisticamx@gmail.com</strong> o al <strong style="color:#00C8FF">811 555 0619</strong>');
+    } else {
+      addBotMsg('Error: ' + escapeHtml(errMsg) + '<br>Contáctanos en <strong style="color:#00C8FF">trazalogisticamx@gmail.com</strong>');
+    }
+    // Remove last user msg from history since it failed
+    if (chatHistory.length && chatHistory[chatHistory.length-1].role === 'user') {
+      chatHistory.pop();
+    }
   }
+
   input.disabled = false;
   input.focus();
 }
