@@ -237,18 +237,74 @@ async function login() {
   }
 }
 
+// Store units (names/plates) and positions separately, merge them
+let unitMap = {}; // IdUnidad -> {name, plate, eco}
+
 function parseVehicleResponse(url, body) {
-  let parsed = [];
-  if (Array.isArray(body)) {
-    parsed = body.map(normalizeVehicle).filter(Boolean);
-  } else if (typeof body === 'object') {
-    const list = body.data || body.units || body.vehicles || body.devices || body.assets || body.results;
-    if (Array.isArray(list)) parsed = list.map(normalizeVehicle).filter(Boolean);
-  }
-  if (parsed.length > 0) {
-    vehicles = parsed; lastSync = new Date().toISOString();
-    syncStatus = 'ok'; syncError = null;
-    console.log(`📡 ${parsed.length} vehicles synced`);
+  try {
+    // SphereGT wrapper: {Estado:1, Datos:[...]}
+    const list = (body && body.Datos) ? body.Datos
+      : Array.isArray(body) ? body
+      : (body && (body.data || body.units || body.vehicles)) ? (body.data || body.units || body.vehicles)
+      : null;
+
+    if (!list || !Array.isArray(list) || list.length === 0) return;
+
+    // ObtenerUnidades — save unit info
+    if (url.includes('ObtenerUnidades')) {
+      list.forEach(u => {
+        if (u.IdUnidad) {
+          unitMap[u.IdUnidad] = {
+            name: u.NombreUnidad || u.Nombre || ('Unit ' + u.IdUnidad),
+            plate: u.Placas || u.Placa || '',
+            eco:   u.NumeroEconomico || '',
+          };
+        }
+      });
+      console.log('Units indexed: ' + Object.keys(unitMap).length);
+      return;
+    }
+
+    // ObtenerPosicionActual — build vehicle list with positions
+    if (url.includes('ObtenerPosicion')) {
+      const parsed = list.map(p => {
+        const lat = parseFloat(p.Latitud  ?? p.lat ?? p.latitude  ?? null);
+        const lng = parseFloat(p.Longitud ?? p.lng ?? p.longitude ?? null);
+        if (isNaN(lat) || isNaN(lng)) return null;
+        const info = unitMap[p.IdUnidad] || {};
+        return {
+          id:      String(p.IdUnidad),
+          name:    info.name || ('Unit ' + p.IdUnidad),
+          plate:   info.plate || '',
+          eco:     info.eco || '',
+          lat, lng,
+          speed:   parseFloat(p.Velocidad ?? p.speed ?? 0) || 0,
+          heading: parseFloat(p.Angulo    ?? p.course ?? 0) || 0,
+          status:  (p.Velocidad > 2) ? 'moving' : 'stopped',
+          location: p.Ubicacion || '',
+          updated:  p.Fecha || new Date().toISOString(),
+        };
+      }).filter(Boolean);
+
+      if (parsed.length > 0) {
+        vehicles = parsed;
+        lastSync = new Date().toISOString();
+        syncStatus = 'ok';
+        syncError = null;
+        console.log('GPS synced: ' + parsed.length + ' vehicles');
+      }
+      return;
+    }
+
+    // Generic fallback
+    const parsed = list.map(normalizeVehicle).filter(Boolean);
+    if (parsed.length > 0) {
+      vehicles = parsed; lastSync = new Date().toISOString();
+      syncStatus = 'ok'; syncError = null;
+      console.log('Vehicles (generic): ' + parsed.length);
+    }
+  } catch(e) {
+    console.error('parseVehicleResponse error:', e.message);
   }
 }
 
