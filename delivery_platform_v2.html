@@ -1273,6 +1273,42 @@ input::placeholder { color: var(--muted); }
   </div>
 </div>
 
+<!-- ══════════════════════════════════════
+     MAPA APP — Satellite live fleet view
+══════════════════════════════════════ -->
+<div class="app-shell" id="mapa-app">
+  <div class="topbar">
+    <div class="tb-back" onclick="goHome()">←</div>
+    <div class="tb-title">Mapa de Flota</div>
+    <span class="tb-badge badge-admin" id="mapa-fleet-badge">— unidades</span>
+  </div>
+
+  <div style="position:relative;flex:1;overflow:hidden;">
+    <div id="mapa-satellite" style="width:100%;height:100%;"></div>
+
+    <!-- Info bar overlay -->
+    <div id="mapa-infobar" style="
+      position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
+      display:flex;gap:8px;z-index:500;pointer-events:none;">
+      <div class="mapa-pill" id="mapa-moving">— en movimiento</div>
+      <div class="mapa-pill" id="mapa-stopped">— detenidos</div>
+    </div>
+
+    <!-- Unit detail popup -->
+    <div id="mapa-popup" style="display:none;position:absolute;top:60px;right:12px;
+      z-index:600;background:rgba(5,10,25,0.95);border:1px solid rgba(0,200,255,0.2);
+      border-radius:10px;padding:14px 18px;min-width:180px;backdrop-filter:blur(12px);">
+      <div style="font-family:Syne,sans-serif;font-weight:800;font-size:15px;color:#EDEDF5;margin-bottom:4px;" id="pp-name">—</div>
+      <div style="font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:.12em;color:#6E6E88;text-transform:uppercase;margin-bottom:8px;" id="pp-plate">—</div>
+      <div style="display:flex;gap:12px;">
+        <div><div style="font-size:18px;font-weight:800;color:#00C8FF;font-family:Syne,sans-serif;" id="pp-speed">0</div><div style="font-size:8px;color:#6E6E88;font-family:JetBrains Mono,monospace;text-transform:uppercase;">km/h</div></div>
+        <div><div style="font-size:18px;font-weight:800;color:#B4FF47;font-family:Syne,sans-serif;" id="pp-status">—</div><div style="font-size:8px;color:#6E6E88;font-family:JetBrains Mono,monospace;text-transform:uppercase;">estado</div></div>
+      </div>
+      <div style="font-size:10px;color:#6E6E88;margin-top:8px;font-family:Instrument Sans,sans-serif;" id="pp-location">—</div>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ══════════════════════════════════════════
    DATA ENGINE
@@ -2410,42 +2446,6 @@ window.addEventListener('resize', ()=>{
   if(tm) tm.width=tm.offsetWidth;
 });
 </script>
-
-<!-- ══════════════════════════════════════
-     MAPA APP — Satellite live fleet view
-══════════════════════════════════════ -->
-<div class="app-shell" id="mapa-app">
-  <div class="topbar">
-    <div class="tb-back" onclick="goHome()">←</div>
-    <div class="tb-title">Mapa de Flota</div>
-    <span class="tb-badge badge-admin" id="mapa-fleet-badge">— unidades</span>
-  </div>
-
-  <div style="position:relative;flex:1;overflow:hidden;">
-    <div id="mapa-satellite" style="width:100%;height:100%;"></div>
-
-    <!-- Info bar overlay -->
-    <div id="mapa-infobar" style="
-      position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
-      display:flex;gap:8px;z-index:500;pointer-events:none;">
-      <div class="mapa-pill" id="mapa-moving">— en movimiento</div>
-      <div class="mapa-pill" id="mapa-stopped">— detenidos</div>
-    </div>
-
-    <!-- Unit detail popup -->
-    <div id="mapa-popup" style="display:none;position:absolute;top:60px;right:12px;
-      z-index:600;background:rgba(5,10,25,0.95);border:1px solid rgba(0,200,255,0.2);
-      border-radius:10px;padding:14px 18px;min-width:180px;backdrop-filter:blur(12px);">
-      <div style="font-family:Syne,sans-serif;font-weight:800;font-size:15px;color:#EDEDF5;margin-bottom:4px;" id="pp-name">—</div>
-      <div style="font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:.12em;color:#6E6E88;text-transform:uppercase;margin-bottom:8px;" id="pp-plate">—</div>
-      <div style="display:flex;gap:12px;">
-        <div><div style="font-size:18px;font-weight:800;color:#00C8FF;font-family:Syne,sans-serif;" id="pp-speed">0</div><div style="font-size:8px;color:#6E6E88;font-family:JetBrains Mono,monospace;text-transform:uppercase;">km/h</div></div>
-        <div><div style="font-size:18px;font-weight:800;color:#B4FF47;font-family:Syne,sans-serif;" id="pp-status">—</div><div style="font-size:8px;color:#6E6E88;font-family:JetBrains Mono,monospace;text-transform:uppercase;">estado</div></div>
-      </div>
-      <div style="font-size:10px;color:#6E6E88;margin-top:8px;font-family:Instrument Sans,sans-serif;" id="pp-location">—</div>
-    </div>
-  </div>
-</div>
 
 </body>
 </html>
