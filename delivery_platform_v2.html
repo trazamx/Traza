@@ -54,7 +54,7 @@ body {
 /* ════════════════════════════════════════
    TRAZA LANDING — ROLE SELECTOR
 ════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Barlow+Condensed:wght@600;700;800;900&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* ═══════════════════════════════════
    TRAZA LANDING — Futuristic minimal
@@ -77,13 +77,14 @@ body {
 /* City label top */
 .traza-city {
   position: relative; z-index: 2;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: clamp(9px, 2vw, 12px);
-  letter-spacing: .45em;
+  font-family: 'Syne', 'JetBrains Mono', monospace;
+  font-weight: 600;
+  font-size: clamp(10px, 2.2vw, 14px);
+  letter-spacing: .55em;
   color: #00C8FF;
   text-transform: uppercase;
-  margin-bottom: 14px;
-  opacity: .85;
+  margin-bottom: 10px;
+  opacity: .75;
   animation: land-in .6s ease .05s both;
 }
 /* Logo canvas wrapper */
@@ -100,62 +101,124 @@ body {
 .traza-tagline {
   position: relative; z-index: 2;
   font-family: 'JetBrains Mono', monospace;
-  font-size: clamp(8px, 1.8vw, 10px);
-  letter-spacing: .3em;
-  color: rgba(110,110,136,0.7);
+  font-weight: 600;
+  font-size: clamp(9px, 2vw, 12px);
+  letter-spacing: .4em;
+  color: rgba(110,110,136,0.65);
   text-transform: uppercase;
   margin-bottom: 56px;
+  margin-top: -8px;
   text-align: center;
   animation: land-in .6s ease .35s both;
 }
-/* Menu row — always horizontal, pinned near bottom */
+/* Menu — luxury numbered cards */
 .role-cards {
   position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 44px;
+  left: 0; right: 0;
+  margin: 0 auto;
+  width: fit-content;
   z-index: 2;
   display: flex;
-  flex-direction: row !important;
-  gap: 1px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 12px;
-  overflow: hidden;
-  animation: land-in .6s ease .5s both;
-  white-space: nowrap;
+  flex-direction: row;
+  gap: 8px;
+  animation: land-in .7s ease .4s both;
 }
 .role-card {
-  background: transparent;
-  padding: 13px 28px;
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 14px;
+  padding: 14px 22px 14px 18px;
+  background: rgba(8, 15, 35, 0.55);
+  border: 1px solid rgba(255,252,245,0.08);
+  border-radius: 4px;
   cursor: pointer;
-  transition: background .22s ease, transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s ease, border-color .22s ease;
-  border-right: 1px solid rgba(255,255,255,0.06);
-  position: relative;
+  overflow: hidden;
+  transition: all .35s cubic-bezier(.25,.8,.25,1);
+  backdrop-filter: blur(20px);
+  min-width: 148px;
 }
-.role-card:last-child { border-right: none; }
+/* Top shimmer line */
+.role-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,252,245,0.15) 50%, transparent 100%);
+}
+/* Cyan glow on hover — left edge */
+.role-card::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0; width: 2px;
+  background: #00C8FF;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform .3s ease;
+}
 .role-card:hover {
-  background: rgba(0,200,255,0.08);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0,200,255,0.15), 0 4px 12px rgba(0,0,0,0.5);
-  border-color: rgba(0,200,255,0.3);
+  background: rgba(0, 200, 255, 0.06);
+  border-color: rgba(0,200,255,0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 20px 48px rgba(0,0,0,0.6), 0 0 24px rgba(0,200,255,0.05);
 }
-.role-card:hover .rc-title { color: #00C8FF; }
-.role-card:active { transform: translateY(-1px); background: rgba(0,200,255,0.13); }
-.rc-icon { font-size: 14px; opacity: .9; }
+.role-card:hover::after { transform: scaleY(1); }
+.role-card:active { transform: translateY(0) scale(0.99); }
+
+.rc-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: rgba(0,200,255,0.5);
+  letter-spacing: .05em;
+  line-height: 1;
+  transition: color .3s;
+  flex-shrink: 0;
+}
+.role-card:hover .rc-num { color: rgba(0,200,255,0.9); }
+.rc-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255,252,245,0.1);
+  flex-shrink: 0;
+  transition: background .3s;
+}
+.role-card:hover .rc-divider { background: rgba(0,200,255,0.2); }
+.rc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
 .rc-title {
   font-family: 'Syne', sans-serif;
   font-weight: 700;
   font-size: 11px;
-  letter-spacing: .1em;
-  color: rgba(237,237,245,0.85);
+  letter-spacing: .18em;
+  color: rgba(255,252,245,0.78);
   text-transform: uppercase;
   white-space: nowrap;
-  transition: color .18s;
+  transition: color .25s;
+  line-height: 1;
 }
+.rc-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .12em;
+  color: rgba(255,252,245,0.28);
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color .25s;
+  line-height: 1;
+}
+.rc-arrow {
+  font-size: 11px;
+  color: rgba(255,252,245,0.2);
+  transition: all .3s ease;
+  flex-shrink: 0;
+}
+.role-card:hover .rc-title  { color: rgba(255,252,245,0.96); }
+.role-card:hover .rc-sub    { color: rgba(255,252,245,0.5); }
+.role-card:hover .rc-arrow  { color: rgba(0,200,255,0.7); transform: translateX(3px); }
 /* hide old unused */
 .traza-stats,.traza-ticker,.landing-left,.landing-right,
 .traza-map-wrap,.landing-ver,.traza-logo { display:none!important; }
@@ -772,16 +835,31 @@ input::placeholder { color: var(--muted); }
 
   <div class="role-cards">
     <div class="role-card" onclick="enterApp('driver')">
-      <span class="rc-icon">🚗</span>
-      <span class="rc-title">Driver Hub</span>
+      <span class="rc-num">01</span>
+      <div class="rc-divider"></div>
+      <div class="rc-body">
+        <span class="rc-title">Driver Hub</span>
+        <span class="rc-sub">Operadores</span>
+      </div>
+      <span class="rc-arrow">→</span>
     </div>
     <div class="role-card" onclick="enterApp('customer')">
-      <span class="rc-icon">📦</span>
-      <span class="rc-title">Delivery</span>
+      <span class="rc-num">02</span>
+      <div class="rc-divider"></div>
+      <div class="rc-body">
+        <span class="rc-title">Delivery</span>
+        <span class="rc-sub">Rastreo en vivo</span>
+      </div>
+      <span class="rc-arrow">→</span>
     </div>
     <div class="role-card" onclick="enterApp('mapa')">
-      <span class="rc-icon">🗺️</span>
-      <span class="rc-title">Mapa</span>
+      <span class="rc-num">03</span>
+      <div class="rc-divider"></div>
+      <div class="rc-body">
+        <span class="rc-title">Mapa</span>
+        <span class="rc-sub">Flota satelital</span>
+      </div>
+      <span class="rc-arrow">→</span>
     </div>
   </div>
 </div>
@@ -1358,7 +1436,7 @@ function orderId(){ return 'ORD-'+String(orderCounter++).padStart(5,'0'); }
    TRAZA LANDING — FUTURISTIC
 ══════════════════════════════════════════ */
 
-// ── Background canvas: stars + shooting stars ─────────
+// ── Background: deep space + multi-direction shooting stars ──
 let landingAnimFrame;
 const STARS = [];
 const SHOOTING_STARS = [];
@@ -1370,30 +1448,57 @@ function initBgCanvas() {
   c.width  = window.innerWidth;
   c.height = window.innerHeight;
   STARS.length = 0;
-  for (let i = 0; i < 160; i++) {
+  // Three layers: tiny dim / medium / bright
+  for (let i = 0; i < 260; i++) {
+    const layer = i < 160 ? 0 : i < 230 ? 1 : 2;
     STARS.push({
       x: Math.random() * c.width,
       y: Math.random() * c.height,
-      r: Math.random() * 1.1 + 0.2,
-      o: Math.random() * 0.5 + 0.1,
+      r: layer === 0 ? Math.random() * 0.6 + 0.2
+       : layer === 1 ? Math.random() * 0.9 + 0.4
+       :               Math.random() * 1.3 + 0.7,
+      o: layer === 0 ? Math.random() * 0.25 + 0.05
+       : layer === 1 ? Math.random() * 0.4  + 0.1
+       :               Math.random() * 0.6  + 0.3,
       twinkle: Math.random() * Math.PI * 2,
+      speed:   Math.random() * 0.8 + 0.4,
     });
   }
   cancelAnimationFrame(landingAnimFrame);
   drawBg(c);
 }
 
-function spawnShootingStar(c) {
-  const angle = Math.PI / 6 + Math.random() * Math.PI / 8;
-  const startX = Math.random() * c.width * 0.7;
-  const startY = Math.random() * c.height * 0.4;
+function spawnShootingStar(W, H) {
+  // Pick random edge: 0=top, 1=right, 2=bottom, 3=left
+  const edge  = Math.floor(Math.random() * 4);
+  let sx, sy, angle;
+  if (edge === 0) {        // from top, going down-right or down-left
+    sx    = Math.random() * W;
+    sy    = -10;
+    angle = Math.PI * 0.15 + Math.random() * Math.PI * 0.2;
+    if (Math.random() > 0.5) angle = Math.PI - angle;
+  } else if (edge === 1) { // from right, going left
+    sx    = W + 10;
+    sy    = Math.random() * H * 0.6;
+    angle = Math.PI + Math.PI * 0.1 + Math.random() * Math.PI * 0.15;
+  } else if (edge === 2) { // from bottom, going up
+    sx    = Math.random() * W;
+    sy    = H + 10;
+    angle = -Math.PI * 0.3 - Math.random() * Math.PI * 0.2;
+  } else {                 // from left, going right
+    sx    = -10;
+    sy    = Math.random() * H * 0.6;
+    angle = -Math.PI * 0.1 + Math.random() * Math.PI * 0.2;
+  }
+  const speed = 14 + Math.random() * 12;
   SHOOTING_STARS.push({
-    x: startX, y: startY,
-    vx: Math.cos(angle) * 18,
-    vy: Math.sin(angle) * 10,
-    len: 90 + Math.random() * 80,
+    x: sx, y: sy,
+    vx: Math.cos(angle) * speed,
+    vy: Math.sin(angle) * speed,
+    len: 100 + Math.random() * 120,
     life: 1.0,
-    decay: 0.022 + Math.random() * 0.01,
+    decay: 0.018 + Math.random() * 0.012,
+    bright: 0.7 + Math.random() * 0.3,
   });
 }
 
@@ -1401,54 +1506,65 @@ function drawBg(c) {
   const ctx = c.getContext('2d');
   const W = c.width, H = c.height;
   const now = Date.now();
+  const t   = now * 0.001;
 
   ctx.clearRect(0, 0, W, H);
-  ctx.fillStyle = '#00050F';
+  ctx.fillStyle = '#00030C';
   ctx.fillRect(0, 0, W, H);
 
-  // Radial glow
-  const g = ctx.createRadialGradient(W*.5, H*.46, 0, W*.5, H*.46, W*.45);
-  g.addColorStop(0, 'rgba(0,60,180,0.18)');
-  g.addColorStop(1, 'transparent');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, W, H);
+  // Deep blue-purple nebula glow, off-center
+  const g1 = ctx.createRadialGradient(W*.42, H*.38, 0, W*.42, H*.38, W*.5);
+  g1.addColorStop(0, 'rgba(10,40,120,0.22)');
+  g1.addColorStop(1, 'transparent');
+  ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);
 
-  // Twinkling stars
-  const t = now * 0.001;
+  const g2 = ctx.createRadialGradient(W*.68, H*.65, 0, W*.68, H*.65, W*.35);
+  g2.addColorStop(0, 'rgba(40,0,80,0.10)');
+  g2.addColorStop(1, 'transparent');
+  ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
+
+  // Stars
   STARS.forEach(s => {
-    const o = s.o * (0.6 + 0.4 * Math.sin(t * 0.9 + s.twinkle));
+    const o = s.o * (0.5 + 0.5 * Math.sin(t * s.speed + s.twinkle));
     ctx.beginPath();
     ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(200,230,255,${o})`;
+    ctx.fillStyle = `rgba(210,228,255,${o})`;
     ctx.fill();
   });
 
-  // Spawn shooting star every 7s
-  if (now - lastShoot > 7000) {
-    spawnShootingStar(c);
+  // Shoot every 5s
+  if (now - lastShoot > 5000) {
+    spawnShootingStar(W, H);
     lastShoot = now;
   }
 
-  // Draw & update shooting stars
+  // Draw shooting stars
   for (let i = SHOOTING_STARS.length - 1; i >= 0; i--) {
-    const s = SHOOTING_STARS[i];
-    const tailX = s.x - Math.cos(Math.atan2(s.vy, s.vx)) * s.len * s.life;
-    const tailY = s.y - Math.sin(Math.atan2(s.vy, s.vx)) * s.len * s.life;
+    const s   = SHOOTING_STARS[i];
+    const ang = Math.atan2(s.vy, s.vx);
+    const tailX = s.x - Math.cos(ang) * s.len * s.life;
+    const tailY = s.y - Math.sin(ang) * s.len * s.life;
+
     const grad = ctx.createLinearGradient(tailX, tailY, s.x, s.y);
-    grad.addColorStop(0, 'rgba(0,200,255,0)');
-    grad.addColorStop(0.6, `rgba(0,200,255,${s.life * 0.4})`);
-    grad.addColorStop(1, `rgba(255,255,255,${s.life * 0.9})`);
+    grad.addColorStop(0,   'rgba(150,200,255,0)');
+    grad.addColorStop(0.5, `rgba(180,220,255,${s.life * s.bright * 0.35})`);
+    grad.addColorStop(0.85,`rgba(220,240,255,${s.life * s.bright * 0.7})`);
+    grad.addColorStop(1,   `rgba(255,255,255,${s.life * s.bright})`);
+
     ctx.beginPath();
     ctx.moveTo(tailX, tailY);
     ctx.lineTo(s.x, s.y);
     ctx.strokeStyle = grad;
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth   = 1.8;
     ctx.stroke();
-    // Bright head
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, 1.5, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(255,255,255,${s.life})`;
-    ctx.fill();
+
+    // Glowing head
+    const hg = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 4);
+    hg.addColorStop(0, `rgba(255,255,255,${s.life * s.bright})`);
+    hg.addColorStop(1, 'transparent');
+    ctx.fillStyle = hg;
+    ctx.beginPath(); ctx.arc(s.x, s.y, 4, 0, Math.PI*2); ctx.fill();
+
     s.x += s.vx; s.y += s.vy; s.life -= s.decay;
     if (s.life <= 0) SHOOTING_STARS.splice(i, 1);
   }
@@ -1456,207 +1572,140 @@ function drawBg(c) {
   landingAnimFrame = requestAnimationFrame(() => drawBg(c));
 }
 
-// ── Logo canvas: TRAZA with inner dots + glow ────────────
-let logoDots = [];
-const LOGO_TEXT  = 'TRAZA';
-const LOGO_COLOR = '#EDEDF5';
-const LOGO_HI    = '#00C8FF'; // middle A (index 2)
+// ── Logo: SpaceX-style — clean filled text + cold scanline sweep + cyan A ──
+let logoAnimId;
+const LOGO_TEXT = 'TRAZA';
 
-function buildLogoDots(canvas) {
-  const ctx = canvas.getContext('2d');
-  const fs  = Math.min(window.innerWidth * 0.18, 130);
-  canvas.width  = Math.min(window.innerWidth * 0.85, 650);
-  canvas.height = fs * 1.35;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Render text off-screen to sample pixels
-  const off = document.createElement('canvas');
-  off.width  = canvas.width;
-  off.height = canvas.height;
-  const octx = off.getContext('2d');
-  octx.fillStyle = '#fff';
-  octx.font = `800 ${fs}px Syne, Arial`;
-  octx.textAlign = 'center';
-  octx.textBaseline = 'middle';
-  octx.letterSpacing = Math.round(fs * 0.09) + 'px';
-  octx.fillText(LOGO_TEXT, off.width / 2, off.height / 2);
-
-  const imgData = octx.getImageData(0, 0, off.width, off.height).data;
-  const W = off.width, H = off.height;
-  const gap = 10; // dot grid spacing — more spaced out
-
-  logoDots = [];
-  for (let y = 0; y < H; y += gap) {
-    for (let x = 0; x < W; x += gap) {
-      const idx = (y * W + x) * 4;
-      if (imgData[idx + 3] > 80) {
-        logoDots.push({
-          ox: x, oy: y,
-          x: x + (Math.random() - .5) * 40,
-          y: y + (Math.random() - .5) * 40,
-          vx: 0, vy: 0,
-          phase: Math.random() * Math.PI * 2,
-        });
-      }
-    }
-  }
-}
-
-function drawLogoDots(canvas) {
+function drawLogo(canvas) {
   const ctx = canvas.getContext('2d');
   const W   = canvas.width, H = canvas.height;
+  const t   = Date.now() * 0.001;
+  const fs  = Math.min(window.innerWidth * 0.15, 115);
+
   ctx.clearRect(0, 0, W, H);
 
-  const t   = Date.now() * 0.001;
-  const fs  = Math.min(window.innerWidth * 0.18, 130);
-  const lsp = Math.round(fs * 0.09);
-
-  // Per-letter widths for mid-A detection
-  ctx.font          = `800 ${fs}px Syne, Arial`;
-  ctx.textAlign     = 'center';
-  ctx.textBaseline  = 'middle';
-  const totalW  = ctx.measureText(LOGO_TEXT).width;
-  const startX  = W/2 - totalW/2;
-  const letterW = totalW / LOGO_TEXT.length;
-  const midAL   = startX + letterW * 2;
-  const midAR   = startX + letterW * 3;
-
-  // ── 1. Crisp letter outlines ──────────────────────────
-  ctx.save();
-  ctx.textAlign    = 'left';
+  ctx.font         = `800 ${fs}px 'Syne', Arial`;
+  ctx.textAlign    = 'center';
   ctx.textBaseline = 'middle';
-  let cx = startX;
-  for (let i = 0; i < LOGO_TEXT.length; i++) {
-    const ch   = LOGO_TEXT[i];
-    const chW  = ctx.measureText(ch).width;
-    const isMid = i === 2;
-    ctx.strokeStyle  = isMid ? 'rgba(0,200,255,0.65)' : 'rgba(220,235,255,0.28)';
-    ctx.lineWidth    = 1.1;
-    ctx.shadowColor  = isMid ? 'rgba(0,200,255,0.5)' : 'transparent';
-    ctx.shadowBlur   = isMid ? 10 : 0;
-    ctx.strokeText(ch, cx, H/2);
-    cx += chW + lsp;
-  }
+  ctx.letterSpacing = Math.round(fs * 0.08) + 'px';
+
+  // ── Outer glow pass ──
+  ctx.save();
+  ctx.shadowColor = 'rgba(200,170,110,0.15)';
+  ctx.shadowBlur  = 24;
+  ctx.fillStyle   = 'rgba(200,170,110,0.04)';
+  ctx.fillText(LOGO_TEXT, W/2, H/2);
   ctx.restore();
 
-  // ── 2. Sandy fill inside letters ─────────────────────
-  const offFill = document.createElement('canvas');
-  offFill.width = W; offFill.height = H;
-  const fctx = offFill.getContext('2d');
-  fctx.font         = `800 ${fs}px Syne, Arial`;
-  fctx.textAlign    = 'left';
-  fctx.textBaseline = 'middle';
-  fctx.fillStyle    = 'rgba(210,185,145,0.18)'; // sand tone, subtle
-  let fx = startX;
-  for (let i = 0; i < LOGO_TEXT.length; i++) {
-    const ch  = LOGO_TEXT[i];
-    const chW = fctx.measureText(ch).width;
-    fctx.fillText(ch, fx, H/2);
-    fx += chW + lsp;
-  }
-  ctx.drawImage(offFill, 0, 0);
-
-  // ── 3. Inner dots — clipped strictly inside letters ────
-  // Build clip path from filled text
+  // ── Main fill — sandy warm, semi-transparent ──
   ctx.save();
-  ctx.beginPath();
-  ctx.font          = `800 ${fs}px Syne, Arial`;
-  ctx.textBaseline  = 'middle';
-  ctx.textAlign     = 'left';
-  let clipX = startX;
+  const fillGrad = ctx.createLinearGradient(0, H*0.15, 0, H*0.88);
+  fillGrad.addColorStop(0,   'rgba(255,252,245,0.82)');
+  fillGrad.addColorStop(0.45,'rgba(245,240,228,0.68)');
+  fillGrad.addColorStop(1,   'rgba(230,224,210,0.52)');
+  ctx.fillStyle = fillGrad;
+  ctx.fillText(LOGO_TEXT, W/2, H/2);
+  ctx.restore();
+
+  // ── Middle A override — cyan glow ──
+  // Measure letter positions
+  ctx.save();
+  ctx.font         = `800 ${fs}px 'Syne', Arial`;
+  ctx.textAlign    = 'left';
+  ctx.textBaseline = 'middle';
+  const lsp   = Math.round(fs * 0.12);
+  const total = ctx.measureText(LOGO_TEXT).width + lsp * (LOGO_TEXT.length - 1);
+  let lx = W/2 - total/2;
   for (let i = 0; i < LOGO_TEXT.length; i++) {
     const ch  = LOGO_TEXT[i];
     const chW = ctx.measureText(ch).width;
-    ctx.fillText(ch, clipX, H/2);
-    clipX += chW + lsp;
+    if (i === 2) { // middle A
+      ctx.shadowColor = 'rgba(0,200,255,0.9)';
+      ctx.shadowBlur  = 18;
+      const cg = ctx.createLinearGradient(lx, H*0.2, lx, H*0.85);
+      cg.addColorStop(0, 'rgba(160,240,255,1)');
+      cg.addColorStop(0.5,'rgba(0,200,255,1)');
+      cg.addColorStop(1, 'rgba(0,140,220,0.85)');
+      ctx.fillStyle = cg;
+      ctx.fillText(ch, lx, H/2);
+    }
+    lx += chW + lsp;
   }
-  // Use compositing to keep dots inside letters only
-  // Draw dots to offscreen, then mask with filled text
-  const offDots = document.createElement('canvas');
-  offDots.width = W; offDots.height = H;
-  const dctx = offDots.getContext('2d');
-
-  logoDots.forEach(d => {
-    const wave = Math.sin(t * 0.8 + d.phase) * 0.3;
-    d.vx += (d.ox - d.x) * 0.15 + wave * 0.1;
-    d.vy += (d.oy - d.y) * 0.15 + wave * 0.08;
-    d.vx *= 0.78; d.vy *= 0.78;
-    d.x += d.vx; d.y += d.vy;
-
-    const isMidA = d.ox >= midAL && d.ox <= midAR;
-    const pulse  = 0.6 + 0.4 * Math.sin(t * 2 + d.phase);
-    const alpha  = isMidA ? (0.55 + 0.2 * pulse) : (0.22 + 0.12 * Math.sin(t*1.5 + d.phase));
-
-    dctx.shadowColor = isMidA ? '#00C8FF' : 'transparent';
-    dctx.shadowBlur  = isMidA ? 3 : 0;
-    dctx.fillStyle   = isMidA ? `rgba(0,200,255,${alpha})` : `rgba(200,220,255,${alpha})`;
-    dctx.beginPath();
-    dctx.arc(d.x, d.y, 1.0, 0, Math.PI*2);
-    dctx.fill();
-  });
-  dctx.shadowBlur = 0;
-
-  // Mask: draw filled text as mask using destination-in
-  const offMask = document.createElement('canvas');
-  offMask.width = W; offMask.height = H;
-  const mctx = offMask.getContext('2d');
-  mctx.font         = `800 ${fs}px Syne, Arial`;
-  mctx.textAlign    = 'left';
-  mctx.textBaseline = 'middle';
-  mctx.fillStyle    = '#fff';
-  let mx = startX;
-  for (let i = 0; i < LOGO_TEXT.length; i++) {
-    const ch  = LOGO_TEXT[i];
-    const chW = mctx.measureText(ch).width;
-    mctx.fillText(ch, mx, H/2);
-    mx += chW + lsp;
-  }
-
-  // Apply mask to dots canvas
-  dctx.globalCompositeOperation = 'destination-in';
-  dctx.drawImage(offMask, 0, 0);
-  dctx.globalCompositeOperation = 'source-over';
-
-  // Draw masked dots onto main canvas
   ctx.restore();
-  ctx.drawImage(offDots, 0, 0);
-  ctx.shadowBlur = 0;
+
+  // ── Scanline sweep — moving horizontal light band ──
+  const sweep = (Math.sin(t * 0.55) * 0.5 + 0.5); // 0→1 oscillating
+  const sweepY = H * (0.15 + sweep * 0.7);
+  const scanH  = H * 0.18;
+  const scanG  = ctx.createLinearGradient(0, sweepY - scanH, 0, sweepY + scanH);
+  scanG.addColorStop(0,   'rgba(180,230,255,0)');
+  scanG.addColorStop(0.45,'rgba(180,230,255,0.07)');
+  scanG.addColorStop(0.5, 'rgba(220,245,255,0.13)');
+  scanG.addColorStop(0.55,'rgba(180,230,255,0.07)');
+  scanG.addColorStop(1,   'rgba(180,230,255,0)');
+
+  // Clip to letter shapes before drawing scan
+  const offScan = document.createElement('canvas');
+  offScan.width = W; offScan.height = H;
+  const sctx = offScan.getContext('2d');
+  sctx.font         = `800 ${fs}px 'Syne', Arial`;
+  sctx.textAlign    = 'center';
+  sctx.textBaseline = 'middle';
+  sctx.letterSpacing = Math.round(fs * 0.08) + 'px';
+  sctx.fillStyle    = '#fff';
+  sctx.fillText(LOGO_TEXT, W/2, H/2);
+  sctx.globalCompositeOperation = 'source-in';
+  sctx.fillStyle = scanG;
+  sctx.fillRect(0, 0, W, H);
+  ctx.drawImage(offScan, 0, 0);
+
+  // ── Thin outline on top — very subtle ──
+  ctx.save();
+  ctx.font         = `800 ${fs}px 'Syne', Arial`;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.letterSpacing = Math.round(fs * 0.08) + 'px';
+  ctx.strokeStyle  = 'rgba(210,185,140,0.18)';
+  ctx.lineWidth    = 0.6;
+  ctx.strokeText(LOGO_TEXT, W/2, H/2);
+  ctx.restore();
 }
 
-let logoAnimId;
 function startLogoAnim() {
   cancelAnimationFrame(logoAnimId);
   function loop() {
     const c = document.getElementById('logo-canvas');
-    if (c) drawLogoDots(c);
+    if (c) drawLogo(c);
     logoAnimId = requestAnimationFrame(loop);
   }
   loop();
+}
+
+function initLogoCanvas() {
+  const c = document.getElementById('logo-canvas');
+  if (!c) return;
+  const fs = Math.min(window.innerWidth * 0.20, 155);
+  c.width  = Math.min(window.innerWidth * 0.88, 680);
+  c.height = fs * 1.3;
+  startLogoAnim();
 }
 
 // ── Init landing ──────────────────────────
 function initLanding() {
   const lc = document.getElementById('landing-canvas');
   if (lc) { lc.width = window.innerWidth; lc.height = window.innerHeight; }
-
-  const logo = document.getElementById('logo-canvas');
-  if (logo) {
-    buildLogoDots(logo);
-    startLogoAnim();
-  }
-
   initBgCanvas();
-
+  initLogoCanvas();
   window.addEventListener('resize', () => {
     const lc2 = document.getElementById('landing-canvas');
-    if (lc2) { lc2.width = window.innerWidth; lc2.height = window.innerHeight; }
-    const logo2 = document.getElementById('logo-canvas');
-    if (logo2) buildLogoDots(logo2);
+    if (lc2) { lc2.width = window.innerWidth; lc2.height = window.innerHeight; initBgCanvas(); }
+    initLogoCanvas();
   });
 }
 
 // Start on load
 document.addEventListener('DOMContentLoaded', initLanding);
+
 
 
 // Initialize 60 drivers
@@ -1705,24 +1754,46 @@ function setEl(id, val){
 let currentRole = null;
 
 function enterApp(role){
-  // Stop landing animations to save memory
-  cancelAnimationFrame(landingAnimFrame);
-  cancelAnimationFrame(mapLoopId);
-  document.getElementById('role-screen').style.display = 'none';
-  document.querySelectorAll('.app-shell').forEach(el=>el.classList.remove('active'));
-  const appEl = document.getElementById(role+'-app') || document.getElementById('customer-app');
-  appEl.classList.add('active');
-  currentRole = role;
-  if(role==='admin') startAdminSim();
-  if(role==='driver'){
-    // pick a random driver name for demo
-    const names = ['Carlos R.','Ana M.','José G.','María L.','Pedro S.'];
-    setEl('driver-name-display', pick(names));
-    startDriverMap();
+  try {
+    // Stop landing animations
+    if(typeof landingAnimFrame !== 'undefined') cancelAnimationFrame(landingAnimFrame);
+    if(typeof logoAnimId !== 'undefined') cancelAnimationFrame(logoAnimId);
+
+    // Hide landing
+    const rs = document.getElementById('role-screen');
+    if(rs) rs.style.display = 'none';
+
+    // Hide all apps, show target
+    document.querySelectorAll('.app-shell').forEach(el => el.classList.remove('active'));
+
+    // Route to correct app shell
+    const appMap = {
+      'driver':   'driver-app',
+      'customer': 'customer-app',
+      'delivery': 'customer-app',
+      'food':     'customer-app',
+      'admin':    'admin-app',
+      'mapa':     'mapa-app',
+    };
+    const appId = appMap[role] || (role + '-app');
+    const appEl = document.getElementById(appId) || document.getElementById('customer-app');
+    if(!appEl){ console.error('App not found:', appId); return; }
+    appEl.classList.add('active');
+    currentRole = role;
+
+    // Init each app
+    if(role === 'admin') startAdminSim();
+    if(role === 'driver'){
+      const names = ['Carlos R.','Ana M.','José G.','María L.','Pedro S.'];
+      setEl('driver-name-display', pick(names));
+      startDriverMap();
+    }
+    if(role === 'customer' || role === 'food' || role === 'delivery') startTrackMap();
+    if(role === 'mapa') setTimeout(initMapaApp, 100);
+
+  } catch(e) {
+    console.error('enterApp error:', e);
   }
-  if(role==='customer') startTrackMap();
-  if(role==='food') startTrackMap(); // Food uses customer view for now
-  if(role==='mapa') { setTimeout(initMapaApp, 80); }
 }
 
 function goHome(){
@@ -2445,6 +2516,112 @@ window.addEventListener('resize', ()=>{
   const tm=document.getElementById('track-map');
   if(tm) tm.width=tm.offsetWidth;
 });
+
+// ══════════════════════════════════════════
+//  MAPA APP — Satellite fleet view
+// ══════════════════════════════════════════
+let mapaMap = null;
+let mapaMarkers = {};
+const EXCLUDE_UNITS = ['23170'];
+
+function initMapaApp() {
+  const container = document.getElementById('mapa-satellite');
+  if (!container) { console.error('mapa-satellite not found'); return; }
+  if (mapaMap) {
+    setTimeout(function(){ mapaMap.invalidateSize(); }, 120);
+    if (window._lastVehicles) updateMapaMarkers(window._lastVehicles);
+    return;
+  }
+  mapaMap = L.map('mapa-satellite', {
+    center: [25.6866, -100.3161],
+    zoom: 13,
+    zoomControl: true,
+    attributionControl: false,
+  });
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19,
+  }).addTo(mapaMap);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19, opacity: 0.65,
+  }).addTo(mapaMap);
+  setTimeout(function(){ mapaMap.invalidateSize(); }, 200);
+  if (window._lastVehicles) updateMapaMarkers(window._lastVehicles);
+}
+
+function extractUnitNum(name, eco) {
+  var raw = name || eco || '';
+  var m = raw.match(/^0*([0-9]+)/);
+  return m ? m[1] : raw.slice(0, 6);
+}
+
+function updateMapaMarkers(vehicles) {
+  window._lastVehicles = vehicles;
+  if (!mapaMap || !vehicles || !vehicles.length) return;
+  var filtered = vehicles.filter(function(v) {
+    var num = extractUnitNum(v.name, v.eco);
+    return EXCLUDE_UNITS.indexOf(num) === -1;
+  });
+  var badge = document.getElementById('mapa-fleet-badge');
+  if (badge) badge.textContent = filtered.length + ' unidades';
+  var moving  = filtered.filter(function(v){ return (v.speed||0) > 2; }).length;
+  var stopped = filtered.length - moving;
+  var mp = document.getElementById('mapa-moving');
+  var sp = document.getElementById('mapa-stopped');
+  if (mp) mp.textContent = moving + ' en movimiento';
+  if (sp) sp.textContent = stopped + ' detenidos';
+  var seen = {};
+  filtered.forEach(function(v) {
+    if (!v.lat || !v.lng) return;
+    var id    = String(v.id || v.name);
+    var num   = extractUnitNum(v.name, v.eco);
+    var mov   = (v.speed||0) > 2;
+    var color = mov ? '#B4FF47' : '#00C8FF';
+    seen[id]  = true;
+    var iconHtml = '<div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;">'
+      + '<div style="width:30px;height:30px;border-radius:50%;background:rgba(3,3,10,0.88);border:2px solid '
+      + color + ';display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 0 10px '
+      + color + '66;">🚕</div>'
+      + '<div style="font-family:JetBrains Mono,monospace;font-size:8px;font-weight:700;color:' + color
+      + ';background:rgba(3,3,10,0.92);border:1px solid ' + color + '44;border-radius:3px;padding:1px 5px;margin-top:2px;white-space:nowrap;">'
+      + num + '</div></div>';
+    var icon = L.divIcon({ html: iconHtml, className: '', iconSize: [34,46], iconAnchor: [17,23] });
+    if (mapaMarkers[id]) {
+      mapaMarkers[id].setLatLng([v.lat, v.lng]);
+      mapaMarkers[id].setIcon(icon);
+    } else {
+      var marker = L.marker([v.lat, v.lng], { icon: icon }).addTo(mapaMap);
+      marker._vdata = v;
+      (function(vv, nn){ marker.on('click', function(){ showMapaPopup(vv, nn); }); })(v, num);
+      mapaMarkers[id] = marker;
+    }
+  });
+  Object.keys(mapaMarkers).forEach(function(id) {
+    if (!seen[id]) { mapaMap.removeLayer(mapaMarkers[id]); delete mapaMarkers[id]; }
+  });
+  if (!mapaMap._fitted) {
+    var pts = filtered.filter(function(v){ return v.lat && v.lng; }).map(function(v){ return [v.lat, v.lng]; });
+    if (pts.length) { mapaMap.fitBounds(pts, { padding: [52,52], maxZoom: 15 }); mapaMap._fitted = true; }
+  }
+}
+
+function showMapaPopup(v, num) {
+  var popup = document.getElementById('mapa-popup');
+  if (!popup) return;
+  document.getElementById('pp-name').textContent     = 'Unidad ' + num;
+  document.getElementById('pp-plate').textContent    = v.plate || v.name || '—';
+  document.getElementById('pp-speed').textContent    = Math.round(v.speed || 0);
+  document.getElementById('pp-status').textContent   = (v.speed||0) > 2 ? 'Movimiento' : 'Detenido';
+  document.getElementById('pp-location').textContent = v.location || 'Monterrey, NL';
+  popup.style.display = 'block';
+}
+
+document.addEventListener('click', function(e) {
+  var popup = document.getElementById('mapa-popup');
+  if (popup && !popup.contains(e.target) && !e.target.closest('.leaflet-marker-icon')) {
+    popup.style.display = 'none';
+  }
+});
+
 </script>
 
 </body>
