@@ -1619,6 +1619,11 @@ input::placeholder { color: var(--muted); }
   border-color: rgba(180,255,71,0.3);
 }
 </style>
+  <!-- Leaflet for route mini-map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- EmailJS para confirmación desde trazalogisticamx@gmail.com -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -1640,8 +1645,6 @@ input::placeholder { color: var(--muted); }
 
   <div class="role-cards">
     <div class="role-card" onclick="enterApp('customer')">
-      <span class="rc-num">01</span>
-      <div class="rc-divider"></div>
       <div class="rc-body">
         <span class="rc-title">Delivery</span>
         <span class="rc-sub">Envía · Rastreo en vivo</span>
@@ -2114,32 +2117,6 @@ input::placeholder { color: var(--muted); }
 .cat-chip.active .cat-chip-name { color: #00C8FF; }
 
 /* Pricing info bar */
-.price-infobar {
-  margin: 12px 16px 0;
-  padding: 10px 14px;
-  background: rgba(0,200,255,0.05);
-  border: 1px solid rgba(0,200,255,0.12);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.price-infobar-icon { font-size: 16px; flex-shrink: 0; }
-.price-infobar-text {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  letter-spacing: .05em;
-  color: rgba(0,200,255,0.7);
-  line-height: 1.5;
-}
-.price-infobar-price {
-  margin-left: auto;
-  font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
-  font-size: 26px;
-  color: #fff;
-  letter-spacing: .04em;
-  flex-shrink: 0;
-}
 
 /* Form section */
 .form-section {
@@ -2205,6 +2182,244 @@ input::placeholder { color: var(--muted); }
   grid-template-columns: 1fr 1fr;
   gap: 8px;
   margin-bottom: 10px;
+}
+
+/* Contact fields with email */
+.contact-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.contact-fields .form-group input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #fff;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color .2s;
+}
+.contact-fields .form-group input:focus {
+  outline: none;
+  border-color: rgba(0,200,255,0.4);
+}
+.contact-fields .form-group input.valid {
+  border-color: rgba(0,224,150,0.45);
+}
+.contact-fields label {
+  display: block;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+
+/* ── Payment section ── */
+.pay-section {
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.btn-pay-native {
+  background: #000;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  transition: opacity .2s;
+}
+.btn-pay-native:hover { opacity: .85; }
+.pay-card-wrap {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.pay-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.pay-card-title {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--muted);
+}
+.pay-card-icons { display: flex; gap: 5px; }
+.pay-icon {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.6);
+  letter-spacing: .05em;
+}
+.pay-card-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: rgba(255,255,255,0.06);
+}
+.pay-field { background: var(--card); padding: 10px 12px; }
+.pay-field-full { grid-column: 1 / -1; }
+.pay-lbl {
+  display: block;
+  font-size: 9px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.pay-field input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 15px;
+  font-family: var(--font-mono);
+  width: 100%;
+  letter-spacing: .06em;
+}
+.pay-field input::placeholder { color: rgba(255,255,255,0.2); }
+.pay-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 2px;
+}
+.pay-total-label {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.pay-total-amount {
+  font-family: 'Bebas Neue','Barlow Condensed',sans-serif;
+  font-size: 32px;
+  letter-spacing: .06em;
+  color: #B4FF47;
+}
+.btn-pay-main {
+  background: linear-gradient(135deg, #00C8FF 0%, #B4FF47 100%);
+  border: none;
+  border-radius: 14px;
+  padding: 16px 24px;
+  font-family: 'Bebas Neue','Barlow Condensed',sans-serif;
+  font-size: 20px;
+  letter-spacing: .1em;
+  color: #03030A;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  transition: all .2s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-pay-main:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.btn-pay-main:active { transform: scale(.98); }
+.btn-pay-main.loading { opacity: .7; pointer-events: none; }
+.btn-pay-arr { font-size: 18px; }
+.pay-secure-note {
+  font-size: 10px;
+  color: var(--muted);
+  text-align: center;
+  font-family: var(--font-mono);
+  letter-spacing: .04em;
+  padding: 2px 0;
+}
+
+/* ── Speed cards (post-mapa) ── */
+.speed-cards { display: flex; flex-direction: column; gap: 8px; }
+.speed-card {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 13px 14px; cursor: pointer;
+  transition: all .18s;
+}
+.speed-card:hover { background: rgba(0,200,255,0.06); border-color: rgba(0,200,255,0.2); }
+.speed-card.active {
+  background: rgba(0,200,255,0.08);
+  border-color: rgba(0,200,255,0.4);
+  box-shadow: 0 0 0 1px rgba(0,200,255,0.15);
+}
+.scard-left { display: flex; align-items: center; gap: 10px; }
+.scard-icon { font-size: 22px; }
+.scard-name { font-size: 14px; font-weight: 700; color: #EDEDF5; font-family: var(--font-body); }
+.scard-eta  { font-size: 11px; color: var(--muted); font-family: var(--font-mono); margin-top: 1px; }
+.scard-price {
+  font-family: 'Bebas Neue','Barlow Condensed',sans-serif;
+  font-size: 24px; letter-spacing: .05em; color: #B4FF47;
+  min-width: 60px; text-align: right;
+}
+
+/* ── Programado date/time picker ── */
+.prog-picker-wrap {
+  background: rgba(0,200,255,0.04);
+  border: 1px solid rgba(0,200,255,0.15);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: -4px;
+}
+.prog-picker-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
+.prog-field { display: flex; flex-direction: column; gap: 6px; }
+.prog-day-scroll {
+  display: flex; flex-direction: column; gap: 4px;
+  max-height: 150px; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: rgba(0,200,255,0.3) transparent;
+}
+.prog-day-btn {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px; padding: 7px 10px; cursor: pointer;
+  text-align: left; color: rgba(255,255,255,0.75);
+  font-size: 12px; font-family: var(--font-body);
+  transition: all .15s;
+}
+.prog-day-btn:hover { background: rgba(0,200,255,0.08); border-color: rgba(0,200,255,0.25); }
+.prog-day-btn.active {
+  background: rgba(0,200,255,0.12); border-color: rgba(0,200,255,0.45);
+  color: #fff; font-weight: 600;
+}
+.prog-hour-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.prog-hour-btn {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 7px; padding: 6px 4px; cursor: pointer;
+  color: rgba(255,255,255,0.65); font-size: 12px;
+  font-family: var(--font-mono); text-align: center;
+  transition: all .15s;
+}
+.prog-hour-btn:hover { background: rgba(180,255,71,0.08); border-color: rgba(180,255,71,0.3); }
+.prog-hour-btn.active {
+  background: rgba(180,255,71,0.12); border-color: rgba(180,255,71,0.5);
+  color: #B4FF47; font-weight: 700;
+}
+.prog-selected-label {
+  font-size: 12px; font-family: var(--font-mono);
+  color: rgba(0,200,255,0.8); text-align: center;
+  padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.06);
+  letter-spacing: .04em;
 }
 
 /* Package detail fields */
@@ -2354,13 +2569,7 @@ input::placeholder { color: var(--muted); }
 .btn-cta-wa:hover { background: rgba(37,211,102,0.18); }
 
 /* Competitor price compare */
-.price-compare {
-  margin: 0 16px 14px;
-  padding: 12px 14px;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 8px;
-}
+
 .price-compare-title {
   font-family: 'JetBrains Mono', monospace;
   font-size: 8px;
@@ -2469,6 +2678,138 @@ input::placeholder { color: var(--muted); }
 .addr-suggestion-sub { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--muted); margin-top: 1px; }
 .addr-loading { padding:12px 14px; font-size:12px; color:var(--muted); font-family:var(--font-mono); letter-spacing:.05em; }
 
+/* ── Structured address fields ── */
+.addr-block {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.addr-fields-grid {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  grid-template-rows: auto auto;
+  gap: 8px;
+}
+.addr-fg-cp    { grid-column: 1; grid-row: 1; }
+.addr-fg-col   { grid-column: 2; grid-row: 1; }
+.addr-fg-calle { grid-column: 1 / span 2; grid-row: 2; position:relative; }
+.addr-fg-num   { grid-column: 1 / span 2; grid-row: 3; }
+@media(min-width:400px){
+  .addr-fields-grid {
+    grid-template-columns: 80px 1fr 90px;
+    grid-template-rows: auto auto;
+  }
+  .addr-fg-cp    { grid-column:1; grid-row:1; }
+  .addr-fg-col   { grid-column:2 / span 2; grid-row:1; }
+  .addr-fg-calle { grid-column:1 / span 2; grid-row:2; }
+  .addr-fg-num   { grid-column:3; grid-row:2; }
+}
+.addr-fg-item { display:flex; flex-direction:column; gap:4px; }
+.addr-lbl {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.addr-fg-item input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-size: 13px;
+  color: #fff;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color .2s;
+}
+.addr-fg-item input:focus {
+  outline: none;
+  border-color: rgba(0,200,255,0.5);
+  background: rgba(0,200,255,0.05);
+}
+.addr-fg-item input.valid {
+  border-color: rgba(0,224,150,0.5);
+  background: rgba(0,224,150,0.04);
+}
+.addr-fg-item input::placeholder { color:var(--muted); font-size:12px; }
+.cp-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(0,224,150,0.8);
+  letter-spacing:.05em;
+  min-height:12px;
+  margin-top:2px;
+}
+.addr-resolved {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(0,200,255,0.7);
+  letter-spacing: .04em;
+  min-height: 14px;
+  padding: 2px 2px 0;
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.addr-resolved.ok   { color: rgba(0,224,150,0.85); }
+.addr-resolved.err  { color: rgba(255,60,80,0.8); }
+.addr-resolved.searching { color: rgba(255,255,255,0.3); }
+.col-dropdown {
+  position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:300;
+  background:#0d1117; border:1px solid rgba(0,200,255,0.2);
+  border-radius:10px; overflow:hidden; display:none;
+  max-height:180px; overflow-y:auto; box-shadow:0 8px 24px rgba(0,0,0,.5);
+}
+.col-option {
+  padding:9px 12px; font-size:12px; cursor:pointer;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  transition:background .15s;
+}
+.col-option:hover { background:rgba(0,200,255,0.1); color:#fff; }
+.col-option:last-child { border-bottom:none; }
+
+/* ── Route mini-map ── */
+#route-map-wrap {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(0,200,255,0.15);
+  background: #0a1628;
+}
+#route-map {
+  width: 100%;
+  height: 200px;
+}
+#route-map-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 10px 14px;
+  background: rgba(0,0,0,0.4);
+  border-top: 1px solid rgba(0,200,255,0.1);
+}
+#route-km-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: #00C8FF;
+}
+#route-eta-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+}
+#route-price-label {
+  font-family: 'Bebas Neue','Barlow Condensed',sans-serif;
+  font-size: 20px;
+  letter-spacing: .05em;
+  color: #B4FF47;
+}
+
 /* Track page */
 .track-search {
   padding: 16px;
@@ -2550,7 +2891,7 @@ input::placeholder { color: var(--muted); }
   <div class="topbar" style="background:linear-gradient(135deg,#000A1F,#001028);">
     <div class="tb-back" onclick="goHome()">←</div>
     <div class="tb-title" style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;letter-spacing:.1em;">TRAZA Delivery</div>
-    <span class="tb-badge badge-customer">ZMM</span>
+
   </div>
 
   <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
@@ -2562,35 +2903,9 @@ input::placeholder { color: var(--muted); }
         <!-- Hero + speed selector -->
         <div class="del-hero">
           <div class="del-hero-title">¿A dónde enviamos?</div>
-          <div class="del-hero-sub">Entrega hoy · Monterrey ZMM · 60+ unidades activas</div>
+          <div class="del-hero-sub">Entrega hoy · Monterrey</div>
 
-          <!-- Speed tabs -->
-          <div class="speed-tabs">
-            <div class="speed-tab active" id="stab-turbo" onclick="selectSpeed(this,'turbo',59,'🚀','20–30 min')">
-              <span class="speed-tab-icon">🚀</span>
-              <span class="speed-tab-name">Turbo</span>
-              <span class="speed-tab-price" id="stab-turbo-price">desde $59</span>
-              <span class="speed-tab-eta">20–30 min</span>
-            </div>
-            <div class="speed-tab" id="stab-express" onclick="selectSpeed(this,'express',69,'⚡','1–2 hrs')">
-              <span class="speed-tab-icon">⚡</span>
-              <span class="speed-tab-name">Express</span>
-              <span class="speed-tab-price" id="stab-express-price">desde $69</span>
-              <span class="speed-tab-eta">1–2 hrs</span>
-            </div>
-            <div class="speed-tab" id="stab-sameday" onclick="selectSpeed(this,'sameday',55,'📦','hoy mismo')">
-              <span class="speed-tab-icon">📦</span>
-              <span class="speed-tab-name">Same Day</span>
-              <span class="speed-tab-price" id="stab-sameday-price">desde $55</span>
-              <span class="speed-tab-eta">hoy mismo</span>
-            </div>
-            <div class="speed-tab" id="stab-programado" onclick="selectSpeed(this,'programado',49,'📅','tú eliges hora')">
-              <span class="speed-tab-icon">📅</span>
-              <span class="speed-tab-name">Programado</span>
-              <span class="speed-tab-price" id="stab-programado-price">desde $49</span>
-              <span class="speed-tab-eta">tú eliges hora</span>
-            </div>
-          </div>
+
         </div>
 
         <!-- Category chips -->
@@ -2621,12 +2936,7 @@ input::placeholder { color: var(--muted); }
           </div>
         </div>
 
-        <!-- Price info bar -->
-        <div class="price-infobar">
-          <span class="price-infobar-icon" id="pi-icon">🚀</span>
-          <span class="price-infobar-text" id="pi-text">Turbo — ingresa origen y destino<br><span style="font-size:11px;opacity:.6">Precio calculado por km · Todo Nuevo León</span></span>
-          <span class="price-infobar-price" id="pi-price">desde $59</span>
-        </div>
+
 
         <!-- Store picker panel (shown for flores/farmacia/comida/compras) -->
         <div id="store-picker-panel" style="display:none;padding:0 16px 0;">
@@ -2634,60 +2944,110 @@ input::placeholder { color: var(--muted); }
           <div class="store-picker-grid" id="store-picker-grid"></div>
         </div>
 
-        <!-- Address fields -->
+        <!-- Address fields — estructuradas v3 -->
         <div class="form-section">
-          <div class="form-section-title">Direcciones</div>
-          <div style="position:relative">
-            <div class="addr-row">
-              <div class="addr-field">
-                <span class="addr-field-dot addr-dot-green">●</span>
-                <input type="text" id="c-from" placeholder="Origen — colonia o calle, Monterrey"
-                  autocomplete="off" oninput="addrSearch('c-from','c-from-drop')" onfocus="addrSearch('c-from','c-from-drop')">
+          <div class="form-section-title" style="display:flex;align-items:center;gap:8px"><span style="color:#00E096">●</span> Origen</div>
+          <div class="addr-block">
+            <div class="addr-fields-grid">
+              <div class="addr-fg-item addr-fg-cp">
+                <label class="addr-lbl">C.P.</label>
+                <input type="text" id="from-cp" maxlength="5" inputmode="numeric"
+                  placeholder="Selecciona" oninput="onCpInput('from')" autocomplete="off">
+                <div class="cp-badge" id="from-cp-badge"></div>
               </div>
-              <div class="addr-field">
-                <span class="addr-field-dot addr-dot-cyan">◆</span>
-                <input type="text" id="c-to" placeholder="Destino — colonia o calle, Monterrey"
-                  autocomplete="off" oninput="addrSearch('c-to','c-to-drop')" onfocus="addrSearch('c-to','c-to-drop')">
+              <div class="addr-fg-item addr-fg-col">
+                <label class="addr-lbl">Colonia</label>
+                <div style="position:relative">
+                  <input type="text" id="from-col" placeholder="Selecciona"
+                    autocomplete="off" readonly onclick="openColDropdown('from')">
+                  <div class="col-dropdown" id="from-col-drop"></div>
+                </div>
+              </div>
+              <div class="addr-fg-item addr-fg-calle">
+                <label class="addr-lbl">Calle</label>
+                <input type="text" id="from-calle" placeholder="Selecciona"
+                  autocomplete="off" oninput="onAddrChange('from')">
+                <div class="col-dropdown" id="from-calle-drop"></div>
+              </div>
+              <div class="addr-fg-item addr-fg-num">
+                <label class="addr-lbl">Núm.</label>
+                <input type="text" id="from-num" placeholder="S/N"
+                  autocomplete="off" oninput="onAddrChange('from')">
               </div>
             </div>
-            <div id="c-from-drop" class="addr-dropdown" style="display:none;top:50%;"></div>
-            <div id="c-to-drop"   class="addr-dropdown" style="display:none;top:100%;"></div>
+            <div class="addr-resolved" id="from-resolved"></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title" style="display:flex;align-items:center;gap:8px"><span style="color:#00C8FF">◆</span> Destino</div>
+          <div class="addr-block">
+            <div class="addr-fields-grid">
+              <div class="addr-fg-item addr-fg-cp">
+                <label class="addr-lbl">C.P.</label>
+                <input type="text" id="to-cp" maxlength="5" inputmode="numeric"
+                  placeholder="Selecciona" oninput="onToChange()" autocomplete="off">
+              </div>
+              <div class="addr-fg-item addr-fg-col">
+                <label class="addr-lbl">Colonia</label>
+                <input type="text" id="to-col" placeholder="Selecciona"
+                  autocomplete="off" oninput="onToChange()">
+              </div>
+              <div class="addr-fg-item addr-fg-calle">
+                <label class="addr-lbl">Calle</label>
+                <input type="text" id="to-calle" placeholder="Selecciona"
+                  autocomplete="off" oninput="onToChange()">
+              </div>
+              <div class="addr-fg-item addr-fg-num">
+                <label class="addr-lbl">Núm.</label>
+                <input type="text" id="to-num" placeholder="S/N"
+                  autocomplete="off" oninput="onToChange()">
+              </div>
+            </div>
+            <div class="addr-resolved" id="to-resolved"></div>
+          </div>
+        </div>
+
+        <!-- Mini mapa de trayecto -->
+        <div id="route-map-section" style="display:none;" class="form-section">
+          <div class="form-section-title">Trayecto estimado</div>
+          <div id="route-map-wrap">
+            <div id="route-map"></div>
+            <div id="route-map-info">
+              <span id="route-km-label">— km</span>
+              <span id="route-eta-label">— min</span>
+              <span id="route-price-label">$—</span>
+            </div>
           </div>
         </div>
 
         <!-- Contact fields -->
         <div class="form-section">
           <div class="form-section-title">Tus datos</div>
-          <div class="contact-row">
+          <div class="contact-fields">
             <div class="form-group" style="margin-bottom:0">
               <label>Nombre</label>
-              <input type="text" id="c-name" placeholder="Nombre completo">
+              <input type="text" id="c-name" placeholder="Nombre completo" autocomplete="name">
             </div>
             <div class="form-group" style="margin-bottom:0">
               <label>WhatsApp</label>
-              <input type="tel" id="c-phone" placeholder="81 0000 0000">
+              <input type="tel" id="c-phone" placeholder="81 0000 0000" autocomplete="tel">
+            </div>
+            <div class="form-group" style="margin-bottom:0;grid-column:1/-1">
+              <label>Correo electrónico</label>
+              <input type="email" id="c-email" placeholder="correo@ejemplo.com" autocomplete="email" oninput="onEmailInput()">
             </div>
           </div>
         </div>
 
         <!-- Package type -->
         <div class="form-section" id="pkg-section">
-          <div class="form-section-title">Tipo de envío</div>
+          <div class="form-section-title">¿Qué enviamos?</div>
           <div class="pkg-grid">
             <div class="pkg-sel active" id="pkg-chico" onclick="selectPkg(this,'chico')">
               <span class="pkg-sel-icon">📮</span>
-              <span class="pkg-sel-name">Chico</span>
-              <span class="pkg-sel-desc">Sobre / &lt;1kg</span>
-            </div>
-            <div class="pkg-sel" id="pkg-mediano" onclick="selectPkg(this,'mediano')">
-              <span class="pkg-sel-icon">📦</span>
-              <span class="pkg-sel-name">Mediano</span>
-              <span class="pkg-sel-desc">Caja hasta 5kg</span>
-            </div>
-            <div class="pkg-sel" id="pkg-grande" onclick="selectPkg(this,'grande')">
-              <span class="pkg-sel-icon">📫</span>
-              <span class="pkg-sel-name">Grande</span>
-              <span class="pkg-sel-desc">Hasta 20kg</span>
+              <span class="pkg-sel-name">Normal</span>
+              <span class="pkg-sel-desc">Sobre / paquete</span>
             </div>
             <div class="pkg-sel" id="pkg-fragil" onclick="selectPkg(this,'fragil')">
               <span class="pkg-sel-icon">🌸</span>
@@ -2725,37 +3085,129 @@ input::placeholder { color: var(--muted); }
           </div>
         </div>
 
-        <!-- Competitor price compare -->
-        <div class="price-compare">
-          <div class="price-compare-title">vs. competencia · precio por km</div>
-          <div class="price-compare-row">
-            <span class="pcr-name">Uber Flash</span>
-            <span class="pcr-price">~$12–$15/km</span>
-          </div>
-          <div class="price-compare-row">
-            <span class="pcr-name">Rappi Express</span>
-            <span class="pcr-price">~$10–$14/km</span>
-          </div>
-          <div class="price-compare-row">
-            <span class="pcr-name">Envíos Pronto</span>
-            <span class="pcr-price">~$8–$10/km (sin GPS)</span>
-          </div>
-          <div class="price-compare-row" style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(0,224,150,0.12)">
-            <span class="pcr-name pcr-traza">TRAZA — GPS en vivo + notif.</span>
-            <span class="pcr-price pcr-traza" id="comp-price">desde $49</span>
+
+
+        <!-- Selección de servicio (aparece DESPUÉS del mapa) -->
+        <div id="speed-picker-section" style="display:none" class="form-section">
+          <div class="form-section-title">Elige tu servicio</div>
+          <div class="speed-cards" id="speed-cards">
+            <div class="speed-card active" id="scard-turbo" onclick="selectSpeed(this,'turbo','🚀','20–30 min')">
+              <div class="scard-left">
+                <span class="scard-icon">🚀</span>
+                <div>
+                  <div class="scard-name">Turbo</div>
+                  <div class="scard-eta">20–30 min</div>
+                </div>
+              </div>
+              <div class="scard-price" id="scard-turbo-price">—</div>
+            </div>
+            <div class="speed-card" id="scard-express" onclick="selectSpeed(this,'express','⚡','1–2 hrs')">
+              <div class="scard-left">
+                <span class="scard-icon">⚡</span>
+                <div>
+                  <div class="scard-name">Express</div>
+                  <div class="scard-eta">1–2 hrs</div>
+                </div>
+              </div>
+              <div class="scard-price" id="scard-express-price">—</div>
+            </div>
+            <div class="speed-card" id="scard-sameday" onclick="selectSpeed(this,'sameday','📦','hoy mismo')">
+              <div class="scard-left">
+                <span class="scard-icon">📦</span>
+                <div>
+                  <div class="scard-name">Same Day</div>
+                  <div class="scard-eta">hoy mismo</div>
+                </div>
+              </div>
+              <div class="scard-price" id="scard-sameday-price">—</div>
+            </div>
+            <div class="speed-card" id="scard-programado" onclick="selectSpeed(this,'programado','📅','tú eliges hora')">
+              <div class="scard-left">
+                <span class="scard-icon">📅</span>
+                <div>
+                  <div class="scard-name">Programado</div>
+                  <div class="scard-eta" id="scard-prog-eta">tú eliges hora</div>
+                </div>
+              </div>
+              <div class="scard-price" id="scard-programado-price">—</div>
+            </div>
+            <!-- Picker de fecha/hora — aparece al elegir Programado -->
+            <div id="prog-picker" style="display:none" class="prog-picker-wrap">
+              <div class="prog-picker-row">
+                <div class="prog-field">
+                  <label class="pay-lbl">Día</label>
+                  <div class="prog-day-scroll" id="prog-day-scroll"></div>
+                </div>
+                <div class="prog-field">
+                  <label class="pay-lbl">Hora</label>
+                  <div class="prog-hour-grid" id="prog-hour-grid"></div>
+                </div>
+              </div>
+              <div class="prog-selected-label" id="prog-selected-label">Elige fecha y hora</div>
+            </div>
           </div>
         </div>
 
-        <!-- CTAs -->
-        <div class="cta-wrap">
-          <button class="btn-cta-main" onclick="placeOrder()">
-            <span>Ordenar ahora</span>
-            <span>→</span>
+        <!-- Pago rápido (aparece tras elegir servicio) -->
+        <div id="pay-section-wrap" style="display:none">
+        <div class="pay-section">
+          <!-- Apple Pay -->
+          <button id="btn-applepay" class="btn-pay-native" onclick="startNativePay()" style="display:none">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 165.521 105.965" height="28">
+              <path fill="white" d="M150.698 0H14.823C6.635 0 0 6.635 0 14.823v76.319c0 8.188 6.635 14.823 14.823 14.823H150.698c8.188 0 14.823-6.635 14.823-14.823V14.823C165.521 6.635 158.886 0 150.698 0z"/>
+              <path fill="black" d="M43.42 35.011c1.624-2.039 2.725-4.762 2.426-7.533-2.35.098-5.224 1.573-6.896 3.61-1.525 1.773-2.849 4.593-2.5 7.289 2.623.195 5.297-1.327 6.97-3.366zm2.401 3.835c-3.858-.228-7.152 2.188-8.99 2.188-1.861 0-4.681-2.07-7.752-2.016-3.99.061-7.69 2.316-9.726 5.9-4.17 7.167-1.086 17.779 2.955 23.606 1.978 2.891 4.348 6.087 7.47 5.974 2.967-.121 4.101-1.919 7.684-1.919 3.58 0 4.59 1.919 7.689 1.86 3.237-.06 5.275-2.891 7.252-5.783 2.25-3.293 3.175-6.49 3.223-6.656-.073-.03-6.187-2.375-6.247-9.434-.058-5.901 4.826-8.728 5.047-8.878-2.768-4.075-7.07-4.52-8.605-4.842zM78.183 30.316c8.83 0 14.97 6.081 14.97 14.94 0 8.89-6.265 15.002-15.188 15.002h-9.764V75.14h-7.3V30.316h17.282zm-9.982 23.732h8.096c6.143 0 9.638-3.31 9.638-9.761 0-6.45-3.495-9.73-9.607-9.73h-8.127v19.491zm38.68 21.432c-4.43 0-7.073-2.13-7.073-5.375 0-3.278 2.581-5.125 7.508-5.407l6.267-.37v-1.755c0-2.55-1.719-3.99-4.59-3.99-2.734 0-4.422 1.317-4.83 3.37h-6.668c.22-5.252 4.588-9.087 11.75-9.087 6.917 0 11.316 3.65 11.316 9.42V75.14h-6.729v-4.336h-.158c-1.78 3-5.117 4.676-8.793 4.676zm1.906-4.985c2.988 0 5.852-1.87 7.005-4.62v-2.456l-5.58.345c-2.8.189-4.34 1.408-4.34 3.308 0 1.94 1.596 3.423 4.915 3.423zm28.844 16.164c-6.985 0-11.63-3.34-11.944-8.384h6.73c.346 1.987 2.22 3.308 5.183 3.308 3.526 0 5.653-1.913 5.653-5.159v-4.558h-.188c-1.498 3.152-4.742 5.072-8.67 5.072-6.887 0-11.412-5.408-11.412-13.605 0-8.26 4.588-13.7 11.538-13.7 3.99 0 7.194 1.97 8.75 5.19h.16v-4.77h6.884v26.277c0 6.889-5.025 11.329-12.684 11.329zm.44-26.09c-4.02 0-6.605 3.09-6.605 8.01 0 4.966 2.553 8.07 6.606 8.07 4.02 0 6.668-3.12 6.668-8.07 0-4.887-2.648-8.01-6.668-8.01z"/>
+            </svg>
           </button>
-          <a href="https://wa.me/528115550619?text=Hola%20TRAZA%2C%20quiero%20un%20envío" target="_blank" class="btn-cta-wa">
-            <span>💬</span>
-            <span>Pedir por WhatsApp</span>
+
+          <!-- Tarjeta -->
+          <div id="pay-card-form" class="pay-card-wrap">
+            <div class="pay-card-header">
+              <span class="pay-card-title">Pago con tarjeta</span>
+              <div class="pay-card-icons">
+                <span class="pay-icon">VISA</span>
+                <span class="pay-icon">MC</span>
+                <span class="pay-icon" style="font-size:9px">AMEX</span>
+              </div>
+            </div>
+            <div class="pay-card-fields">
+              <div class="pay-field pay-field-full">
+                <label class="pay-lbl">Número de tarjeta</label>
+                <input type="text" id="card-num" placeholder="0000 0000 0000 0000"
+                  maxlength="19" inputmode="numeric" autocomplete="cc-number"
+                  oninput="fmtCardNum(this)">
+              </div>
+              <div class="pay-field">
+                <label class="pay-lbl">Vencimiento</label>
+                <input type="text" id="card-exp" placeholder="MM/AA"
+                  maxlength="5" inputmode="numeric" autocomplete="cc-exp"
+                  oninput="fmtExp(this)">
+              </div>
+              <div class="pay-field">
+                <label class="pay-lbl">CVV</label>
+                <input type="text" id="card-cvv" placeholder="000"
+                  maxlength="4" inputmode="numeric" autocomplete="cc-csc">
+              </div>
+            </div>
+          </div>
+
+          <!-- Total único — viene del km calculado -->
+          <div class="pay-total-row">
+            <span class="pay-total-label">Total a pagar</span>
+            <span class="pay-total-amount" id="pay-total-amt">$—</span>
+          </div>
+
+          <button class="btn-pay-main" id="btn-pay-main" onclick="placeOrder()">
+            <span id="btn-pay-icon">💳</span>
+            <span id="btn-pay-text">Pagar y ordenar</span>
+            <span class="btn-pay-arr">→</span>
+          </button>
+
+          <div class="pay-secure-note">🔒 Pago seguro · Confirmación por email</div>
+
+          <a href="https://wa.me/528115550619?text=Hola%20TRAZA%2C%20quiero%20un%20envío" target="_blank" class="btn-cta-wa" style="margin-top:8px">
+            <span>💬</span><span>Pedir por WhatsApp</span>
           </a>
+        </div>
         </div>
       </div>
 
@@ -2867,12 +3319,12 @@ input::placeholder { color: var(--muted); }
 <div style="position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px" id="success-modal">
   <div style="background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:36px;max-width:360px;width:100%;text-align:center">
     <div style="font-size:52px;margin-bottom:16px">🚀</div>
-    <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:30px;letter-spacing:.06em;margin-bottom:10px">¡Orden Enviada!</div>
+    <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:30px;letter-spacing:.06em;margin-bottom:10px">¡Pago exitoso!</div>
     <div style="color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.6">
-      Tu orden fue recibida. Un conductor será asignado por proximidad GPS en segundos.
+      Tu orden fue confirmada. Un conductor será asignado por proximidad GPS en segundos.
     </div>
-    <div style="font-family:var(--font-mono);font-size:14px;color:var(--blue);background:var(--blue-dim);padding:10px 20px;border-radius:8px;letter-spacing:.08em;margin-bottom:20px" id="modal-order-id">TRZ-00000</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Recibirás actualizaciones por WhatsApp</div>
+    <div style="font-family:var(--font-mono);font-size:14px;color:var(--blue);background:var(--blue-dim);padding:10px 20px;border-radius:8px;letter-spacing:.08em;margin-bottom:12px" id="modal-order-id">TRZ-00000</div>
+    <div style="font-size:12px;color:rgba(180,255,71,0.8);margin-bottom:20px;font-family:var(--font-mono)">✉ Confirmación enviada a <span id="modal-email-confirm" style="color:#B4FF47">—</span></div>
     <button class="btn btn-primary" onclick="closeModal()">Rastrear orden →</button>
   </div>
 </div>
@@ -3995,11 +4447,80 @@ let delivSpeed = { id:'turbo', price:89, icon:'🚀', name:'Turbo', eta:'20–30
 let delivCat   = { id:'paquete', icon:'📦', name:'Paquete' };
 let delivPkg   = { id:'chico', name:'Chico (<1kg)' };
 
-function selectSpeed(el, id, price, icon, eta){
-  document.querySelectorAll('.speed-tab').forEach(e=>e.classList.remove('active'));
+function selectSpeed(el, id, icon, eta){
+  document.querySelectorAll('.speed-card').forEach(e=>e.classList.remove('active'));
   el.classList.add('active');
-  delivSpeed = { id, price, icon, name: el.querySelector('.speed-tab-name').textContent.trim(), eta };
-  calcAndUpdatePrice();
+  const nameEl = el.querySelector('.scard-name');
+  delivSpeed = { id, icon, name: nameEl?nameEl.textContent.trim():id, eta, price:0 };
+
+  // Mostrar/ocultar picker de programado
+  const picker = document.getElementById('prog-picker');
+  if(id === 'programado'){ picker.style.display='block'; initProgPicker(); }
+  else { picker.style.display='none'; }
+
+  const km = _coords?.from?.kmRoute||0;
+  if(km) refreshPayTotal(km);
+  document.getElementById('pay-section-wrap').style.display='block';
+  const mapLbl = document.getElementById('route-price-label');
+  if(mapLbl) mapLbl.textContent = document.getElementById('pay-total-amt')?.textContent||'$—';
+}
+
+// ── Programado picker ─────────────────────────────────────────────────────────
+let _progDay = null, _progHour = null;
+
+function initProgPicker(){
+  const dayScroll = document.getElementById('prog-day-scroll');
+  const hourGrid  = document.getElementById('prog-hour-grid');
+  if(dayScroll.children.length) return;
+
+  const days   = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const today  = new Date();
+  for(let i=1; i<=14; i++){
+    const d = new Date(today);
+    d.setDate(today.getDate()+i);
+    const label = days[d.getDay()]+' '+d.getDate()+' '+months[d.getMonth()];
+    const btn = document.createElement('div');
+    btn.className='prog-day-btn'; btn.textContent=label;
+    btn.onclick=()=>selectProgDay(btn,label);
+    dayScroll.appendChild(btn);
+  }
+
+  for(let h=8; h<=21; h++){
+    ['00','30'].forEach(m=>{
+      if(h===21&&m==='30') return;
+      const label = String(h).padStart(2,'0')+':'+m;
+      const btn = document.createElement('div');
+      btn.className='prog-hour-btn'; btn.textContent=label;
+      btn.onclick=()=>selectProgHour(btn,label);
+      hourGrid.appendChild(btn);
+    });
+  }
+}
+
+function selectProgDay(btn, label){
+  document.querySelectorAll('.prog-day-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); _progDay=label; updateProgLabel();
+}
+
+function selectProgHour(btn, label){
+  document.querySelectorAll('.prog-hour-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); _progHour=label; updateProgLabel();
+}
+
+function updateProgLabel(){
+  const el    = document.getElementById('prog-selected-label');
+  const etaEl = document.getElementById('scard-prog-eta');
+  if(_progDay&&_progHour){
+    const txt = _progDay+' a las '+_progHour;
+    el.textContent='✓ '+txt; el.style.color='rgba(180,255,71,.9)';
+    if(etaEl) etaEl.textContent=txt;
+    delivSpeed.eta=txt;
+  } else if(_progDay){
+    el.textContent='Elige la hora'; el.style.color='rgba(0,200,255,.6)';
+  } else {
+    el.textContent='Elige fecha y hora'; el.style.color='rgba(0,200,255,.6)';
+  }
 }
 
 // ── Store catalogs ──────────────────────────────────────────────
@@ -4007,35 +4528,35 @@ const STORES = {
   flores: [
     { name:'Azap Flores',        sub:'San Pedro · Online',     icon:'🌹', addr:'Vía Cordillera 635, San Pedro' },
     { name:'La Violetera',       sub:'Monterrey · Valle',      icon:'💜', addr:'Lázaro Cárdenas 827, Valle' },
-    { name:'Envía Flores',       sub:'ZMM · 20+ años',         icon:'🌸', addr:'Online / Zona MTY' },
+    { name:'Envía Flores',       sub:'20+ años',         icon:'🌸', addr:'Online / Zona MTY' },
     { name:'Verbena Flores',     sub:'San Pedro · Artesanal',  icon:'🌼', addr:'Gonzalitos 800, Monterrey' },
     { name:'Bloom & Co',         sub:'San Pedro · Moderno',    icon:'🌺', addr:'Humberto Lobo 418, San Pedro' },
     { name:'Flores y Fresas',    sub:'Del Valle · Plaza Reloj',icon:'🍓', addr:'Calz. del Valle 201, San Pedro' },
     { name:'Rosabel',            sub:'Monterrey · Tradicional',icon:'🌷', addr:'Pino Suárez 765, Monterrey' },
     { name:'Bloom Lab',          sub:'San Pedro · Editorial',  icon:'🌻', addr:'Vasconcelos Ote 101, San Pedro' },
     { name:'Encanto Flores',     sub:'Monterrey · Juvenil',    icon:'🌿', addr:'Hidalgo Ote 503, Monterrey' },
-    { name:'Florería Petunia',   sub:'ZMM · 15 años',          icon:'🌱', addr:'Ruiz Cortines 1234, Guadalupe' },
+    { name:'Florería Petunia',   sub:'15 años',          icon:'🌱', addr:'Ruiz Cortines 1234, Guadalupe' },
   ],
   farmacia: [
-    { name:'Farmacia Guadalajara', sub:'24 hrs · ZMM completa', icon:'💊', addr:'Av. Revolución 2703, Monterrey' },
+    { name:'Farmacia Guadalajara', sub:'24 hrs · Monterrey', icon:'💊', addr:'Av. Revolución 2703, Monterrey' },
     { name:'Farmacias Benavides',  sub:'Norte de México · 100+ años', icon:'💉', addr:'Pino Suárez 1068, Monterrey' },
     { name:'Farmacias del Ahorro', sub:'1,800+ suc. nacionales', icon:'🏥', addr:'Gonzalitos 600 Sur, Monterrey' },
     { name:'Farmacias Similares',  sub:'Genéricos · Dr. Simi',  icon:'🩺', addr:'Av. Lincoln 3200, Monterrey' },
-    { name:'Farmacia San Pablo',   sub:'Especializada · ZMM',   icon:'🔬', addr:'Garza Sada 2501, Monterrey' },
+    { name:'Farmacia San Pablo',   sub:'Especializada · Monterrey',   icon:'🔬', addr:'Garza Sada 2501, Monterrey' },
   ],
   comida: [
-    { name:'Taco Palenque',      sub:'Regio · Tacos 24 hrs',   icon:'🌮', addr:'Múltiples suc. ZMM' },
-    { name:"McDonald's",         sub:'Cadena · Drive-thru',    icon:'🍔', addr:'Múltiples suc. ZMM' },
-    { name:'KFC',                sub:'Pollo frito · Combos',   icon:'🍗', addr:'Múltiples suc. ZMM' },
-    { name:'Domino\'s Pizza',    sub:'Delivery propio · ZMM',  icon:'🍕', addr:'Múltiples suc. ZMM' },
-    { name:'Little Caesars',     sub:'Pizza · Express',        icon:'👑', addr:'Múltiples suc. ZMM' },
+    { name:'Taco Palenque',      sub:'Regio · Tacos 24 hrs',   icon:'🌮', addr:'Múltiples sucursales' },
+    { name:"McDonald's",         sub:'Cadena · Drive-thru',    icon:'🍔', addr:'Múltiples sucursales' },
+    { name:'KFC',                sub:'Pollo frito · Combos',   icon:'🍗', addr:'Múltiples sucursales' },
+    { name:'Domino\'s Pizza',    sub:'Delivery propio',  icon:'🍕', addr:'Múltiples sucursales' },
+    { name:'Little Caesars',     sub:'Pizza · Express',        icon:'👑', addr:'Múltiples sucursales' },
   ],
   compras: [
-    { name:'Walmart',            sub:'Super · ZMM completa',   icon:'🛒', addr:'Múltiples suc. ZMM' },
-    { name:'Soriana',            sub:'Super · Norte México',   icon:'🏪', addr:'Múltiples suc. ZMM' },
-    { name:'HEB',                sub:'Premium · San Pedro/MTY',icon:'🌟', addr:'Múltiples suc. ZMM' },
-    { name:'Chedraui',           sub:'Super · Variedad',       icon:'🛍️', addr:'Múltiples suc. ZMM' },
-    { name:'Sam\'s Club',        sub:'Mayoreo · Membresía',    icon:'📦', addr:'Múltiples suc. ZMM' },
+    { name:'Walmart',            sub:'Super · Monterrey',   icon:'🛒', addr:'Múltiples sucursales' },
+    { name:'Soriana',            sub:'Super · Norte México',   icon:'🏪', addr:'Múltiples sucursales' },
+    { name:'HEB',                sub:'Premium · San Pedro/MTY',icon:'🌟', addr:'Múltiples sucursales' },
+    { name:'Chedraui',           sub:'Super · Variedad',       icon:'🛍️', addr:'Múltiples sucursales' },
+    { name:'Sam\'s Club',        sub:'Mayoreo · Membresía',    icon:'📦', addr:'Múltiples sucursales' },
   ],
 };
 
@@ -4069,28 +4590,21 @@ function selectStore(catId, idx) {
   if(card) card.classList.add('active');
   const store = STORES[catId][idx];
   selectedStore = store;
-  const fromInput = document.getElementById('c-from');
-  fromInput.value = store.addr;
-  fromInput.style.color = 'rgba(0,200,255,0.85)';
-  hideDropdown('c-from-drop');
-  _coords.from = null; // reset, geocodificamos
-  // Geocodifica la dirección de la tienda en background
+  // Llena campo calle/origen con la dirección de la tienda
+  const calleEl = document.getElementById('from-calle');
+  if(calleEl){
+    calleEl.value = store.addr;
+    calleEl.classList.add('valid');
+    calleEl.style.color = 'rgba(0,200,255,0.85)';
+  }
+  // Geocodifica en background para obtener coords
+  _coords.from = null;
   geocodeAddr(store.addr + ', Nuevo León', coords => {
     if(coords){ _coords.from = coords; if(_coords.to) calcAndUpdatePrice(); }
   });
 }
 
-// Geocodifica una dirección y devuelve {lat, lon} al callback
-async function geocodeAddr(query, cb){
-  try {
-    const url = `https://nominatim.openstreetmap.org/search?` +
-      `q=${encodeURIComponent(query)}&format=json&limit=1&addressdetails=1&countrycodes=mx&accept-language=es`;
-    const res  = await fetch(url, { headers:{'Accept-Language':'es'} });
-    const data = await res.json();
-    if(data.length) cb({ lat: data[0].lat, lon: data[0].lon });
-    else cb(null);
-  } catch(e){ cb(null); }
-}
+// geocodeAddr → defined below in geocoding block
 
 function selectCat(el, id){
   document.querySelectorAll('.cat-chip').forEach(e=>e.classList.remove('active'));
@@ -4125,7 +4639,7 @@ const _coords = { from: null, to: null };
 
 // Tarifas base por servicio (MXN) + tarifa por km
 const TARIFAS = {
-  turbo:      { base: 59, perKm: 9,  minKm: 1, maxKm: 15 },
+  turbo:      { base: 79, perKm: 12, minKm: 1, maxKm: 15 },
   express:    { base: 69, perKm: 8,  minKm: 1, maxKm: 40 },
   sameday:    { base: 55, perKm: 7,  minKm: 1, maxKm: 60 },
   programado: { base: 49, perKm: 7,  minKm: 1, maxKm: 80 },
@@ -4160,13 +4674,13 @@ function calcAndUpdatePrice(){
   let price, kmText, etaText;
 
   if(_coords.from && _coords.to){
-    // Distancia real
-    const km = haversineKm(
-      parseFloat(_coords.from.lat), parseFloat(_coords.from.lon),
-      parseFloat(_coords.to.lat),   parseFloat(_coords.to.lon)
-    );
-    // Factor ruta ~1.35 (calles no son línea recta)
-    const kmRuta = Math.max(km * 1.35, 1);
+    // Usa distancia real de OSRM si está disponible, si no haversine * 1.35
+    const kmRuta = _coords.from.kmRoute
+      ? Math.max(_coords.from.kmRoute, 1)
+      : Math.max(haversineKm(
+          parseFloat(_coords.from.lat), parseFloat(_coords.from.lon),
+          parseFloat(_coords.to.lat),   parseFloat(_coords.to.lon)
+        ) * 1.35, 1);
 
     if(kmRuta > t.maxKm){
       // Fuera de rango del servicio
@@ -4246,145 +4760,474 @@ function calcAndUpdatePrice(){
   return price;
 }
 
-// ── Autocomplete — Nominatim / OpenStreetMap  ────────────────────────────────
-let _addrTimers = {};
-let _addrAC     = {};
+const NL_CP_DB = {
+  "64000":{"muni":"Monterrey","cols":[{"n":"Centro","lat":25.6714,"lon":-100.309},{"n":"Obispado","lat":25.6688,"lon":-100.321},{"n":"Barrio Antiguo","lat":25.669,"lon":-100.306}]},
+  "64010":{"muni":"Monterrey","cols":[{"n":"Centro","lat":25.673,"lon":-100.306},{"n":"Independencia","lat":25.675,"lon":-100.302}]},
+  "64020":{"muni":"Monterrey","cols":[{"n":"Tecnológico","lat":25.652,"lon":-100.29},{"n":"Colonia del Valle","lat":25.655,"lon":-100.295}]},
+  "64030":{"muni":"Monterrey","cols":[{"n":"Mitras Centro","lat":25.678,"lon":-100.325},{"n":"Mitras Poniente","lat":25.68,"lon":-100.329},{"n":"Mitras Norte","lat":25.682,"lon":-100.324}]},
+  "64040":{"muni":"Monterrey","cols":[{"n":"Anáhuac","lat":25.743,"lon":-100.306},{"n":"Cumbres 1er Sector","lat":25.748,"lon":-100.31}]},
+  "64050":{"muni":"Monterrey","cols":[{"n":"Cumbres 2do Sector","lat":25.75,"lon":-100.315},{"n":"Cumbres Elite","lat":25.752,"lon":-100.32}]},
+  "64053":{"muni":"Monterrey","cols":[{"n":"Cumbres 3er Sector","lat":25.749,"lon":-100.325},{"n":"Cumbres 4to Sector","lat":25.751,"lon":-100.328}]},
+  "64055":{"muni":"Monterrey","cols":[{"n":"Cumbres 5to Sector","lat":25.752,"lon":-100.33},{"n":"Cumbres Platino","lat":25.754,"lon":-100.332}]},
+  "64058":{"muni":"Monterrey","cols":[{"n":"Cumbres 7mo Sector","lat":25.756,"lon":-100.335},{"n":"Cumbres Renacimiento","lat":25.758,"lon":-100.337}]},
+  "64060":{"muni":"Monterrey","cols":[{"n":"Contry","lat":25.656,"lon":-100.28},{"n":"Contry Club","lat":25.654,"lon":-100.278},{"n":"Cumbres Club de Golf","lat":25.657,"lon":-100.282}]},
+  "64070":{"muni":"Monterrey","cols":[{"n":"Residencial Anáhuac","lat":25.74,"lon":-100.3},{"n":"Pedregal de Anáhuac","lat":25.742,"lon":-100.303}]},
+  "64080":{"muni":"Monterrey","cols":[{"n":"Las Cumbres","lat":25.745,"lon":-100.305}]},
+  "64100":{"muni":"Monterrey","cols":[{"n":"San Jerónimo","lat":25.661,"lon":-100.389},{"n":"Sierra Ventana","lat":25.663,"lon":-100.393},{"n":"Cumbres San Agustín","lat":25.665,"lon":-100.387}]},
+  "64110":{"muni":"Monterrey","cols":[{"n":"Del Paseo Residencial","lat":25.658,"lon":-100.382},{"n":"Carrizalejo","lat":25.656,"lon":-100.38}]},
+  "64120":{"muni":"Monterrey","cols":[{"n":"Lomas de San Francisco","lat":25.663,"lon":-100.405},{"n":"Rincón de San Jerónimo","lat":25.661,"lon":-100.402}]},
+  "64130":{"muni":"Monterrey","cols":[{"n":"Colonias Obispado","lat":25.668,"lon":-100.325},{"n":"Lomas del Roble","lat":25.67,"lon":-100.328}]},
+  "64140":{"muni":"Monterrey","cols":[{"n":"Lomas de San Francisco Coacalco","lat":25.658,"lon":-100.39}]},
+  "64150":{"muni":"Monterrey","cols":[{"n":"Rincón de San Jerónimo","lat":25.66,"lon":-100.398},{"n":"Cumbres del Campestre","lat":25.662,"lon":-100.401}]},
+  "64160":{"muni":"Monterrey","cols":[{"n":"Loma Larga Oriente","lat":25.664,"lon":-100.318},{"n":"Loma Larga Poniente","lat":25.662,"lon":-100.322}]},
+  "64180":{"muni":"Monterrey","cols":[{"n":"Churubusco Norte","lat":25.708,"lon":-100.295},{"n":"Los Elizondo","lat":25.71,"lon":-100.298}]},
+  "64190":{"muni":"Monterrey","cols":[{"n":"Industrial","lat":25.715,"lon":-100.288},{"n":"Parque Industrial","lat":25.716,"lon":-100.286}]},
+  "64200":{"muni":"Monterrey","cols":[{"n":"Estadio","lat":25.668,"lon":-100.308},{"n":"Linda Vista","lat":25.672,"lon":-100.306}]},
+  "64220":{"muni":"Monterrey","cols":[{"n":"Narvarte","lat":25.674,"lon":-100.315},{"n":"Roma","lat":25.673,"lon":-100.313}]},
+  "64240":{"muni":"Monterrey","cols":[{"n":"Nuevo Repueblo","lat":25.675,"lon":-100.299},{"n":"Buenos Aires","lat":25.677,"lon":-100.301}]},
+  "64260":{"muni":"Monterrey","cols":[{"n":"Fierro","lat":25.679,"lon":-100.296},{"n":"Insulares","lat":25.68,"lon":-100.294}]},
+  "64280":{"muni":"Monterrey","cols":[{"n":"Moderna","lat":25.676,"lon":-100.288},{"n":"Del Norte","lat":25.678,"lon":-100.29}]},
+  "64290":{"muni":"Monterrey","cols":[{"n":"Treviño","lat":25.681,"lon":-100.287},{"n":"Caracol","lat":25.682,"lon":-100.285}]},
+  "64300":{"muni":"Monterrey","cols":[{"n":"Garza Nieto","lat":25.692,"lon":-100.296},{"n":"Zúazua","lat":25.694,"lon":-100.294}]},
+  "64320":{"muni":"Monterrey","cols":[{"n":"Balcones de Anáhuac","lat":25.738,"lon":-100.302},{"n":"Rincón de Anáhuac","lat":25.736,"lon":-100.3}]},
+  "64340":{"muni":"Monterrey","cols":[{"n":"Lomas de Anáhuac","lat":25.734,"lon":-100.298},{"n":"Villa de Anáhuac","lat":25.732,"lon":-100.296}]},
+  "64360":{"muni":"Monterrey","cols":[{"n":"Pedregal","lat":25.715,"lon":-100.355},{"n":"Pedregal la Silla","lat":25.717,"lon":-100.358}]},
+  "64380":{"muni":"Monterrey","cols":[{"n":"Las Puentes","lat":25.702,"lon":-100.302},{"n":"Los Pinos","lat":25.704,"lon":-100.3}]},
+  "64400":{"muni":"Monterrey","cols":[{"n":"Jardines de Anáhuac","lat":25.73,"lon":-100.312},{"n":"Prados de Anáhuac","lat":25.728,"lon":-100.31}]},
+  "64420":{"muni":"Monterrey","cols":[{"n":"Colinas de San Jerónimo","lat":25.657,"lon":-100.396},{"n":"Las Torres","lat":25.659,"lon":-100.399}]},
+  "64440":{"muni":"Monterrey","cols":[{"n":"Del Valle","lat":25.658,"lon":-100.374},{"n":"Del Valle Oriente","lat":25.657,"lon":-100.37}]},
+  "64460":{"muni":"Monterrey","cols":[{"n":"Lomas del Valle","lat":25.654,"lon":-100.368},{"n":"Contry Sur","lat":25.652,"lon":-100.366}]},
+  "64480":{"muni":"Monterrey","cols":[{"n":"Colinas de San Jerónimo","lat":25.655,"lon":-100.404},{"n":"Bosques de San Ángel","lat":25.653,"lon":-100.406}]},
+  "64500":{"muni":"Monterrey","cols":[{"n":"Contry La Silla","lat":25.648,"lon":-100.276},{"n":"Jardín","lat":25.65,"lon":-100.279}]},
+  "64520":{"muni":"Monterrey","cols":[{"n":"Burocrática","lat":25.681,"lon":-100.318},{"n":"Hipódromo","lat":25.683,"lon":-100.32}]},
+  "64540":{"muni":"Monterrey","cols":[{"n":"San Ángel","lat":25.686,"lon":-100.322},{"n":"Las Mitras","lat":25.688,"lon":-100.324}]},
+  "64560":{"muni":"Monterrey","cols":[{"n":"Prados de la Sierra","lat":25.69,"lon":-100.326},{"n":"Las Huertas","lat":25.692,"lon":-100.328}]},
+  "64580":{"muni":"Monterrey","cols":[{"n":"Las Quintas","lat":25.694,"lon":-100.33},{"n":"Jardines de Anáhuac Sector Alpes","lat":25.696,"lon":-100.332}]},
+  "64600":{"muni":"Monterrey","cols":[{"n":"Garza Sada","lat":25.644,"lon":-100.282},{"n":"Leones","lat":25.646,"lon":-100.285}]},
+  "64620":{"muni":"Monterrey","cols":[{"n":"Las Quintas","lat":25.642,"lon":-100.28},{"n":"Villa Universidad","lat":25.64,"lon":-100.278}]},
+  "64640":{"muni":"Monterrey","cols":[{"n":"Altavista","lat":25.638,"lon":-100.276},{"n":"Chepevera","lat":25.636,"lon":-100.274}]},
+  "64650":{"muni":"Monterrey","cols":[{"n":"Bello Monte","lat":25.634,"lon":-100.272},{"n":"Lomas de Valle Verde","lat":25.632,"lon":-100.27}]},
+  "64700":{"muni":"Monterrey","cols":[{"n":"Valle Oriente","lat":25.651,"lon":-100.343},{"n":"Carrizalejo Sur","lat":25.649,"lon":-100.341}]},
+  "64710":{"muni":"Monterrey","cols":[{"n":"Residencial San Ángel","lat":25.686,"lon":-100.326},{"n":"Valle Alto","lat":25.684,"lon":-100.324}]},
+  "64720":{"muni":"Monterrey","cols":[{"n":"Cumbres Élite 5to Sector","lat":25.753,"lon":-100.334},{"n":"Cumbres Élite 8vo Sector","lat":25.755,"lon":-100.336}]},
+  "64750":{"muni":"Monterrey","cols":[{"n":"Cumbres Elite 9no Sector","lat":25.757,"lon":-100.338},{"n":"Cumbres Mediterráneo","lat":25.759,"lon":-100.34}]},
+  "64780":{"muni":"Monterrey","cols":[{"n":"Las Cumbres","lat":25.761,"lon":-100.342},{"n":"Cumbres Providencia","lat":25.763,"lon":-100.344}]},
+  "64800":{"muni":"Monterrey","cols":[{"n":"Fierro","lat":25.68,"lon":-100.295},{"n":"Progreso","lat":25.682,"lon":-100.293}]},
+  "64820":{"muni":"Monterrey","cols":[{"n":"Acero","lat":25.684,"lon":-100.291},{"n":"Industrial Nogalar","lat":25.686,"lon":-100.289}]},
+  "64840":{"muni":"Monterrey","cols":[{"n":"Las Américas","lat":25.688,"lon":-100.287},{"n":"Nuevo Centro","lat":25.69,"lon":-100.285}]},
+  "64860":{"muni":"Monterrey","cols":[{"n":"Nuevo Amanecer","lat":25.692,"lon":-100.283},{"n":"Azteca","lat":25.694,"lon":-100.281}]},
+  "64900":{"muni":"Monterrey","cols":[{"n":"Unidad Laboral","lat":25.725,"lon":-100.305},{"n":"Plutarco E Calles","lat":25.727,"lon":-100.303}]},
+  "64920":{"muni":"Monterrey","cols":[{"n":"Jardín Dorado","lat":25.729,"lon":-100.301},{"n":"Mezquital","lat":25.731,"lon":-100.299}]},
+  "64940":{"muni":"Monterrey","cols":[{"n":"La Pastora","lat":25.733,"lon":-100.297},{"n":"Nacozari","lat":25.735,"lon":-100.295}]},
+  "64960":{"muni":"Monterrey","cols":[{"n":"Lázaro Cárdenas","lat":25.737,"lon":-100.293},{"n":"Roma","lat":25.739,"lon":-100.291}]},
+  "64980":{"muni":"Monterrey","cols":[{"n":"Moderna","lat":25.741,"lon":-100.289},{"n":"Urdiales","lat":25.743,"lon":-100.287}]},
+  "66200":{"muni":"San Pedro Garza García","cols":[{"n":"Centro","lat":25.658,"lon":-100.404},{"n":"Del Paseo Residencial","lat":25.656,"lon":-100.406}]},
+  "66210":{"muni":"San Pedro Garza García","cols":[{"n":"San Agustín","lat":25.649,"lon":-100.395},{"n":"Residencial San Agustín","lat":25.651,"lon":-100.397}]},
+  "66215":{"muni":"San Pedro Garza García","cols":[{"n":"San Agustín 1er Sector","lat":25.647,"lon":-100.393},{"n":"San Agustín 2do Sector","lat":25.645,"lon":-100.391}]},
+  "66220":{"muni":"San Pedro Garza García","cols":[{"n":"Villa Montaña","lat":25.643,"lon":-100.402},{"n":"La Estanzuela","lat":25.641,"lon":-100.4}]},
+  "66230":{"muni":"San Pedro Garza García","cols":[{"n":"Lomas de San Francisco","lat":25.66,"lon":-100.41},{"n":"Bosques de San Ángel","lat":25.658,"lon":-100.412}]},
+  "66240":{"muni":"San Pedro Garza García","cols":[{"n":"Humberto Lobo","lat":25.651,"lon":-100.408},{"n":"Calzada del Valle","lat":25.649,"lon":-100.406}]},
+  "66250":{"muni":"San Pedro Garza García","cols":[{"n":"Valle Oriente","lat":25.653,"lon":-100.346},{"n":"Carrizalejo","lat":25.651,"lon":-100.344}]},
+  "66254":{"muni":"San Pedro Garza García","cols":[{"n":"Vía Cordillera","lat":25.657,"lon":-100.339},{"n":"Valle Poniente","lat":25.655,"lon":-100.341}]},
+  "66260":{"muni":"San Pedro Garza García","cols":[{"n":"Tecnológico","lat":25.652,"lon":-100.368},{"n":"Del Valle","lat":25.65,"lon":-100.366}]},
+  "66265":{"muni":"San Pedro Garza García","cols":[{"n":"Del Valle Oriente","lat":25.654,"lon":-100.364},{"n":"Valle del Mirador","lat":25.656,"lon":-100.362}]},
+  "66266":{"muni":"San Pedro Garza García","cols":[{"n":"Del Valle Norte","lat":25.658,"lon":-100.36},{"n":"Cumbres del Valle","lat":25.66,"lon":-100.358}]},
+  "66267":{"muni":"San Pedro Garza García","cols":[{"n":"Valle de San Ángel","lat":25.662,"lon":-100.356},{"n":"Valle Campestre","lat":25.664,"lon":-100.354}]},
+  "66268":{"muni":"San Pedro Garza García","cols":[{"n":"El Ángel","lat":25.666,"lon":-100.352},{"n":"Valle Soleado","lat":25.668,"lon":-100.35}]},
+  "66270":{"muni":"San Pedro Garza García","cols":[{"n":"Del Valle","lat":25.65,"lon":-100.378},{"n":"Del Valle Oriente","lat":25.652,"lon":-100.376},{"n":"Calzada del Valle","lat":25.648,"lon":-100.376},{"n":"Palo Blanco","lat":25.653,"lon":-100.38}]},
+  "66278":{"muni":"San Pedro Garza García","cols":[{"n":"Zona Valle","lat":25.655,"lon":-100.383},{"n":"Vasconcelos Oriente","lat":25.653,"lon":-100.381}]},
+  "66280":{"muni":"San Pedro Garza García","cols":[{"n":"Fuentes del Valle","lat":25.651,"lon":-100.386},{"n":"Las Fuentes","lat":25.649,"lon":-100.384}]},
+  "66290":{"muni":"San Pedro Garza García","cols":[{"n":"Lomas de San Francisco","lat":25.66,"lon":-100.415},{"n":"Real San Agustín","lat":25.658,"lon":-100.413}]},
+  "66295":{"muni":"San Pedro Garza García","cols":[{"n":"Moraleja","lat":25.642,"lon":-100.386},{"n":"Los Pirules","lat":25.64,"lon":-100.384}]},
+  "66296":{"muni":"San Pedro Garza García","cols":[{"n":"Encino","lat":25.638,"lon":-100.382},{"n":"Real Encino","lat":25.636,"lon":-100.38}]},
+  "66297":{"muni":"San Pedro Garza García","cols":[{"n":"Praderas del Valle","lat":25.644,"lon":-100.388},{"n":"Altavista","lat":25.646,"lon":-100.39}]},
+  "66298":{"muni":"San Pedro Garza García","cols":[{"n":"Residencial Monterrey","lat":25.642,"lon":-100.392},{"n":"Puerta de Hierro","lat":25.644,"lon":-100.394}]},
+  "66300":{"muni":"San Pedro Garza García","cols":[{"n":"Centro","lat":25.664,"lon":-100.402},{"n":"San Pedro Centro","lat":25.666,"lon":-100.404}]},
+  "67100":{"muni":"Guadalupe","cols":[{"n":"Centro","lat":25.678,"lon":-100.256},{"n":"Independencia","lat":25.68,"lon":-100.254}]},
+  "67110":{"muni":"Guadalupe","cols":[{"n":"Jardines de Guadalupe","lat":25.676,"lon":-100.252},{"n":"Rincón de Guadalupe","lat":25.674,"lon":-100.25}]},
+  "67120":{"muni":"Guadalupe","cols":[{"n":"Los Altos","lat":25.672,"lon":-100.248},{"n":"Moderna","lat":25.67,"lon":-100.246}]},
+  "67130":{"muni":"Guadalupe","cols":[{"n":"Las Puentes","lat":25.684,"lon":-100.244},{"n":"Las Puentes 1er Sector","lat":25.686,"lon":-100.242},{"n":"Las Puentes 2do Sector","lat":25.688,"lon":-100.24}]},
+  "67140":{"muni":"Guadalupe","cols":[{"n":"Contry","lat":25.664,"lon":-100.27},{"n":"Contry La Silla","lat":25.662,"lon":-100.268}]},
+  "67150":{"muni":"Guadalupe","cols":[{"n":"Constituyentes","lat":25.69,"lon":-100.256},{"n":"Nuevo Repueblo","lat":25.692,"lon":-100.254}]},
+  "67160":{"muni":"Guadalupe","cols":[{"n":"Ruiz Cortines","lat":25.658,"lon":-100.256},{"n":"San Rafael","lat":25.656,"lon":-100.254}]},
+  "67170":{"muni":"Guadalupe","cols":[{"n":"Ciudad Satélite","lat":25.69,"lon":-100.28},{"n":"Satélite Acueducto","lat":25.692,"lon":-100.282}]},
+  "67180":{"muni":"Guadalupe","cols":[{"n":"Tolteca","lat":25.694,"lon":-100.276},{"n":"La Condesa","lat":25.696,"lon":-100.274}]},
+  "67190":{"muni":"Guadalupe","cols":[{"n":"Nuevo Amanecer","lat":25.698,"lon":-100.272},{"n":"Azteca","lat":25.7,"lon":-100.27}]},
+  "66600":{"muni":"Apodaca","cols":[{"n":"Centro","lat":25.7806,"lon":-100.1878},{"n":"San Nicolás","lat":25.782,"lon":-100.186}]},
+  "66610":{"muni":"Apodaca","cols":[{"n":"Villas de Anáhuac","lat":25.77,"lon":-100.21},{"n":"Jardines de Anáhuac","lat":25.772,"lon":-100.212}]},
+  "66614":{"muni":"Apodaca","cols":[{"n":"Las Reynas","lat":25.768,"lon":-100.208},{"n":"Praderas de Anáhuac","lat":25.766,"lon":-100.206}]},
+  "66620":{"muni":"Apodaca","cols":[{"n":"Bosques de Anáhuac","lat":25.764,"lon":-100.204},{"n":"Cumbres de Anáhuac","lat":25.762,"lon":-100.202}]},
+  "66630":{"muni":"Apodaca","cols":[{"n":"Hacienda los Morales","lat":25.786,"lon":-100.184},{"n":"Residencial Apodaca","lat":25.784,"lon":-100.182}]},
+  "66640":{"muni":"Apodaca","cols":[{"n":"San Pedro","lat":25.79,"lon":-100.18},{"n":"Villa del Sol","lat":25.788,"lon":-100.178}]},
+  "66645":{"muni":"Apodaca","cols":[{"n":"Privadas de Anáhuac","lat":25.774,"lon":-100.214},{"n":"Portal de Anáhuac","lat":25.776,"lon":-100.216}]},
+  "66650":{"muni":"Apodaca","cols":[{"n":"Prados de La Silla","lat":25.778,"lon":-100.218},{"n":"Rinconada de Anáhuac","lat":25.78,"lon":-100.22}]},
+  "66400":{"muni":"San Nicolás de los Garza","cols":[{"n":"Centro","lat":25.743,"lon":-100.296},{"n":"Las Puentes","lat":25.745,"lon":-100.294}]},
+  "66410":{"muni":"San Nicolás de los Garza","cols":[{"n":"Nogalar","lat":25.748,"lon":-100.298},{"n":"Industrial Nogalar","lat":25.75,"lon":-100.3}]},
+  "66420":{"muni":"San Nicolás de los Garza","cols":[{"n":"Mitras Norte","lat":25.751,"lon":-100.302},{"n":"Jardines de San Nicolás","lat":25.753,"lon":-100.304}]},
+  "66430":{"muni":"San Nicolás de los Garza","cols":[{"n":"Roma","lat":25.754,"lon":-100.306},{"n":"La Silla","lat":25.756,"lon":-100.308}]},
+  "66440":{"muni":"San Nicolás de los Garza","cols":[{"n":"Valle Verde","lat":25.74,"lon":-100.29},{"n":"Valle de San Isidro","lat":25.738,"lon":-100.288}]},
+  "66450":{"muni":"San Nicolás de los Garza","cols":[{"n":"Anáhuac","lat":25.742,"lon":-100.292},{"n":"Del Real","lat":25.744,"lon":-100.294}]},
+  "66460":{"muni":"San Nicolás de los Garza","cols":[{"n":"Independencia","lat":25.746,"lon":-100.296},{"n":"Nueva Independencia","lat":25.748,"lon":-100.298}]},
+  "66470":{"muni":"San Nicolás de los Garza","cols":[{"n":"Parque Acero","lat":25.75,"lon":-100.3},{"n":"Valle de Lincoln","lat":25.752,"lon":-100.302}]},
+  "66480":{"muni":"San Nicolás de los Garza","cols":[{"n":"Ciudad Universitaria","lat":25.733,"lon":-100.31},{"n":"Residencial Cumbres","lat":25.735,"lon":-100.312}]},
+  "66490":{"muni":"San Nicolás de los Garza","cols":[{"n":"Las Quintas","lat":25.737,"lon":-100.314},{"n":"Del Norte","lat":25.739,"lon":-100.316}]},
+  "66350":{"muni":"Santa Catarina","cols":[{"n":"Centro","lat":25.673,"lon":-100.458},{"n":"Las Quintas","lat":25.675,"lon":-100.46}]},
+  "66360":{"muni":"Santa Catarina","cols":[{"n":"La Fama","lat":25.653,"lon":-100.425},{"n":"Altavista","lat":25.655,"lon":-100.427}]},
+  "66367":{"muni":"Santa Catarina","cols":[{"n":"Contry Sol","lat":25.657,"lon":-100.429},{"n":"Real del Sol","lat":25.659,"lon":-100.431}]},
+  "66370":{"muni":"Santa Catarina","cols":[{"n":"Linda Vista","lat":25.661,"lon":-100.433},{"n":"Valle de Santa Catarina","lat":25.663,"lon":-100.435}]},
+  "66380":{"muni":"Santa Catarina","cols":[{"n":"La Cieneguilla","lat":25.665,"lon":-100.437},{"n":"El Roble","lat":25.667,"lon":-100.439}]},
+  "66390":{"muni":"Santa Catarina","cols":[{"n":"Puerta del Sol","lat":25.669,"lon":-100.441},{"n":"Altabrisa","lat":25.671,"lon":-100.443}]},
+  "66050":{"muni":"General Escobedo","cols":[{"n":"Centro","lat":25.796,"lon":-100.322},{"n":"Parque Escobedo","lat":25.798,"lon":-100.324}]},
+  "66052":{"muni":"General Escobedo","cols":[{"n":"San Miguel","lat":25.794,"lon":-100.32},{"n":"Las Brisas","lat":25.792,"lon":-100.318}]},
+  "66054":{"muni":"General Escobedo","cols":[{"n":"Las Puentes","lat":25.79,"lon":-100.316},{"n":"Colinas del Aeropuerto","lat":25.788,"lon":-100.314}]},
+  "66056":{"muni":"General Escobedo","cols":[{"n":"Valle del Mirador","lat":25.8,"lon":-100.326},{"n":"Residencial Escobedo","lat":25.802,"lon":-100.328}]},
+  "67250":{"muni":"Juárez","cols":[{"n":"Centro","lat":25.654,"lon":-100.112},{"n":"Balcones de Juárez","lat":25.656,"lon":-100.11}]},
+  "67252":{"muni":"Juárez","cols":[{"n":"Villas de Juárez","lat":25.658,"lon":-100.108},{"n":"Privadas de Juárez","lat":25.66,"lon":-100.106}]},
+  "66000":{"muni":"García","cols":[{"n":"Centro","lat":25.807,"lon":-100.588},{"n":"La Ciudadela","lat":25.809,"lon":-100.586}]},
+  "66006":{"muni":"García","cols":[{"n":"Ciudad Galaxia","lat":25.805,"lon":-100.59},{"n":"Villa de García","lat":25.803,"lon":-100.592}]},
+  "67300":{"muni":"Santiago","cols":[{"n":"Centro","lat":25.428,"lon":-100.143},{"n":"La Aurora","lat":25.43,"lon":-100.141}]},
+  "67310":{"muni":"Santiago","cols":[{"n":"Las Misiones","lat":25.561,"lon":-100.164},{"n":"Privadas de Las Misiones","lat":25.563,"lon":-100.166}]},
+  "67450":{"muni":"Cadereyta Jiménez","cols":[{"n":"Centro","lat":25.592,"lon":-99.999},{"n":"Independencia","lat":25.594,"lon":-99.997}]},
+  "67700":{"muni":"Linares","cols":[{"n":"Centro","lat":24.865,"lon":-99.565},{"n":"Jardines de Linares","lat":24.867,"lon":-99.563}]},
+  "67500":{"muni":"Montemorelos","cols":[{"n":"Centro","lat":25.194,"lon":-99.829},{"n":"Independencia","lat":25.196,"lon":-99.827}]},
+};
 
-function hideDropdown(dropId){
-  const d = document.getElementById(dropId);
-  if(d) d.style.display = 'none';
+// ══════════════════════════════════════════════════════════════════════════════
+// TRAZA — Direcciones v4: Origen estructurado · Destino libre · Mini-mapa OSRM
+// ══════════════════════════════════════════════════════════════════════════════
+
+const _cpCache   = {};
+const _addrState = {
+  from: { cp:'', colonias:[], colonia:'', ready:false },
+  to:   { ready:false }
+};
+let _routeMap = null, _routeLayer = null, _fromMarker = null, _toMarker = null;
+let _toGeoTimer = null, _fromChangeTimer = null;
+
+// ── CP lookup: DB local → Nominatim fallback ─────────────────────────────────
+async function fetchCP(cp){
+  if(_cpCache[cp]) return _cpCache[cp];
+  if(NL_CP_DB[cp]){
+    const e = NL_CP_DB[cp];
+    const r = e.cols.map(c=>({colonia:c.n, municipio:e.muni, lat:c.lat, lon:c.lon}));
+    return (_cpCache[cp] = r);
+  }
+  try {
+    const res  = await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${cp}&country=mx&format=json&addressdetails=1&limit=20&accept-language=es`,{headers:{'Accept-Language':'es'}});
+    const data = await res.json();
+    const seen = new Set(), result = [];
+    for(const r of data){
+      const a=r.address||{};
+      const col=a.suburb||a.neighbourhood||a.quarter||a.village||'';
+      const muni=a.city||a.town||a.municipality||'';
+      if(col&&!seen.has(col)){ seen.add(col); result.push({colonia:col,municipio:muni,lat:parseFloat(r.lat),lon:parseFloat(r.lon)}); }
+    }
+    return (_cpCache[cp] = result);
+  } catch(e){ return []; }
 }
 
-document.addEventListener('click', e=>{
-  if(!e.target.closest('.addr-row') && !e.target.closest('.addr-dropdown')){
-    hideDropdown('c-from-drop');
-    hideDropdown('c-to-drop');
+// ── ORIGEN: CP → colonias dropdown ───────────────────────────────────────────
+async function onCpInput(side){
+  if(side !== 'from') return; // CP del destino se maneja por onToChange
+  const input = document.getElementById('from-cp');
+  const badge = document.getElementById('from-cp-badge');
+  const colEl = document.getElementById('from-col');
+  const drop  = document.getElementById('from-col-drop');
+  const cp    = input.value.replace(/\D/g,'').slice(0,5);
+  input.value = cp;
+
+  // Reset
+  _addrState.from = {cp:'', colonias:[], colonia:'', ready:false};
+  _coords.from = null;
+  colEl.value=''; colEl.readOnly=true; colEl.classList.remove('valid');
+  drop.style.display='none'; badge.textContent=''; input.classList.remove('valid');
+  setFromResolved('');
+  hideRouteMap();
+
+  if(cp.length < 5){ return; }
+
+  badge.textContent='⏳'; badge.style.color='rgba(255,255,255,.4)';
+  const colonias = await fetchCP(cp);
+
+  _addrState.from.cp = cp;
+  input.classList.add('valid');
+
+  if(!colonias.length){
+    badge.textContent='C.P. '+cp;
+    badge.style.color='rgba(255,255,255,.5)';
+    colEl.readOnly=false; colEl.placeholder='Escribe colonia…';
+    colEl.oninput = ()=>onFromFieldChange();
+    return;
+  }
+
+  _addrState.from.colonias = colonias;
+  badge.textContent = '✓ ' + (colonias[0].municipio||'Nuevo León');
+  badge.style.color = 'rgba(0,224,150,.9)';
+
+  if(colonias.length === 1){
+    selectColonia(colonias[0].colonia, colonias[0].lat, colonias[0].lon);
+    return;
+  }
+  colEl.readOnly=false;
+  colEl.placeholder = colonias.length+' colonias…';
+  renderColDropdown(colonias);
+  drop.style.display='block';
+  colEl.focus();
+}
+
+function renderColDropdown(colonias){
+  const drop = document.getElementById('from-col-drop');
+  const q    = document.getElementById('from-col').value.toLowerCase();
+  const list = q ? colonias.filter(c=>c.colonia.toLowerCase().includes(q)) : colonias;
+  drop.innerHTML = list.map(c=>
+    `<div class="col-option" onclick="selectColonia('${c.colonia.replace(/'/g,"\'")}',${c.lat},${c.lon})">${c.colonia}</div>`
+  ).join('')||'<div class="col-option" style="opacity:.4">Sin coincidencias</div>';
+  drop.style.display='block';
+}
+
+function openColDropdown(){
+  if(_addrState.from.colonias.length) renderColDropdown(_addrState.from.colonias);
+}
+
+function selectColonia(colonia, lat, lon){
+  _addrState.from.colonia = colonia;
+  const colEl = document.getElementById('from-col');
+  colEl.value=colonia; colEl.readOnly=true; colEl.classList.add('valid');
+  document.getElementById('from-col-drop').style.display='none';
+  if(lat&&lon){ _coords.from={lat,lon}; }
+  document.getElementById('from-calle').focus();
+  onFromFieldChange();
+}
+
+// ── Cambios en campos de origen → resumen + geocode ──────────────────────────
+function onAddrChange(side){
+  if(side==='from') onFromFieldChange();
+}
+
+function onFromFieldChange(){
+  const cp    = document.getElementById('from-cp').value.trim();
+  const col   = document.getElementById('from-col').value.trim();
+  const calle = document.getElementById('from-calle').value.trim();
+  const num   = document.getElementById('from-num').value.trim();
+
+  const hasMin = cp && calle; // mínimo para mostrar ✓
+  if(hasMin){
+    const parts=[calle+(num?' #'+num:''),col,cp?'C.P.'+cp:''].filter(Boolean);
+    setFromResolved('✓ '+parts.join(', '), true);
+    _addrState.from.ready = true;
+  } else {
+    const parts=[calle+(num?' #'+num:''),col,cp?'C.P.'+cp:''].filter(Boolean);
+    setFromResolved(parts.length ? '📍 '+parts.join(', ') : '', false);
+    _addrState.from.ready = false;
+  }
+
+  clearTimeout(_fromChangeTimer);
+  _fromChangeTimer = setTimeout(()=>geocodeFrom(), 900);
+}
+
+function setFromResolved(text, ok=false){
+  const el = document.getElementById('from-resolved');
+  el.textContent = text;
+  el.className = 'addr-resolved' + (ok?' ok':'');
+}
+
+async function geocodeFrom(){
+  const cp    = document.getElementById('from-cp').value.trim();
+  const col   = document.getElementById('from-col').value.trim();
+  const calle = document.getElementById('from-calle').value.trim();
+  const num   = document.getElementById('from-num').value.trim();
+  if(!calle) return;
+
+  // Usa coords de colonia de DB local si existen
+  const colEntry = (NL_CP_DB[cp]?.cols||[]).find(c=>c.n===col);
+  if(colEntry && !num){ _coords.from={lat:colEntry.lat,lon:colEntry.lon}; tryRoute(); return; }
+
+  const muni = NL_CP_DB[cp]?.muni || col || 'Monterrey';
+  const q    = [calle+(num?' '+num:''),col,muni,'Nuevo León','México'].filter(Boolean).join(', ');
+  try {
+    const res  = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=3&addressdetails=1&countrycodes=mx&accept-language=es`,{headers:{'Accept-Language':'es'}});
+    const data = await res.json();
+    const best = cp ? (data.find(r=>r.address?.postcode===cp)||data[0]) : data[0];
+    if(best){ _coords.from={lat:parseFloat(best.lat),lon:parseFloat(best.lon)}; }
+    else if(colEntry){ _coords.from={lat:colEntry.lat,lon:colEntry.lon}; }
+  } catch(e){
+    if(colEntry) _coords.from={lat:colEntry.lat,lon:colEntry.lon};
+  }
+  tryRoute();
+}
+
+// ── DESTINO: texto libre → geocode silencioso ─────────────────────────────────
+let _toTimer = null;
+function onToChange(){
+  const cp    = document.getElementById('to-cp').value.trim();
+  const col   = document.getElementById('to-col').value.trim();
+  const calle = document.getElementById('to-calle').value.trim();
+  const num   = document.getElementById('to-num').value.trim();
+
+  const hasMin = cp && calle;
+  const parts=[calle+(num?' #'+num:''),col,cp?'C.P.'+cp:''].filter(Boolean);
+
+  const el = document.getElementById('to-resolved');
+  if(hasMin){
+    el.className='addr-resolved ok';
+    el.textContent='✓ '+parts.join(', ');
+    _addrState.to.ready=true;
+  } else {
+    el.className='addr-resolved';
+    el.textContent=parts.length?'📍 '+parts.join(', '):'';
+    _addrState.to.ready=false;
+  }
+
+  clearTimeout(_toTimer);
+  _toTimer = setTimeout(()=>geocodeTo(), 900);
+}
+
+async function geocodeTo(){
+  const cp    = document.getElementById('to-cp').value.trim();
+  const col   = document.getElementById('to-col').value.trim();
+  const calle = document.getElementById('to-calle').value.trim();
+  const num   = document.getElementById('to-num').value.trim();
+  if(!calle) return;
+
+  const colEntry = (NL_CP_DB[cp]?.cols||[]).find(c=>c.n===col);
+  if(colEntry && !num){ _coords.to={lat:colEntry.lat,lon:colEntry.lon}; tryRoute(); return; }
+
+  const muni = NL_CP_DB[cp]?.muni || col || 'Monterrey';
+  const q    = [calle+(num?' '+num:''),col,muni,'Nuevo León','México'].filter(Boolean).join(', ');
+  try {
+    const res  = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=3&addressdetails=1&countrycodes=mx&accept-language=es`,{headers:{'Accept-Language':'es'}});
+    const data = await res.json();
+    const best = cp?(data.find(r=>r.address?.postcode===cp)||data[0]):data[0];
+    if(best){ _coords.to={lat:parseFloat(best.lat),lon:parseFloat(best.lon)}; }
+    else if(colEntry){ _coords.to={lat:colEntry.lat,lon:colEntry.lon}; }
+  } catch(e){
+    if(colEntry) _coords.to={lat:colEntry.lat,lon:colEntry.lon};
+  }
+  tryRoute();
+}
+
+// ── Ruta: solo cuando ambos lados tienen ✓ y coords ─────────────────────────
+async function tryRoute(){
+  if(!_addrState.from.ready || !_addrState.to.ready) return;
+  if(!_coords.from || !_coords.to) return;
+
+  const f=_coords.from, t=_coords.to;
+  document.getElementById('route-map-section').style.display='block';
+
+  // Init mapa
+  if(!_routeMap){
+    _routeMap = L.map('route-map',{zoomControl:true,attributionControl:false});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd'}).addTo(_routeMap);
+  }
+
+  // Marcadores
+  const mkFrom = L.divIcon({className:'',html:'<div style="width:13px;height:13px;background:#00E096;border-radius:50%;border:2px solid #fff;box-shadow:0 0 10px #00E096"></div>',iconAnchor:[6,6]});
+  const mkTo   = L.divIcon({className:'',html:'<div style="width:13px;height:13px;background:#00C8FF;border-radius:50%;border:2px solid #fff;box-shadow:0 0 10px #00C8FF"></div>',iconAnchor:[6,6]});
+  if(_fromMarker) _routeMap.removeLayer(_fromMarker);
+  if(_toMarker)   _routeMap.removeLayer(_toMarker);
+  _fromMarker = L.marker([f.lat,f.lon],{icon:mkFrom}).addTo(_routeMap);
+  _toMarker   = L.marker([t.lat,t.lon],{icon:mkTo}).addTo(_routeMap);
+  if(_routeLayer){ _routeMap.removeLayer(_routeLayer); _routeLayer=null; }
+
+  let kmRoute = haversineKm(f.lat,f.lon,t.lat,t.lon)*1.35;
+
+  // OSRM para ruta real por calles
+  try {
+    const url  = `https://router.project-osrm.org/route/v1/driving/${f.lon},${f.lat};${t.lon},${t.lat}?overview=full&geometries=geojson`;
+    const res  = await fetch(url,{signal:AbortSignal.timeout(5000)});
+    const data = await res.json();
+    if(data.routes?.[0]){
+      kmRoute = data.routes[0].distance/1000;
+      _routeLayer = L.geoJSON(data.routes[0].geometry,{
+        style:{color:'#00C8FF',weight:4,opacity:.85,dashArray:'7,4'}
+      }).addTo(_routeMap);
+    }
+  } catch(e){
+    _routeLayer = L.polyline([[f.lat,f.lon],[t.lat,t.lon]],{color:'#00C8FF',weight:3,opacity:.65,dashArray:'8,5'}).addTo(_routeMap);
+  }
+
+  _routeMap.fitBounds(L.latLngBounds([[f.lat,f.lon],[t.lat,t.lon]]),{padding:[28,28]});
+  _coords.from.kmRoute = kmRoute;
+  updateRouteInfo(kmRoute);
+  calcAndUpdatePrice();
+}
+
+function hideRouteMap(){
+  document.getElementById('route-map-section').style.display='none';
+  _coords.from = _coords.to = null;
+}
+
+function updateRouteInfo(km){
+  // Muestra sección de selección de servicio
+  document.getElementById('speed-picker-section').style.display='block';
+
+  // Precio para cada card de servicio
+  const pid = delivPkg?.id||'chico';
+  const surcharge = PKG_SURCHARGE[pid]||0;
+  [['turbo','scard-turbo'],['express','scard-express'],['sameday','scard-sameday'],['programado','scard-programado']].forEach(([sid,elId])=>{
+    const t = TARIFAS[sid];
+    const price = km>t.maxKm ? null : Math.round(t.base+km*t.perKm+surcharge);
+    const el = document.getElementById(elId+'-price');
+    if(el) el.textContent = price?'$'+price:'Sin cobert.';
+  });
+
+  // Info del mapa
+  const sid = delivSpeed?.id||'turbo';
+  const eta = estimateETA(sid,km);
+  document.getElementById('route-km-label').textContent  = km.toFixed(1)+' km';
+  document.getElementById('route-eta-label').textContent = '~'+(eta<60?eta+' min':Math.round(eta/60*10)/10+' hrs');
+
+  // Precio del servicio activo en mapa y botón
+  refreshPayTotal(km);
+  if(delivSpeed) document.getElementById('pay-section-wrap').style.display='block';
+}
+
+function refreshPayTotal(km){
+  const sid = delivSpeed?.id||'turbo';
+  const pid = delivPkg?.id||'chico';
+  const t   = TARIFAS[sid]||TARIFAS.turbo;
+  const kmUse = km||_coords?.from?.kmRoute||0;
+  if(!kmUse) return;
+  const price = kmUse>t.maxKm ? null : Math.round(t.base+kmUse*t.perKm+(PKG_SURCHARGE[pid]||0));
+  if(delivSpeed) delivSpeed.price = price||0;
+  const amt    = document.getElementById('pay-total-amt');
+  const btnTxt = document.getElementById('btn-pay-text');
+  const mapLbl = document.getElementById('route-price-label');
+  const sumKm  = document.getElementById('sum-km');
+  if(amt)    amt.textContent    = price?'$'+price:'Sin cobert.';
+  if(btnTxt) btnTxt.textContent = price?'Pagar $'+price:'Sin cobertura';
+  if(mapLbl) mapLbl.textContent = price?'$'+price:'Sin cobert.';
+  if(sumKm){
+    sumKm.textContent = kmUse.toFixed(1)+' km';
+    sumKm.style.color = 'rgba(0,200,255,0.85)';
+  }
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function hideDropdown(id){ const d=document.getElementById(id); if(d) d.style.display='none'; }
+
+function getAddrLabel(side){
+  const calle=document.getElementById(side+'-calle').value.trim();
+  const num  =document.getElementById(side+'-num').value.trim();
+  const col  =document.getElementById(side+'-col').value.trim();
+  const cp   =document.getElementById(side+'-cp').value.trim();
+  return [calle+(num?' #'+num:''),col,cp?'C.P. '+cp:''].filter(Boolean).join(', ');
+}
+
+async function geocodeAddr(query, cb){
+  try {
+    const q  = query.includes('Nuevo')?query:query+', Nuevo León, México';
+    const res= await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1&countrycodes=mx&accept-language=es`,{headers:{'Accept-Language':'es'}});
+    const d  = await res.json();
+    if(d.length) cb({lat:parseFloat(d[0].lat),lon:parseFloat(d[0].lon)}); else cb(null);
+  } catch(e){ cb(null); }
+}
+
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.addr-block')){
+    document.getElementById('from-col-drop').style.display='none';
   }
 });
-
-// Formatea el display_name de Nominatim en 2 líneas legibles
-function formatAddr(r){
-  const a = r.address || {};
-  // Línea principal: número + calle / nombre del lugar
-  let main = '';
-  if(r.name && r.name !== a.road) main = r.name;
-  if(a.road)   main += (main ? ' — ' : '') + a.road;
-  if(a.house_number) main = a.house_number + ' ' + main;
-  if(!main)    main = r.display_name.split(',')[0];
-
-  // Línea secundaria: colonia, municipio, estado
-  const parts = [];
-  if(a.suburb||a.neighbourhood||a.quarter) parts.push(a.suburb||a.neighbourhood||a.quarter);
-  if(a.city||a.town||a.municipality||a.county) parts.push(a.city||a.town||a.municipality||a.county);
-  if(a.state) parts.push(a.state);
-  const sub = parts.join(', ');
-
-  return { main: main.trim(), sub };
-}
-
-async function addrSearch(inputId, dropId){
-  const input = document.getElementById(inputId);
-  const drop  = document.getElementById(dropId);
-  const q     = input.value.trim();
-
-  if(q.length < 2){ hideDropdown(dropId); return; }
-
-  clearTimeout(_addrTimers[inputId]);
-  _addrTimers[inputId] = setTimeout(async ()=>{
-    if(_addrAC[inputId]) _addrAC[inputId].abort();
-    _addrAC[inputId] = new AbortController();
-
-    drop.style.display = 'block';
-    drop.innerHTML = '<div class="addr-loading"><span style="opacity:.5">⏳</span> Buscando en Nuevo León…</div>';
-
-    try {
-      // Bounding box completo de Nuevo León: W=-101.2, S=23.1, E=-98.4, N=27.8
-      // bounded=0 para que busque en todo NL sin restringir al bbox visible
-      const url =
-        `https://nominatim.openstreetmap.org/search?` +
-        `q=${encodeURIComponent(q)}&format=json&limit=8&addressdetails=1` +
-        `&countrycodes=mx&viewbox=-101.2,27.8,-98.4,23.1&bounded=0` +
-        `&accept-language=es`;
-
-      const res  = await fetch(url, {
-        signal: _addrAC[inputId].signal,
-        headers: { 'Accept-Language': 'es', 'User-Agent': 'TRAZA-App/1.0' }
-      });
-      const data = await res.json();
-
-      // Filtra resultados en Nuevo León
-      const nl = data.filter(r=>{
-        const state = (r.address?.state||'').toLowerCase();
-        const lat   = parseFloat(r.lat);
-        const lon   = parseFloat(r.lon);
-        return state.includes('nuevo') ||
-               (lat>=23.1 && lat<=27.8 && lon>=-101.2 && lon<=-98.4);
-      });
-
-      if(!nl.length){
-        // Segundo intento sin bounded — agrega "Nuevo León" al query
-        const url2 =
-          `https://nominatim.openstreetmap.org/search?` +
-          `q=${encodeURIComponent(q+', Nuevo León')}&format=json&limit=8&addressdetails=1` +
-          `&countrycodes=mx&accept-language=es`;
-        const res2  = await fetch(url2, { signal: _addrAC[inputId].signal, headers:{'Accept-Language':'es'} });
-        const data2 = await res2.json();
-        const nl2   = data2.filter(r=>
-          (r.address?.state||'').toLowerCase().includes('nuevo') ||
-          (parseFloat(r.lat)>=23.1 && parseFloat(r.lat)<=27.8)
-        );
-        if(!nl2.length){
-          drop.innerHTML = '<div class="addr-loading">Sin resultados en Nuevo León</div>';
-          return;
-        }
-        renderDropdown(nl2, inputId, dropId, drop);
-        return;
-      }
-
-      renderDropdown(nl, inputId, dropId, drop);
-
-    } catch(err){
-      if(err.name==='AbortError') return;
-      drop.innerHTML = '<div class="addr-loading">Error de conexión — intenta de nuevo</div>';
-    }
-  }, 280);
-}
-
-function renderDropdown(results, inputId, dropId, drop){
-  drop.innerHTML = results.map(r=>{
-    const { main, sub } = formatAddr(r);
-    const lat = r.lat, lon = r.lon;
-    const mainEsc = main.replace(/'/g,"&#39;").replace(/"/g,'&quot;');
-    const subEsc  = sub.replace(/'/g,"&#39;").replace(/"/g,'&quot;');
-    const safeDisplay = (main+', '+sub).replace(/'/g,"&#39;");
-    return `<div class="addr-suggestion" tabindex="0"
-      onclick="pickAddr('${inputId}','${dropId}','${safeDisplay}',${lat},${lon})"
-      onkeydown="if(event.key==='Enter')pickAddr('${inputId}','${dropId}','${safeDisplay}',${lat},${lon})">
-      <span class="addr-suggestion-icon">📍</span>
-      <div>
-        <div class="addr-suggestion-main">${main}</div>
-        <div class="addr-suggestion-sub">${sub}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function pickAddr(inputId, dropId, label, lat, lon){
-  const input = document.getElementById(inputId);
-  input.value = label;
-  input.style.color = '';
-
-  // Guarda coordenadas
-  if(inputId === 'c-from') _coords.from = { lat, lon };
-  if(inputId === 'c-to')   _coords.to   = { lat, lon };
-
-  hideDropdown(dropId);
-  input.blur();
-
-  // Recalcula precio si ambos coords están listos
-  if(_coords.from && _coords.to) calcAndUpdatePrice();
-}
-
 function selectPkg(el, id){
   document.querySelectorAll('.pkg-sel').forEach(e=>e.classList.remove('active'));
   el.classList.add('active');
@@ -4405,33 +5248,217 @@ function delivTab(pageId, btnId){
 // Legacy alias
 function customerTab(pageId, btnId){ delivTab(pageId, btnId.replace('-btn','').replace('c-new','dtab-new').replace('c-track','dtab-track')); }
 
-function placeOrder(){
-  const from  = document.getElementById('c-from').value.trim();
-  const to    = document.getElementById('c-to').value.trim();
-  const name  = document.getElementById('c-name').value.trim();
-  const phone = document.getElementById('c-phone').value.trim();
-  if(!from) { document.getElementById('c-from').focus(); showToast('Ingresa la dirección de origen'); return; }
-  if(!to)   { document.getElementById('c-to').focus();   showToast('Ingresa la dirección de destino'); return; }
-  if(!name) { document.getElementById('c-name').focus(); showToast('Ingresa tu nombre'); return; }
+// ══════════════════════════════════════════════════════════════════════════════
+// TRAZA — Payment Engine · Apple Pay · Card · Email DB
+// ══════════════════════════════════════════════════════════════════════════════
 
-  const id = 'TRZ-' + String(Math.floor(10000 + Math.random()*89999));
-  const newOrder = {
-    id, from, to,
-    source: 'traza',
-    status: 'active',
-    earn:   delivSpeed.price,
-    dist:   rand(2,12).toFixed(1)+' km',
-    eta:    delivSpeed.eta,
-    driver: pick(DRIVER_NAMES),
-    service: delivSpeed.name,
-    cat: delivCat.name,
-  };
-  orders.push(newOrder);
-  setEl('modal-order-id', id);
-  document.getElementById('success-modal').style.display='flex';
-  document.getElementById('track-input').value = id;
+// Mini base de datos de emails (localStorage como persistencia)
+const _emailDB = JSON.parse(localStorage.getItem('traza_email_db')||'[]');
+function saveEmailToDB(email, name, phone, orderId){
+  const entry = { email, name, phone, orderId, ts: Date.now() };
+  if(!_emailDB.find(e=>e.email===email)){
+    _emailDB.push(entry);
+  } else {
+    // Actualiza nombre/phone si ya existe
+    const ex = _emailDB.find(e=>e.email===email);
+    if(name) ex.name=name; if(phone) ex.phone=phone;
+  }
+  localStorage.setItem('traza_email_db', JSON.stringify(_emailDB));
+  console.log('[TRAZA DB] emails:', _emailDB.length, '→', email);
 }
 
+// Formateadores de tarjeta
+function fmtCardNum(el){
+  let v = el.value.replace(/\D/g,'').slice(0,16);
+  el.value = v.replace(/(\d{4})(?=\d)/g,'$1 ');
+  updatePayBtn();
+}
+function fmtExp(el){
+  let v = el.value.replace(/\D/g,'').slice(0,4);
+  if(v.length>=3) v = v.slice(0,2)+'/'+v.slice(2);
+  el.value = v;
+  updatePayBtn();
+}
+function onEmailInput(){
+  const email = document.getElementById('c-email').value.trim();
+  const el    = document.getElementById('c-email');
+  el.classList.toggle('valid', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+  updatePayBtn();
+}
+
+// Actualiza total en el botón de pago
+function updatePayBtn(){
+  const amt  = document.getElementById('pay-total-amt');
+  const text = document.getElementById('btn-pay-text');
+  const icon = document.getElementById('btn-pay-icon');
+  if(delivSpeed && delivSpeed.price){
+    amt.textContent  = '$'+delivSpeed.price;
+    text.textContent = 'Pagar $'+delivSpeed.price;
+    icon.textContent = '💳';
+  } else {
+    amt.textContent  = '$—';
+    text.textContent = 'Pagar y ordenar';
+  }
+}
+
+// Apple Pay / Payment Request API
+async function startNativePay(){
+  const price = delivSpeed?.price||0;
+  if(!price){ showToast('Completa las direcciones primero'); return; }
+  if(!window.PaymentRequest) return;
+  const rq = new PaymentRequest(
+    [{ supportedMethods:'https://apple.com/apple-pay',
+       data:{ version:3, merchantIdentifier:'merchant.mx.traza.delivery',
+              merchantCapabilities:['supports3DS'],
+              supportedNetworks:['visa','masterCard','amex'],
+              countryCode:'MX' } }],
+    { total:{ label:'TRAZA Delivery', amount:{ currency:'MXN', value:String(price) } } }
+  );
+  try {
+    const result = await rq.show();
+    await result.complete('success');
+    finalizeOrder('apple_pay');
+  } catch(e){ /* usuario canceló */ }
+}
+
+// Detecta si Apple Pay está disponible
+function checkNativePay(){
+  if(window.ApplePaySession && ApplePaySession.canMakePayments()){
+    document.getElementById('btn-applepay').style.display='flex';
+    document.getElementById('btn-pay-text').textContent = 'Pagar con tarjeta';
+  }
+}
+window.addEventListener('load', checkNativePay);
+
+// Validación tarjeta simple (Luhn no requerido para demo)
+function validateCard(){
+  const num = document.getElementById('card-num').value.replace(/\s/g,'');
+  const exp = document.getElementById('card-exp').value;
+  const cvv = document.getElementById('card-cvv').value;
+  if(num.length < 13){ showToast('Número de tarjeta inválido'); return false; }
+  if(exp.length < 5) { showToast('Fecha de vencimiento inválida'); return false; }
+  if(cvv.length < 3) { showToast('CVV inválido'); return false; }
+  return true;
+}
+
+function placeOrder(){
+  // Validar direcciones
+  if(!document.getElementById('from-cp').value.trim())    { document.getElementById('from-cp').focus();    showToast('Ingresa el C.P. de origen'); return; }
+  if(!document.getElementById('from-calle').value.trim()) { document.getElementById('from-calle').focus(); showToast('Ingresa la calle de origen'); return; }
+  if(!document.getElementById('to-cp').value.trim())      { document.getElementById('to-cp').focus();      showToast('Ingresa el C.P. de destino'); return; }
+  if(!document.getElementById('to-calle').value.trim())   { document.getElementById('to-calle').focus();   showToast('Ingresa la calle de destino'); return; }
+  // Validar datos del cliente
+  const name  = document.getElementById('c-name').value.trim();
+  const phone = document.getElementById('c-phone').value.trim();
+  const email = document.getElementById('c-email').value.trim();
+  if(!name)  { document.getElementById('c-name').focus();  showToast('Ingresa tu nombre'); return; }
+  if(!email) { document.getElementById('c-email').focus(); showToast('Ingresa tu correo para confirmación'); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ document.getElementById('c-email').focus(); showToast('Correo inválido'); return; }
+  // Validar tarjeta
+  if(!validateCard()) return;
+  // Validar fecha/hora si es programado
+  if(delivSpeed?.id==='programado'){
+    if(!_progDay||!_progHour){ showToast('Elige día y hora para tu envío programado'); document.getElementById('prog-picker').scrollIntoView({behavior:'smooth',block:'center'}); return; }
+  }
+  // Procesar
+  finalizeOrder('card');
+}
+
+// ── EmailJS config — conecta trazalogisticamx@gmail.com ─────────────────────
+// SETUP (5 min en emailjs.com):
+//  1. Crea cuenta gratis en https://emailjs.com
+//  2. Add Service → Gmail → conecta trazalogisticamx@gmail.com
+//  3. Create Email Template con variables: {{order_id}} {{to_name}} {{from_addr}} {{to_addr}} {{km}} {{price}} {{service}}
+//  4. Reemplaza los 3 valores abajo con los de tu cuenta
+const EMAILJS_SERVICE_ID  = 'service_traza';    // ← tu Service ID
+const EMAILJS_TEMPLATE_ID = 'template_confirm'; // ← tu Template ID
+const EMAILJS_PUBLIC_KEY  = 'TU_PUBLIC_KEY';    // ← tu Public Key
+
+function initEmailJS(){
+  if(typeof emailjs !== 'undefined'){
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+  }
+}
+window.addEventListener('load', initEmailJS);
+
+async function sendConfirmationEmail(params){
+  if(typeof emailjs === 'undefined' || EMAILJS_PUBLIC_KEY === 'TU_PUBLIC_KEY'){
+    console.log('[TRAZA EMAIL — modo demo]', params);
+    return true;
+  }
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
+    console.log('[TRAZA EMAIL] Enviado a', params.to_email);
+    return true;
+  } catch(e){
+    console.warn('[TRAZA EMAIL] Error:', e);
+    return false;
+  }
+}
+
+function finalizeOrder(method){
+  const name  = document.getElementById('c-name').value.trim();
+  const phone = document.getElementById('c-phone').value.trim();
+  const email = document.getElementById('c-email').value.trim();
+  const from  = getAddrLabel('from');
+  const to    = getAddrLabel('to');
+
+  const km = _coords?.from?.kmRoute ||
+    (_coords?.from && _coords?.to ? haversineKm(_coords.from.lat,_coords.from.lon,_coords.to.lat,_coords.to.lon)*1.35 : 0);
+  const distStr = km ? km.toFixed(1)+' km' : '— km';
+
+  const id = 'TRZ-' + String(Math.floor(10000+Math.random()*89999));
+
+  // Guardar en DB local
+  saveEmailToDB(email, name, phone, id);
+
+  // Animación procesando
+  const btn = document.getElementById('btn-pay-main');
+  btn.classList.add('loading');
+  document.getElementById('btn-pay-text').textContent = 'Procesando…';
+  document.getElementById('btn-pay-icon').textContent = '⏳';
+
+  setTimeout(async ()=>{
+    // Registrar orden
+    const newOrder = {
+      id, from, to,
+      source:'traza', status:'active',
+      earn: delivSpeed.price,
+      dist: distStr,
+      eta:  delivSpeed.eta,
+      driver: pick(DRIVER_NAMES),
+      service: delivSpeed.name,
+      cat: delivCat.name,
+      email, name, payMethod: method
+    };
+    orders.push(newOrder);
+
+    // Enviar email de confirmación vía EmailJS → trazalogisticamx@gmail.com
+    await sendConfirmationEmail({
+      to_email:   email,
+      to_name:    name,
+      order_id:   id,
+      from_addr:  from,
+      to_addr:    to,
+      km:         distStr,
+      price:      '$'+delivSpeed.price,
+      service:    delivSpeed.name+' '+delivSpeed.eta,
+      pay_method: method === 'apple_pay' ? 'Apple Pay' : 'Tarjeta',
+      reply_to:   'trazalogisticamx@gmail.com',
+    });
+
+    btn.classList.remove('loading');
+    document.getElementById('btn-pay-icon').textContent = '✓';
+    document.getElementById('btn-pay-text').textContent = '¡Pagado!';
+
+    setTimeout(()=>{
+      setEl('modal-order-id', id);
+      setEl('modal-email-confirm', email);
+      document.getElementById('success-modal').style.display='flex';
+      document.getElementById('track-input').value = id;
+    }, 300);
+  }, 1000);
+}
 function closeModal(){
   document.getElementById('success-modal').style.display='none';
   delivTab('c-track','dtab-track');
@@ -5088,7 +6115,7 @@ async function sendChat() {
         <div class="lp-stat-label">Refresh GPS</div>
       </div>
       <div class="lp-stat">
-        <div class="lp-stat-val">ZMM</div>
+        <div class="lp-stat-val">MTY</div>
         <div class="lp-stat-label">Cobertura total</div>
       </div>
     </div>
@@ -5151,7 +6178,7 @@ async function sendChat() {
       <svg viewBox="0 0 14 14" fill="none"><path d="M9 1L3 7l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <div class="lp-topbar-title">Servicios</div>
-    <span class="lp-topbar-tag">Precios · ZMM</span>
+    <span class="lp-topbar-tag">Precios · Monterrey</span>
   </div>
   <div class="lp-body">
     <div class="lp-hero lp-reveal">
@@ -5238,7 +6265,7 @@ async function sendChat() {
 
       <div class="lp-section lp-reveal">
         <div class="lp-section-hd">
-          <span class="lp-section-title">Cobertura ZMM</span>
+          <span class="lp-section-title">Cobertura Monterrey</span>
           <div class="lp-section-hd-line"></div>
         </div>
         <div class="lp-coverage">
@@ -5438,7 +6465,7 @@ async function sendChat() {
         <div id="nav-tagline">Logística Inteligente · Monterrey</div>
         <div id="nav-status-row">
           <span class="nav-status-dot"></span>
-          <span class="nav-status-txt">Monterrey ZMM · Delivery</span>
+          <span class="nav-status-txt">Monterrey · Delivery</span>
         </div>
       </div>
 
