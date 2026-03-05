@@ -44,7 +44,6 @@ html = html.replace(
 `const BRIDGE_URL = '${proto}://${host}'`
 );
 res.setHeader(‘Content-Type’, ‘text/html’);
-res.setHeader(‘Content-Security-Policy’, “default-src ‘self’ ‘unsafe-inline’ ‘unsafe-eval’ data: blob: https:; script-src ‘self’ ‘unsafe-inline’ ‘unsafe-eval’ https://js.stripe.com https://cdn.jsdelivr.net https://unpkg.com https://fonts.googleapis.com https://cdnjs.cloudflare.com; frame-src https://js.stripe.com; connect-src ‘self’ https://api.stripe.com https:”);
 res.send(html);
 });
 
