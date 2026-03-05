@@ -9,6 +9,7 @@ const cors      = require('cors');
 const puppeteer = require('puppeteer');
 const path      = require('path');
 const fs        = require('fs');
+const Stripe    = require('stripe');
 
 // Railway injects PORT automatically — must use it
 const PORT = process.env.PORT || 4000;
@@ -32,7 +33,7 @@ const SPHEREGT_PASS = process.env.SPHEREGT_PASS || '';
 const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL || '15000');
 const SESSION_PATH  = '/tmp/spheregt-session';
 
-// ─── Serve TRAZA app — patches BRIDGE_URL automatically ─
+// ─── Serve TRAZA app ──────────────────────────────────────
 app.get('/app', (req, res) => {
   const file = path.join(__dirname, 'delivery_platform_v2.html');
   if (!fs.existsSync(file)) return res.status(404).send('delivery_platform_v2.html not found');
@@ -76,8 +77,32 @@ app.post('/refresh', async (req, res) => {
   res.json({ ok: true, vehicleCount: vehicles.length, lastSync });
 });
 
+// ─── Stripe — crear intención de pago ────────────────────
+// La STRIPE_SECRET_KEY va en Railway → Variables, nunca en el código
+app.post('/create-payment-intent', async (req, res) => {
+  const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+  if (!STRIPE_SECRET_KEY) {
+    return res.status(500).json({ ok: false, error: 'STRIPE_SECRET_KEY no configurada en Railway Variables' });
+  }
+  const stripe = Stripe(STRIPE_SECRET_KEY);
+  const { amount } = req.body; // monto en centavos MXN (ej: $87 → 8700)
+  if (!amount || isNaN(amount)) {
+    return res.status(400).json({ ok: false, error: 'Monto inválido' });
+  }
+  try {
+    const intent = await stripe.paymentIntents.create({
+      amount: Math.round(amount),
+      currency: 'mxn',
+      payment_method_types: ['card'],
+    });
+    res.json({ ok: true, clientSecret: intent.client_secret });
+  } catch(e) {
+    console.error('Stripe error:', e.message);
+    res.status(400).json({ ok: false, error: e.message });
+  }
+});
 
-// ─── Chatbot proxy — keeps API key server-side ────────────
+// ─── Chatbot proxy ────────────────────────────────────────
 app.post('/chat', async (req, res) => {
   const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
   if (!ANTHROPIC_KEY) {
@@ -120,36 +145,23 @@ app.post('/chat', async (req, res) => {
       let data = '';
       apiRes.on('data', chunk => data += chunk);
       apiRes.on('end', () => {
-        console.log('Anthropic status:', apiRes.statusCode, '| body:', data.substring(0, 200));
         try {
           const parsed = JSON.parse(data);
-          // Check for API-level errors (invalid key, quota, etc.)
-          if (parsed.error) {
-            console.error('Anthropic API error:', parsed.error);
-            return res.status(500).json({ ok: false, error: parsed.error.message || parsed.error.type || 'API error' });
-          }
+          if (parsed.error) return res.status(500).json({ ok: false, error: parsed.error.message || 'API error' });
           const text = parsed.content?.[0]?.text;
-          if (!text) {
-            console.error('No text in response:', data);
-            return res.status(500).json({ ok: false, error: 'Respuesta vacía de la API' });
-          }
+          if (!text) return res.status(500).json({ ok: false, error: 'Respuesta vacía' });
           res.json({ ok: true, reply: text });
         } catch(e) {
-          console.error('Parse error:', e.message, '| raw:', data.substring(0,100));
           res.status(500).json({ ok: false, error: 'Parse error: ' + e.message });
         }
       });
     });
 
-    apiReq.on('error', e => {
-      console.error('HTTPS request error:', e.message);
-      res.status(500).json({ ok: false, error: e.message });
-    });
+    apiReq.on('error', e => res.status(500).json({ ok: false, error: e.message }));
     apiReq.write(payload);
     apiReq.end();
 
   } catch(e) {
-    console.error('/chat error:', e.message);
     res.status(500).json({ ok: false, error: e.message });
   }
 });
@@ -209,14 +221,7 @@ async function launchBrowser() {
     headless: 'new',
     userDataDir: SESSION_PATH,
     executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-gpu',
-      '--no-zygote',
-      '--single-process',
-    ],
+    args: ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage','--disable-gpu','--no-zygote','--single-process'],
   });
   page = await browser.newPage();
 
@@ -229,18 +234,14 @@ async function launchBrowser() {
   page.on('response', async response => {
     const url = response.url();
     const ct  = response.headers()['content-type'] || '';
-    // Log ALL non-static responses so we can find vehicle data endpoint
     if (ct.includes('json') || ct.includes('text/plain')) {
       try {
         const text = await response.text().catch(() => null);
         if (text && text.length > 10 && text.length < 50000) {
-          console.log('NET ' + url.split('?')[0] + ' | ' + text.substring(0, 200));
           const body = JSON.parse(text);
           if (body) parseVehicleResponse(url, body);
         }
       } catch (_) {}
-    } else if (/unit|vehicle|position|gps|device|asset|tracker|map|fleet/i.test(url)) {
-      console.log('URL-MATCH (non-json): ' + url.substring(0, 150));
     }
   });
   console.log('✅ Browser ready');
@@ -251,62 +252,34 @@ async function login() {
   syncStatus = 'syncing';
   try {
     await page.goto(SPHEREGT_URL, { waitUntil: 'domcontentloaded', timeout: 40000 });
-    // Wait a bit for JS-rendered forms
     await new Promise(r => setTimeout(r, 3000));
 
-    // Dump all inputs for debugging
-    const inputInfo = await page.evaluate(() => {
-      const inputs = Array.from(document.querySelectorAll('input'));
-      return inputs.map(i => ({ type: i.type, name: i.name, id: i.id, placeholder: i.placeholder, className: i.className }));
-    });
-    console.log('Inputs found on page:', JSON.stringify(inputInfo));
-
-    // Try to fill using evaluate (bypasses clickability issues)
     const filled = await page.evaluate((user, pass) => {
-      const inputs = Array.from(document.querySelectorAll('input'));
-      // SphereGT: always use txtUser (first form), not txtUsuario_login (second form)
-      const userInput =
-        document.getElementById('txtUser') ||
-        document.querySelector('input[name="txtUser"]');
-      const passInput =
-        document.getElementById('txtClave') ||
-        document.querySelector('input[name="txtClave"]');
+      const userInput = document.getElementById('txtUser') || document.querySelector('input[name="txtUser"]');
+      const passInput = document.getElementById('txtClave') || document.querySelector('input[name="txtClave"]');
       if (!userInput || !passInput) return { ok: false, reason: 'fields not found' };
-      // Set value and trigger React/Vue events
-      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
-      nativeInputValueSetter.call(userInput, user);
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+      setter.call(userInput, user);
       userInput.dispatchEvent(new Event('input', { bubbles: true }));
       userInput.dispatchEvent(new Event('change', { bubbles: true }));
-      nativeInputValueSetter.call(passInput, pass);
+      setter.call(passInput, pass);
       passInput.dispatchEvent(new Event('input', { bubbles: true }));
       passInput.dispatchEvent(new Event('change', { bubbles: true }));
-      return { ok: true, userField: userInput.name || userInput.id, passField: passInput.name || passInput.id };
+      return { ok: true };
     }, SPHEREGT_USER, SPHEREGT_PASS);
 
-    console.log('Fill result:', JSON.stringify(filled));
     if (!filled.ok) throw new Error('Could not fill login fields: ' + filled.reason);
-
     await new Promise(r => setTimeout(r, 500));
 
-    // Click submit button
-    const submitted = await page.evaluate(() => {
-      const btn = document.querySelector('button[type="submit"],input[type="submit"],button.login,button.btn-login,.btn-primary,button');
-      if (btn) { btn.click(); return btn.textContent || btn.type; }
-      // Try submitting the form directly
-      const form = document.querySelector('form');
-      if (form) { form.submit(); return 'form.submit()'; }
-      return null;
+    await page.evaluate(() => {
+      const btn = document.querySelector('button[type="submit"],input[type="submit"],.btn-primary,button');
+      if (btn) btn.click();
+      else { const form = document.querySelector('form'); if (form) form.submit(); }
     });
-    console.log('Submit via:', submitted);
 
     await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 25000 }).catch(() => {});
-    const finalUrl = page.url();
-    console.log('After login URL:', finalUrl);
-
-    if (finalUrl.includes('login')) {
-      throw new Error('Still on login page after submit — check credentials');
-    }
-    console.log('Logged in successfully');
+    if (page.url().includes('login')) throw new Error('Still on login page — check credentials');
+    console.log('✅ Logged in');
     return true;
   } catch (err) {
     syncStatus = 'error'; syncError = err.message;
@@ -315,91 +288,46 @@ async function login() {
   }
 }
 
-// Store units (names/plates) and positions separately, merge them
-let unitMap = {}; // IdUnidad -> {name, plate, eco}
+let unitMap = {};
 
 function parseVehicleResponse(url, body) {
   try {
-    // SphereGT wrapper: {Estado:1, Datos:[...]}
     const list = (body && body.Datos) ? body.Datos
       : Array.isArray(body) ? body
       : (body && (body.data || body.units || body.vehicles)) ? (body.data || body.units || body.vehicles)
       : null;
-
     if (!list || !Array.isArray(list) || list.length === 0) return;
 
-    // ObtenerUnidades — save unit info
     if (url.includes('ObtenerUnidades')) {
       list.forEach(u => {
-        if (u.IdUnidad) {
-          unitMap[u.IdUnidad] = {
-            name: u.NombreUnidad || u.Nombre || ('Unit ' + u.IdUnidad),
-            plate: u.Placas || u.Placa || '',
-            eco:   u.NumeroEconomico || '',
-          };
-        }
+        if (u.IdUnidad) unitMap[u.IdUnidad] = { name: u.NombreUnidad || u.Nombre || ('Unit '+u.IdUnidad), plate: u.Placas||u.Placa||'', eco: u.NumeroEconomico||'' };
       });
-      console.log('Units indexed: ' + Object.keys(unitMap).length);
       return;
     }
 
-    // ObtenerPosicionActual — build vehicle list with positions
     if (url.includes('ObtenerPosicion')) {
       const parsed = list.map(p => {
-        const lat = parseFloat(p.Latitud  ?? p.lat ?? p.latitude  ?? null);
-        const lng = parseFloat(p.Longitud ?? p.lng ?? p.longitude ?? null);
+        const lat = parseFloat(p.Latitud ?? p.lat ?? null);
+        const lng = parseFloat(p.Longitud ?? p.lng ?? null);
         if (isNaN(lat) || isNaN(lng)) return null;
         const info = unitMap[p.IdUnidad] || {};
-        return {
-          id:      String(p.IdUnidad),
-          name:    info.name || ('Unit ' + p.IdUnidad),
-          plate:   info.plate || '',
-          eco:     info.eco || '',
-          lat, lng,
-          speed:   parseFloat(p.Velocidad ?? p.speed ?? 0) || 0,
-          heading: parseFloat(p.Angulo    ?? p.course ?? 0) || 0,
-          status:  (p.Velocidad > 2) ? 'moving' : 'stopped',
-          location: p.Ubicacion || '',
-          updated:  p.Fecha || new Date().toISOString(),
-        };
+        return { id: String(p.IdUnidad), name: info.name||('Unit '+p.IdUnidad), plate: info.plate||'', eco: info.eco||'', lat, lng, speed: parseFloat(p.Velocidad??0)||0, heading: parseFloat(p.Angulo??0)||0, status: (p.Velocidad>2)?'moving':'stopped', location: p.Ubicacion||'', updated: p.Fecha||new Date().toISOString() };
       }).filter(Boolean);
-
-      if (parsed.length > 0) {
-        vehicles = parsed;
-        lastSync = new Date().toISOString();
-        syncStatus = 'ok';
-        syncError = null;
-        console.log('GPS synced: ' + parsed.length + ' vehicles');
-      }
+      if (parsed.length > 0) { vehicles = parsed; lastSync = new Date().toISOString(); syncStatus = 'ok'; syncError = null; console.log('GPS synced: '+parsed.length); }
       return;
     }
 
-    // Generic fallback
     const parsed = list.map(normalizeVehicle).filter(Boolean);
-    if (parsed.length > 0) {
-      vehicles = parsed; lastSync = new Date().toISOString();
-      syncStatus = 'ok'; syncError = null;
-      console.log('Vehicles (generic): ' + parsed.length);
-    }
-  } catch(e) {
-    console.error('parseVehicleResponse error:', e.message);
-  }
+    if (parsed.length > 0) { vehicles = parsed; lastSync = new Date().toISOString(); syncStatus = 'ok'; syncError = null; }
+  } catch(e) { console.error('parseVehicleResponse error:', e.message); }
 }
 
 function normalizeVehicle(v) {
   if (!v || typeof v !== 'object') return null;
-  const lat = parseFloat(v.lat ?? v.latitude  ?? v.lt ?? v.y ?? v.position?.lat ?? null);
-  const lng = parseFloat(v.lng ?? v.longitude ?? v.lon ?? v.lo ?? v.x ?? v.position?.lng ?? null);
+  const lat = parseFloat(v.lat ?? v.latitude ?? v.lt ?? v.y ?? null);
+  const lng = parseFloat(v.lng ?? v.longitude ?? v.lon ?? v.lo ?? v.x ?? null);
   if (isNaN(lat) || isNaN(lng)) return null;
-  return {
-    id:      String(v.id ?? v.unit_id ?? v.deviceId ?? v.imei ?? Math.random()),
-    name:    String(v.name ?? v.label ?? v.alias ?? v.plate ?? v.patente ?? 'Vehicle'),
-    lat, lng,
-    speed:   parseFloat(v.speed  ?? v.velocidad ?? 0) || 0,
-    heading: parseFloat(v.course ?? v.heading   ?? 0) || 0,
-    status:  String(v.status ?? v.estado ?? 'unknown'),
-    updated: v.updated_at ?? v.timestamp ?? v.lastUpdate ?? new Date().toISOString(),
-  };
+  return { id: String(v.id ?? Math.random()), name: String(v.name ?? v.label ?? v.plate ?? 'Vehicle'), lat, lng, speed: parseFloat(v.speed??0)||0, heading: parseFloat(v.course??v.heading??0)||0, status: String(v.status??'unknown'), updated: v.updated_at ?? new Date().toISOString() };
 }
 
 async function pollVehicles() {
@@ -417,27 +345,18 @@ async function pollVehicles() {
       const globals = [window.units, window.vehicles, window.markers, window.devices, window.fleet, window.positions];
       for (const g of globals) {
         if (Array.isArray(g) && g.length > 0) return g;
-        if (g && typeof g === 'object') {
-          const vals = Object.values(g);
-          if (vals.length > 0 && vals[0]?.lat) return vals;
-        }
+        if (g && typeof g === 'object') { const vals = Object.values(g); if (vals.length > 0 && vals[0]?.lat) return vals; }
       }
       return null;
     }).catch(() => null);
 
     if (domVehicles?.length > 0) {
       const parsed = domVehicles.map(normalizeVehicle).filter(Boolean);
-      if (parsed.length > 0) {
-        vehicles = parsed; lastSync = new Date().toISOString();
-        syncStatus = 'ok'; syncError = null;
-        console.log(`🔄 ${parsed.length} vehicles from page state`);
-      }
+      if (parsed.length > 0) { vehicles = parsed; lastSync = new Date().toISOString(); syncStatus = 'ok'; syncError = null; }
     } else {
-      const url = page.url();
-      if (!url.includes('login')) {
+      if (!page.url().includes('login')) {
         await page.reload({ waitUntil: 'networkidle2', timeout: 15000 }).catch(() => {});
       } else {
-        console.log('⚠️  Session expired — re-logging in');
         await login();
       }
     }
@@ -450,18 +369,16 @@ async function pollVehicles() {
 
 // ─── Boot ─────────────────────────────────────────────────
 async function start() {
-  // Always start HTTP server first — never crash on missing credentials
   app.listen(PORT, '0.0.0.0', () => {
     console.log('TRAZA running on port ' + PORT);
     console.log('   App:       /app');
     console.log('   Dashboard: /dashboard');
     console.log('   API:       /vehicles');
+    console.log('   Stripe:    /create-payment-intent');
   });
 
   if (!SPHEREGT_USER || !SPHEREGT_PASS) {
-    console.warn('WARNING: SPHEREGT_USER / SPHEREGT_PASS not set.');
-    console.warn('App is running but GPS bridge is disabled.');
-    console.warn('Add them in Railway -> your service -> Variables tab.');
+    console.warn('WARNING: SPHEREGT_USER / SPHEREGT_PASS not set. GPS bridge disabled.');
     syncStatus = 'waiting';
     return;
   }
@@ -471,7 +388,7 @@ async function start() {
   if (ok) {
     await pollVehicles();
     setInterval(pollVehicles, POLL_INTERVAL);
-    console.log(`🔁 Polling every ${POLL_INTERVAL / 1000}s\n`);
+    console.log(`🔁 Polling every ${POLL_INTERVAL / 1000}s`);
   }
 }
 
@@ -479,24 +396,3 @@ process.on('SIGINT',  async () => { if (browser) await browser.close(); process.
 process.on('SIGTERM', async () => { if (browser) await browser.close(); process.exit(); });
 
 start().catch(console.error);
-const Stripe = require('stripe');
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-
-app.post('/create-payment-intent', async (req, res) => {
-  const { amount } = req.body; // en centavos MXN
-  try {
-    const intent = await stripe.paymentIntents.create({
-      amount,
-      currency: 'mxn',
-      payment_method_types: ['card'],
-    });
-    res.json({ clientSecret: intent.client_secret });
-  } catch(e) {
-    res.status(400).json({ error: e.message });
-  }
-});
-```
-
-Luego en Railway → Variables → agrega:
-```
-STRIPE_SECRET_KEY=sk_live_...
