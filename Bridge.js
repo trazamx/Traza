@@ -1,5 +1,6 @@
-//   TRAZA — SphereGT Bridge  
-//   Railway-ready: single PORT, serves app + API together  
+// TRAZA - SphereGT Bridge
+// Railway-ready: single PORT, serves app + API together
+
 
 require(‘dotenv’).config();
 const express   = require(‘express’);
@@ -211,12 +212,8 @@ headless: ‘new’,
 userDataDir: SESSION_PATH,
 executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
 args: [
-‘–no-sandbox’,
-‘–disable-setuid-sandbox’,
-‘–disable-dev-shm-usage’,
-‘–disable-gpu’,
-‘–no-zygote’,
-‘–single-process’,
+'--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage','--disable-gpu','--no-zygote','--single-process'
+
 ],
 });
 page = await browser.newPage();
