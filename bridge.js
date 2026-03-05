@@ -479,3 +479,24 @@ process.on('SIGINT',  async () => { if (browser) await browser.close(); process.
 process.on('SIGTERM', async () => { if (browser) await browser.close(); process.exit(); });
 
 start().catch(console.error);
+const Stripe = require('stripe');
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+
+app.post('/create-payment-intent', async (req, res) => {
+  const { amount } = req.body; // en centavos MXN
+  try {
+    const intent = await stripe.paymentIntents.create({
+      amount,
+      currency: 'mxn',
+      payment_method_types: ['card'],
+    });
+    res.json({ clientSecret: intent.client_secret });
+  } catch(e) {
+    res.status(400).json({ error: e.message });
+  }
+});
+```
+
+Luego en Railway → Variables → agrega:
+```
+STRIPE_SECRET_KEY=sk_live_...
