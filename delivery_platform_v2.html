@@ -4398,6 +4398,36 @@ let adminInterval, orderInterval, mapInterval;
 // Change this to your bridge server IP once running
 // e.g. 'http://192.168.1.10:4000' if on same network
 const BRIDGE_URL = 'http://localhost:4000';
+const STRIPE_PK  = 'pk_live_51T7179Rr86Bf5TfuTAXtS6YnfLEyVz2RD5OXYQzCGMo3bHzg4MWNghdoiyaYC5C0kKptcShyXMgYieAPuePwhQtk00ayoXU4fd';
+let _stripe = null;
+let _stripeElements = null;
+let _stripeCardElement = null;
+function initStripe(){
+  return new Promise((resolve)=>{
+    if(typeof Stripe !== 'undefined'){
+      _stripe = Stripe(STRIPE_PK);
+      console.log('✅ Stripe listo');
+      return resolve(true);
+    }
+    // Cargar Stripe.js desde proxy del servidor (evita bloqueo CSP)
+    const stripeUrl = (typeof BRIDGE_URL !== 'undefined' && BRIDGE_URL && !BRIDGE_URL.includes('localhost'))
+      ? BRIDGE_URL + '/stripe.js'
+      : 'https://js.stripe.com/v3/';
+    const s = document.createElement('script');
+    s.src = stripeUrl;
+    s.onload = ()=>{
+      _stripe = Stripe(STRIPE_PK);
+      console.log('✅ Stripe cargado dinámicamente');
+      resolve(true);
+    };
+    s.onerror = ()=>{
+      console.error('❌ No se pudo cargar Stripe.js');
+      resolve(false);
+    };
+    document.head.appendChild(s);
+  });
+}
+window.addEventListener('load', ()=> initStripe());
 let bridgeConnected = false;
 let bridgePollInterval = null;
 
@@ -5846,7 +5876,7 @@ async function sendConfirmationEmail(params){
   }
 }
 
-function finalizeOrder(method){
+async function finalizeOrder(method){
   const name  = document.getElementById('c-name').value.trim();
   const phone = document.getElementById('c-phone').value.trim();
   const email = document.getElementById('c-email').value.trim();
@@ -5856,20 +5886,57 @@ function finalizeOrder(method){
   const km = _coords?.from?.kmRoute ||
     (_coords?.from && _coords?.to ? haversineKm(_coords.from.lat,_coords.from.lon,_coords.to.lat,_coords.to.lon)*1.35 : 0);
   const distStr = km ? km.toFixed(1)+' km' : '— km';
-
   const id = 'TRZ-' + String(Math.floor(10000+Math.random()*89999));
 
-  // Guardar en DB local
   saveEmailToDB(email, name, phone, id);
 
-  // Animación procesando
   const btn = document.getElementById('btn-pay-main');
   btn.classList.add('loading');
   document.getElementById('btn-pay-text').textContent = 'Procesando…';
   document.getElementById('btn-pay-icon').textContent = '⏳';
 
-  setTimeout(async ()=>{
-    // Registrar orden
+  try {
+    // ── Cobro real con Stripe ────────────────────────────
+    if(!_stripe) await initStripe();
+    if(method === 'card' && _stripe){
+      // 1. Pedir clientSecret al backend
+      const amountCents = Math.round((delivSpeed.price || 0) * 100);
+      const intentRes = await fetch(BRIDGE_URL + '/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: amountCents })
+      });
+      const intentData = await intentRes.json();
+      if(!intentData.ok || !intentData.clientSecret){
+        throw new Error(intentData.error || 'Error creando intención de pago');
+      }
+
+      // 2. Confirmar pago con datos de tarjeta
+      const cardNum = document.getElementById('card-num').value.replace(/\s/g,'');
+      const expParts = document.getElementById('card-exp').value.split('/');
+      const cvv = document.getElementById('card-cvv').value;
+
+      const { paymentIntent, error } = await _stripe.confirmCardPayment(intentData.clientSecret, {
+        payment_method: {
+          card: {
+            number:     cardNum,
+            exp_month:  parseInt(expParts[0]),
+            exp_year:   parseInt('20' + (expParts[1]||'').trim()),
+            cvc:        cvv,
+          },
+          billing_details: { name, email }
+        }
+      });
+
+      if(error){
+        throw new Error(error.message || 'Pago rechazado');
+      }
+      if(paymentIntent.status !== 'succeeded'){
+        throw new Error('El pago no fue completado');
+      }
+    }
+
+    // ── Registrar orden ───────────────────────────────────
     const newOrder = {
       id, from, to,
       source:'traza', status:'active',
@@ -5878,14 +5945,14 @@ function finalizeOrder(method){
       eta:  delivSpeed.eta,
       driver: pick(DRIVER_NAMES),
       service: delivSpeed.name,
-      cat: delivCat.name,
+      cat: delivCat?.name || '',
       email, name, payMethod: method,
       fromCoords: _coords.from ? {lat:_coords.from.lat, lon:_coords.from.lon} : null,
       toCoords:   _coords.to   ? {lat:_coords.to.lat,   lon:_coords.to.lon}   : null,
     };
     orders.push(newOrder);
 
-    // Enviar email de confirmación vía EmailJS → trazalogisticamx@gmail.com
+    // ── Email de confirmación ─────────────────────────────
     await sendConfirmationEmail({
       to_email:   email,
       to_name:    name,
@@ -5902,14 +5969,21 @@ function finalizeOrder(method){
     btn.classList.remove('loading');
     document.getElementById('btn-pay-icon').textContent = '✓';
     document.getElementById('btn-pay-text').textContent = '¡Pagado!';
-
     setTimeout(()=>{
       setEl('modal-order-id', id);
       setEl('modal-email-confirm', email);
       document.getElementById('success-modal').style.display='flex';
       document.getElementById('track-input').value = id;
     }, 300);
-  }, 1000);
+
+  } catch(err) {
+    // Error de pago — mostrar al usuario
+    btn.classList.remove('loading');
+    document.getElementById('btn-pay-icon').textContent = '💳';
+    document.getElementById('btn-pay-text').textContent = 'Pagar $'+(delivSpeed?.price||'');
+    showToast('❌ '+err.message);
+    console.error('Payment error:', err);
+  }
 }
 function closeModal(){
   document.getElementById('success-modal').style.display='none';
