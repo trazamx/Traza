@@ -1639,33 +1639,29 @@ input::placeholder { color: var(--muted); }
   <div class="traza-tagline">Logística Inteligente</div>
 
   <div class="role-cards">
-    <div class="role-card" onclick="enterApp('driver')">
+    <div class="role-card" onclick="enterApp('customer')">
       <span class="rc-num">01</span>
       <div class="rc-divider"></div>
       <div class="rc-body">
-        <span class="rc-title">Driver Hub</span>
-        <span class="rc-sub">Operadores</span>
-      </div>
-      <span class="rc-arrow">→</span>
-    </div>
-    <div class="role-card" onclick="enterApp('customer')">
-      <span class="rc-num">02</span>
-      <div class="rc-divider"></div>
-      <div class="rc-body">
         <span class="rc-title">Delivery</span>
-        <span class="rc-sub">Rastreo en vivo</span>
+        <span class="rc-sub">Envía · Rastreo en vivo</span>
       </div>
       <span class="rc-arrow">→</span>
     </div>
-    <div class="role-card" onclick="enterApp('mapa')">
-      <span class="rc-num">03</span>
-      <div class="rc-divider"></div>
-      <div class="rc-body">
-        <span class="rc-title">Mapa</span>
-        <span class="rc-sub">Flota satelital</span>
-      </div>
-      <span class="rc-arrow">→</span>
+  </div>
+
+  <!-- PIN gate modal -->
+  <div id="pin-gate" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,2,10,0.92);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;flex-direction:column;">
+    <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:28px;letter-spacing:.1em;color:#fff;margin-bottom:6px;" id="pin-gate-title">ACCESO RESTRINGIDO</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;color:rgba(0,200,255,0.5);margin-bottom:28px;" id="pin-gate-sub">Ingresa la clave de acceso</div>
+    <div style="position:relative;margin-bottom:16px;">
+      <input id="pin-input" type="password" placeholder="••••••••••"
+        style="background:rgba(0,200,255,0.06);border:1px solid rgba(0,200,255,0.25);border-radius:10px;padding:14px 48px 14px 18px;font-family:'JetBrains Mono',monospace;font-size:15px;color:#fff;letter-spacing:.15em;width:220px;outline:none;"
+        onkeydown="if(event.key==='Enter')checkPin()">
+      <span onclick="checkPin()" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:rgba(0,200,255,0.6);font-size:16px;">→</span>
     </div>
+    <div id="pin-error" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#ff4466;letter-spacing:.08em;height:16px;margin-bottom:16px;"></div>
+    <div onclick="closePinGate()" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;color:rgba(255,255,255,0.25);cursor:pointer;text-transform:uppercase;">Cancelar</div>
   </div>
 </div>
 
@@ -2570,28 +2566,28 @@ input::placeholder { color: var(--muted); }
 
           <!-- Speed tabs -->
           <div class="speed-tabs">
-            <div class="speed-tab active" id="stab-turbo" onclick="selectSpeed(this,'turbo',89,'🚀','20–30 min')">
+            <div class="speed-tab active" id="stab-turbo" onclick="selectSpeed(this,'turbo',59,'🚀','20–30 min')">
               <span class="speed-tab-icon">🚀</span>
               <span class="speed-tab-name">Turbo</span>
-              <span class="speed-tab-price">$89</span>
+              <span class="speed-tab-price" id="stab-turbo-price">desde $59</span>
               <span class="speed-tab-eta">20–30 min</span>
             </div>
-            <div class="speed-tab" id="stab-express" onclick="selectSpeed(this,'express',129,'⚡','1–2 hrs')">
+            <div class="speed-tab" id="stab-express" onclick="selectSpeed(this,'express',69,'⚡','1–2 hrs')">
               <span class="speed-tab-icon">⚡</span>
               <span class="speed-tab-name">Express</span>
-              <span class="speed-tab-price">$129</span>
+              <span class="speed-tab-price" id="stab-express-price">desde $69</span>
               <span class="speed-tab-eta">1–2 hrs</span>
             </div>
-            <div class="speed-tab" id="stab-sameday" onclick="selectSpeed(this,'sameday',99,'📦','2–4 hrs')">
+            <div class="speed-tab" id="stab-sameday" onclick="selectSpeed(this,'sameday',55,'📦','hoy mismo')">
               <span class="speed-tab-icon">📦</span>
               <span class="speed-tab-name">Same Day</span>
-              <span class="speed-tab-price">$99</span>
+              <span class="speed-tab-price" id="stab-sameday-price">desde $55</span>
               <span class="speed-tab-eta">hoy mismo</span>
             </div>
-            <div class="speed-tab" id="stab-programado" onclick="selectSpeed(this,'programado',149,'📅','hora elegida')">
+            <div class="speed-tab" id="stab-programado" onclick="selectSpeed(this,'programado',49,'📅','tú eliges hora')">
               <span class="speed-tab-icon">📅</span>
               <span class="speed-tab-name">Programado</span>
-              <span class="speed-tab-price">$149</span>
+              <span class="speed-tab-price" id="stab-programado-price">desde $49</span>
               <span class="speed-tab-eta">tú eliges hora</span>
             </div>
           </div>
@@ -2611,10 +2607,6 @@ input::placeholder { color: var(--muted); }
             <span class="cat-chip-icon">📄</span>
             <span class="cat-chip-name">Documentos</span>
           </div>
-          <div class="cat-chip" id="cat-comida" onclick="selectCat(this,'comida')">
-            <span class="cat-chip-icon">🍔</span>
-            <span class="cat-chip-name">Comida</span>
-          </div>
           <div class="cat-chip" id="cat-farmacia" onclick="selectCat(this,'farmacia')">
             <span class="cat-chip-icon">💊</span>
             <span class="cat-chip-name">Farmacia</span>
@@ -2632,8 +2624,8 @@ input::placeholder { color: var(--muted); }
         <!-- Price info bar -->
         <div class="price-infobar">
           <span class="price-infobar-icon" id="pi-icon">🚀</span>
-          <span class="price-infobar-text" id="pi-text">Turbo — 20 a 30 minutos<br>Paquete · ZMM cobertura total</span>
-          <span class="price-infobar-price" id="pi-price">$89</span>
+          <span class="price-infobar-text" id="pi-text">Turbo — ingresa origen y destino<br><span style="font-size:11px;opacity:.6">Precio calculado por km · Todo Nuevo León</span></span>
+          <span class="price-infobar-price" id="pi-price">desde $59</span>
         </div>
 
         <!-- Store picker panel (shown for flores/farmacia/comida/compras) -->
@@ -2724,33 +2716,33 @@ input::placeholder { color: var(--muted); }
             <span class="summary-val" id="sum-pkg">Chico (&lt;1kg)</span>
           </div>
           <div class="summary-row">
-            <span class="summary-label">Cobertura</span>
-            <span class="summary-val" style="color:var(--green)">✓ Monterrey ZMM</span>
+            <span class="summary-label">Distancia</span>
+            <span class="summary-val" id="sum-km" style="color:rgba(0,200,255,0.85)">— km</span>
           </div>
           <div class="summary-total">
             <span class="summary-total-label">Total</span>
-            <span class="summary-total-price"><span>$</span><span id="sum-price">89</span></span>
+            <span class="summary-total-price"><span>$</span><span id="sum-price">—</span></span>
           </div>
         </div>
 
         <!-- Competitor price compare -->
         <div class="price-compare">
-          <div class="price-compare-title">vs. competencia (tarifa aprox.)</div>
+          <div class="price-compare-title">vs. competencia · precio por km</div>
           <div class="price-compare-row">
             <span class="pcr-name">Uber Flash</span>
-            <span class="pcr-price">$120–$180</span>
+            <span class="pcr-price">~$12–$15/km</span>
           </div>
           <div class="price-compare-row">
-            <span class="pcr-name">Rappi Turbo</span>
-            <span class="pcr-price">$89–$149</span>
+            <span class="pcr-name">Rappi Express</span>
+            <span class="pcr-price">~$10–$14/km</span>
           </div>
           <div class="price-compare-row">
             <span class="pcr-name">Envíos Pronto</span>
-            <span class="pcr-price">$60–$85 (sin GPS)</span>
+            <span class="pcr-price">~$8–$10/km (sin GPS)</span>
           </div>
           <div class="price-compare-row" style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(0,224,150,0.12)">
             <span class="pcr-name pcr-traza">TRAZA — GPS en vivo + notif.</span>
-            <span class="pcr-price pcr-traza" id="comp-price">$89</span>
+            <span class="pcr-price pcr-traza" id="comp-price">desde $49</span>
           </div>
         </div>
 
@@ -3472,6 +3464,43 @@ function setEl(id, val){
 ══════════════════════════════════════════ */
 let currentRole = null;
 
+// ── PIN gate ─────────────────────────────────────────────────────
+const TRAZA_KEY = 'tramosa1749';
+let _pendingRole = null;
+
+function requirePin(role) {
+  _pendingRole = role;
+  const gate = document.getElementById('pin-gate');
+  document.getElementById('pin-gate-title').textContent =
+    role === 'driver' ? 'DRIVER HUB' : role === 'mapa' ? 'MAPA GPS' : 'ACCESO RESTRINGIDO';
+  document.getElementById('pin-error').textContent = '';
+  document.getElementById('pin-input').value = '';
+  gate.style.display = 'flex';
+  setTimeout(() => document.getElementById('pin-input').focus(), 80);
+}
+
+function checkPin() {
+  const val = document.getElementById('pin-input').value.trim();
+  if (val === TRAZA_KEY) {
+    document.getElementById('pin-gate').style.display = 'none';
+    if (_pendingRole) { enterApp(_pendingRole); _pendingRole = null; }
+  } else {
+    const err = document.getElementById('pin-error');
+    err.textContent = 'Clave incorrecta';
+    document.getElementById('pin-input').value = '';
+    document.getElementById('pin-input').style.borderColor = 'rgba(255,60,80,0.6)';
+    setTimeout(() => {
+      err.textContent = '';
+      document.getElementById('pin-input').style.borderColor = 'rgba(0,200,255,0.25)';
+    }, 1800);
+  }
+}
+
+function closePinGate() {
+  document.getElementById('pin-gate').style.display = 'none';
+  _pendingRole = null;
+}
+
 function enterApp(role){
   _currentPage = 'app:' + role;
   try {
@@ -3970,12 +3999,7 @@ function selectSpeed(el, id, price, icon, eta){
   document.querySelectorAll('.speed-tab').forEach(e=>e.classList.remove('active'));
   el.classList.add('active');
   delivSpeed = { id, price, icon, name: el.querySelector('.speed-tab-name').textContent.trim(), eta };
-  document.getElementById('pi-icon').textContent  = icon;
-  document.getElementById('pi-text').innerHTML    = `${delivSpeed.name} — ${eta}<br>${delivCat.name} · ZMM cobertura total`;
-  document.getElementById('pi-price').textContent = '$'+price;
-  document.getElementById('sum-svc').textContent  = icon+' '+delivSpeed.name+' — '+eta;
-  document.getElementById('sum-price').textContent= price;
-  document.getElementById('comp-price').textContent='$'+price;
+  calcAndUpdatePrice();
 }
 
 // ── Store catalogs ──────────────────────────────────────────────
@@ -4049,6 +4073,23 @@ function selectStore(catId, idx) {
   fromInput.value = store.addr;
   fromInput.style.color = 'rgba(0,200,255,0.85)';
   hideDropdown('c-from-drop');
+  _coords.from = null; // reset, geocodificamos
+  // Geocodifica la dirección de la tienda en background
+  geocodeAddr(store.addr + ', Nuevo León', coords => {
+    if(coords){ _coords.from = coords; if(_coords.to) calcAndUpdatePrice(); }
+  });
+}
+
+// Geocodifica una dirección y devuelve {lat, lon} al callback
+async function geocodeAddr(query, cb){
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?` +
+      `q=${encodeURIComponent(query)}&format=json&limit=1&addressdetails=1&countrycodes=mx&accept-language=es`;
+    const res  = await fetch(url, { headers:{'Accept-Language':'es'} });
+    const data = await res.json();
+    if(data.length) cb({ lat: data[0].lat, lon: data[0].lon });
+    else cb(null);
+  } catch(e){ cb(null); }
 }
 
 function selectCat(el, id){
@@ -4057,30 +4098,161 @@ function selectCat(el, id){
   const icon = el.querySelector('.cat-chip-icon').textContent;
   const name = el.querySelector('.cat-chip-name').textContent;
   delivCat = { id, icon, name };
-  document.getElementById('pi-text').innerHTML = `${delivSpeed.name} — ${delivSpeed.eta}<br>${name} · ZMM cobertura total`;
   document.getElementById('sum-cat').textContent = icon+' '+name;
   if(id==='flores') document.getElementById('pkg-fragil').querySelector('.pkg-sel-icon').textContent='🌸';
   else if(id==='documentos') document.getElementById('pkg-fragil').querySelector('.pkg-sel-icon').textContent='📋';
   else document.getElementById('pkg-fragil').querySelector('.pkg-sel-icon').textContent='🌸';
-  // Reset from address when switching category
-  if(['flores','farmacia','comida','compras'].includes(id)){
+  if(['flores','farmacia','compras'].includes(id)){
     document.getElementById('c-from').style.color='';
+    _coords.from = null;
     renderStorePicker(id);
   } else {
     document.getElementById('store-picker-panel').style.display='none';
     document.getElementById('c-from').value='';
     document.getElementById('c-from').style.color='';
     selectedStore = null;
+    _coords.from = null;
   }
+  calcAndUpdatePrice();
 }
 
-// ── Address Autocomplete — Nominatim OSM ─────────────────────────────────────
-let addrTimers = {};
-let addrControllers = {};
+// ══════════════════════════════════════════════════════════════════════════════
+// TRAZA — Geocoding + Km-based pricing  (Nominatim / OSM · Todo Nuevo León)
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Estado de coordenadas para calcular distancia real
+const _coords = { from: null, to: null };
+
+// Tarifas base por servicio (MXN) + tarifa por km
+const TARIFAS = {
+  turbo:      { base: 59, perKm: 9,  minKm: 1, maxKm: 15 },
+  express:    { base: 69, perKm: 8,  minKm: 1, maxKm: 40 },
+  sameday:    { base: 55, perKm: 7,  minKm: 1, maxKm: 60 },
+  programado: { base: 49, perKm: 7,  minKm: 1, maxKm: 80 },
+};
+
+// Recargos por tamaño de paquete
+const PKG_SURCHARGE = { chico:0, mediano:10, grande:25, fragil:30 };
+
+// Haversine — distancia en km entre dos puntos
+function haversineKm(lat1, lon1, lat2, lon2){
+  const R = 6371;
+  const dLat = (lat2-lat1)*Math.PI/180;
+  const dLon = (lon2-lon1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// Estima tiempo en minutos según modalidad y km
+function estimateETA(svcId, km){
+  const speeds = { turbo:30, express:25, sameday:20, programado:22 }; // km/h promedio urbano
+  const base   = { turbo:10, express:15, sameday:20, programado:30 };
+  return Math.round(base[svcId] + (km / speeds[svcId]) * 60);
+}
+
+// Calcula precio y actualiza toda la UI
+function calcAndUpdatePrice(){
+  const svcId  = delivSpeed ? delivSpeed.id : 'turbo';
+  const pkgId  = delivPkg   ? delivPkg.id   : 'chico';
+  const t      = TARIFAS[svcId] || TARIFAS.turbo;
+
+  let price, kmText, etaText;
+
+  if(_coords.from && _coords.to){
+    // Distancia real
+    const km = haversineKm(
+      parseFloat(_coords.from.lat), parseFloat(_coords.from.lon),
+      parseFloat(_coords.to.lat),   parseFloat(_coords.to.lon)
+    );
+    // Factor ruta ~1.35 (calles no son línea recta)
+    const kmRuta = Math.max(km * 1.35, 1);
+
+    if(kmRuta > t.maxKm){
+      // Fuera de rango del servicio
+      price  = null;
+      kmText = `${kmRuta.toFixed(1)} km — fuera de rango para ${delivSpeed ? delivSpeed.name : 'Turbo'}`;
+      etaText = '—';
+    } else {
+      price   = Math.round(t.base + kmRuta * t.perKm + (PKG_SURCHARGE[pkgId]||0));
+      kmText  = `${kmRuta.toFixed(1)} km de distancia`;
+      const eta = estimateETA(svcId, kmRuta);
+      etaText = eta < 60 ? `~${eta} min` : `~${Math.round(eta/60*10)/10} hrs`;
+    }
+  } else {
+    // Sin coordenadas todavía — precio mínimo referencial
+    price   = t.base + (PKG_SURCHARGE[pkgId]||0);
+    kmText  = 'Ingresa origen y destino para precio exacto';
+    etaText = delivSpeed ? delivSpeed.eta : '20–30 min';
+  }
+
+  // Actualiza UI
+  const priceStr = price ? '$' + price : 'Sin cobertura';
+  document.getElementById('sum-price').textContent  = price ? price : '—';
+  document.getElementById('comp-price').textContent = priceStr;
+  document.getElementById('pi-price').textContent   = priceStr;
+  const sumKmEl = document.getElementById('sum-km');
+  if(sumKmEl){
+    if(_coords.from && _coords.to){
+      const km = haversineKm(
+        parseFloat(_coords.from.lat), parseFloat(_coords.from.lon),
+        parseFloat(_coords.to.lat),   parseFloat(_coords.to.lon)
+      ) * 1.35;
+      sumKmEl.textContent = km.toFixed(1) + ' km';
+      sumKmEl.style.color = km > (TARIFAS[svcId]||TARIFAS.turbo).maxKm
+        ? '#ff4466' : 'rgba(0,200,255,0.85)';
+    } else {
+      sumKmEl.textContent = '— ingresa origen y destino';
+      sumKmEl.style.color = 'rgba(255,255,255,0.35)';
+    }
+  }
+
+  // Barra de info
+  const icon = delivSpeed ? delivSpeed.icon : '🚀';
+  const svcName = delivSpeed ? delivSpeed.name : 'Turbo';
+  document.getElementById('pi-icon').textContent = icon;
+  document.getElementById('pi-text').innerHTML   =
+    `<strong>${svcName}</strong> · ${etaText}<br><span style="font-size:11px;opacity:.7">${kmText}</span>`;
+
+  // Resumen
+  if(delivSpeed){
+    document.getElementById('sum-svc').textContent =
+      icon + ' ' + svcName + ' — ' + etaText;
+  }
+
+  // Colorea los tabs de velocidad con el precio calculado
+  if(_coords.from && _coords.to){
+    const kmBase = haversineKm(
+      parseFloat(_coords.from.lat), parseFloat(_coords.from.lon),
+      parseFloat(_coords.to.lat),   parseFloat(_coords.to.lon)
+    ) * 1.35;
+    const pkgSurcharge = PKG_SURCHARGE[pkgId]||0;
+    Object.keys(TARIFAS).forEach(id => {
+      const el = document.getElementById('stab-'+id);
+      if(!el) return;
+      const tThis = TARIFAS[id];
+      const km    = Math.max(kmBase, 1);
+      const p     = km > tThis.maxKm ? null : Math.round(tThis.base + km*tThis.perKm + pkgSurcharge);
+      const pEl   = el.querySelector('.speed-tab-price');
+      const eEl   = el.querySelector('.speed-tab-eta');
+      if(pEl) pEl.textContent = p ? '$'+p : 'Sin cobertura';
+      if(eEl && p){
+        const eta = estimateETA(id, kmBase);
+        eEl.textContent = eta < 60 ? '~'+eta+' min' : '~'+Math.round(eta/60*10)/10+' hrs';
+      }
+    });
+  }
+
+  return price;
+}
+
+// ── Autocomplete — Nominatim / OpenStreetMap  ────────────────────────────────
+let _addrTimers = {};
+let _addrAC     = {};
 
 function hideDropdown(dropId){
   const d = document.getElementById(dropId);
-  if(d) d.style.display='none';
+  if(d) d.style.display = 'none';
 }
 
 document.addEventListener('click', e=>{
@@ -4090,70 +4262,127 @@ document.addEventListener('click', e=>{
   }
 });
 
-async function addrSearch(inputId, dropId) {
+// Formatea el display_name de Nominatim en 2 líneas legibles
+function formatAddr(r){
+  const a = r.address || {};
+  // Línea principal: número + calle / nombre del lugar
+  let main = '';
+  if(r.name && r.name !== a.road) main = r.name;
+  if(a.road)   main += (main ? ' — ' : '') + a.road;
+  if(a.house_number) main = a.house_number + ' ' + main;
+  if(!main)    main = r.display_name.split(',')[0];
+
+  // Línea secundaria: colonia, municipio, estado
+  const parts = [];
+  if(a.suburb||a.neighbourhood||a.quarter) parts.push(a.suburb||a.neighbourhood||a.quarter);
+  if(a.city||a.town||a.municipality||a.county) parts.push(a.city||a.town||a.municipality||a.county);
+  if(a.state) parts.push(a.state);
+  const sub = parts.join(', ');
+
+  return { main: main.trim(), sub };
+}
+
+async function addrSearch(inputId, dropId){
   const input = document.getElementById(inputId);
   const drop  = document.getElementById(dropId);
   const q     = input.value.trim();
 
-  if(q.length < 3){ hideDropdown(dropId); return; }
+  if(q.length < 2){ hideDropdown(dropId); return; }
 
-  clearTimeout(addrTimers[inputId]);
-  addrTimers[inputId] = setTimeout(async ()=>{
-    if(addrControllers[inputId]) addrControllers[inputId].abort();
-    addrControllers[inputId] = new AbortController();
+  clearTimeout(_addrTimers[inputId]);
+  _addrTimers[inputId] = setTimeout(async ()=>{
+    if(_addrAC[inputId]) _addrAC[inputId].abort();
+    _addrAC[inputId] = new AbortController();
 
     drop.style.display = 'block';
-    drop.innerHTML = '<div class="addr-loading">Buscando…</div>';
+    drop.innerHTML = '<div class="addr-loading"><span style="opacity:.5">⏳</span> Buscando en Nuevo León…</div>';
 
     try {
-      const url = `https://nominatim.openstreetmap.org/search?` +
-        `q=${encodeURIComponent(q+' Monterrey Nuevo León')}&format=json&limit=6` +
-        `&addressdetails=1&countrycodes=mx&viewbox=-100.7,25.9,-99.7,25.3&bounded=1`;
+      // Bounding box completo de Nuevo León: W=-101.2, S=23.1, E=-98.4, N=27.8
+      // bounded=0 para que busque en todo NL sin restringir al bbox visible
+      const url =
+        `https://nominatim.openstreetmap.org/search?` +
+        `q=${encodeURIComponent(q)}&format=json&limit=8&addressdetails=1` +
+        `&countrycodes=mx&viewbox=-101.2,27.8,-98.4,23.1&bounded=0` +
+        `&accept-language=es`;
 
       const res  = await fetch(url, {
-        signal: addrControllers[inputId].signal,
-        headers: { 'Accept-Language': 'es' }
+        signal: _addrAC[inputId].signal,
+        headers: { 'Accept-Language': 'es', 'User-Agent': 'TRAZA-App/1.0' }
       });
       const data = await res.json();
 
-      if(!data.length){
-        drop.innerHTML = '<div class="addr-loading">Sin resultados — intenta con otra calle o colonia</div>';
+      // Filtra resultados en Nuevo León
+      const nl = data.filter(r=>{
+        const state = (r.address?.state||'').toLowerCase();
+        const lat   = parseFloat(r.lat);
+        const lon   = parseFloat(r.lon);
+        return state.includes('nuevo') ||
+               (lat>=23.1 && lat<=27.8 && lon>=-101.2 && lon<=-98.4);
+      });
+
+      if(!nl.length){
+        // Segundo intento sin bounded — agrega "Nuevo León" al query
+        const url2 =
+          `https://nominatim.openstreetmap.org/search?` +
+          `q=${encodeURIComponent(q+', Nuevo León')}&format=json&limit=8&addressdetails=1` +
+          `&countrycodes=mx&accept-language=es`;
+        const res2  = await fetch(url2, { signal: _addrAC[inputId].signal, headers:{'Accept-Language':'es'} });
+        const data2 = await res2.json();
+        const nl2   = data2.filter(r=>
+          (r.address?.state||'').toLowerCase().includes('nuevo') ||
+          (parseFloat(r.lat)>=23.1 && parseFloat(r.lat)<=27.8)
+        );
+        if(!nl2.length){
+          drop.innerHTML = '<div class="addr-loading">Sin resultados en Nuevo León</div>';
+          return;
+        }
+        renderDropdown(nl2, inputId, dropId, drop);
         return;
       }
 
-      drop.innerHTML = data.map(r=>{
-        const parts = r.display_name.split(', ');
-        const main  = parts.slice(0,2).join(', ');
-        const sub   = parts.slice(2,5).join(', ');
-        return `<div class="addr-suggestion" tabindex="0"
-          onclick="pickAddr('${inputId}','${dropId}','${r.display_name.replace(/'/g,'&#39;')}')"
-          onkeydown="if(event.key==='Enter')pickAddr('${inputId}','${dropId}','${r.display_name.replace(/'/g,'&#39;')}')">
-          <span class="addr-suggestion-icon">📍</span>
-          <div>
-            <div class="addr-suggestion-main">${main}</div>
-            <div class="addr-suggestion-sub">${sub}</div>
-          </div>
-        </div>`;
-      }).join('');
+      renderDropdown(nl, inputId, dropId, drop);
+
     } catch(err){
       if(err.name==='AbortError') return;
-      drop.innerHTML = '<div class="addr-loading">Error de conexión</div>';
+      drop.innerHTML = '<div class="addr-loading">Error de conexión — intenta de nuevo</div>';
     }
-  }, 320);
+  }, 280);
 }
 
-function pickAddr(inputId, dropId, val){
+function renderDropdown(results, inputId, dropId, drop){
+  drop.innerHTML = results.map(r=>{
+    const { main, sub } = formatAddr(r);
+    const lat = r.lat, lon = r.lon;
+    const mainEsc = main.replace(/'/g,"&#39;").replace(/"/g,'&quot;');
+    const subEsc  = sub.replace(/'/g,"&#39;").replace(/"/g,'&quot;');
+    const safeDisplay = (main+', '+sub).replace(/'/g,"&#39;");
+    return `<div class="addr-suggestion" tabindex="0"
+      onclick="pickAddr('${inputId}','${dropId}','${safeDisplay}',${lat},${lon})"
+      onkeydown="if(event.key==='Enter')pickAddr('${inputId}','${dropId}','${safeDisplay}',${lat},${lon})">
+      <span class="addr-suggestion-icon">📍</span>
+      <div>
+        <div class="addr-suggestion-main">${main}</div>
+        <div class="addr-suggestion-sub">${sub}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function pickAddr(inputId, dropId, label, lat, lon){
   const input = document.getElementById(inputId);
-  // Clean up: remove country/long suffix
-  const clean = val.split(', ').slice(0,4).join(', ');
-  input.value = clean;
+  input.value = label;
   input.style.color = '';
-  // If origin was auto-filled by store, remove store override
-  if(inputId === 'c-from') {
-    input.style.color = '';
-  }
+
+  // Guarda coordenadas
+  if(inputId === 'c-from') _coords.from = { lat, lon };
+  if(inputId === 'c-to')   _coords.to   = { lat, lon };
+
   hideDropdown(dropId);
   input.blur();
+
+  // Recalcula precio si ambos coords están listos
+  if(_coords.from && _coords.to) calcAndUpdatePrice();
 }
 
 function selectPkg(el, id){
@@ -4163,6 +4392,7 @@ function selectPkg(el, id){
   const desc = el.querySelector('.pkg-sel-desc').textContent;
   delivPkg = { id, name: name+' ('+desc+')' };
   document.getElementById('sum-pkg').textContent = delivPkg.name;
+  calcAndUpdatePrice();
 }
 
 function delivTab(pageId, btnId){
@@ -4843,20 +5073,16 @@ async function sendChat() {
       <svg viewBox="0 0 14 14" fill="none"><path d="M9 1L3 7l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <div class="lp-topbar-title">Quiénes Somos</div>
-    <span class="lp-topbar-tag">TRAZA · 2024</span>
+    <span class="lp-topbar-tag">TRAZA · 2026</span>
   </div>
   <div class="lp-body">
     <div class="lp-hero lp-reveal">
-      <div class="lp-eyebrow">Monterrey, NL · Fundada 2024</div>
+      <div class="lp-eyebrow">Monterrey, NL · Fundada 2026</div>
       <h1 class="lp-h1">Logística que<br><span>mueve</span> Monterrey</h1>
       <p class="lp-lead">Nacimos para resolver un problema real: la última milla en el área metropolitana era lenta, opaca y cara. Lo cambiamos con tecnología propia.</p>
     </div>
 
     <div class="lp-stats lp-reveal">
-      <div class="lp-stat">
-        <div class="lp-stat-val">60<span>+</span></div>
-        <div class="lp-stat-label">Unidades activas</div>
-      </div>
       <div class="lp-stat">
         <div class="lp-stat-val">15<span>s</span></div>
         <div class="lp-stat-label">Refresh GPS</div>
@@ -5212,7 +5438,7 @@ async function sendChat() {
         <div id="nav-tagline">Logística Inteligente · Monterrey</div>
         <div id="nav-status-row">
           <span class="nav-status-dot"></span>
-          <span class="nav-status-txt">Flota activa · 60+ unidades</span>
+          <span class="nav-status-txt">Monterrey ZMM · Delivery</span>
         </div>
       </div>
 
@@ -5258,11 +5484,11 @@ async function sendChat() {
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2L3 6v10h12V6L9 2z" stroke="#B4FF47" stroke-width="1.2" stroke-linejoin="round"/><rect x="6.5" y="10" width="5" height="6" rx="0.5" stroke="#B4FF47" stroke-width="1.2"/></svg>
           <span>Rastrear</span>
         </div>
-        <div class="nav-platform-btn" onclick="enterApp('mapa'); closeNav();">
+        <div class="nav-platform-btn" onclick="closeNav(); requirePin('mapa');">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5C6.239 1.5 4 3.739 4 6.5c0 3.75 5 10 5 10s5-6.25 5-10c0-2.761-2.239-5-5-5z" stroke="#B4FF47" stroke-width="1.2"/><circle cx="9" cy="6.5" r="1.5" stroke="#B4FF47" stroke-width="1.2"/></svg>
           <span>Mapa GPS</span>
         </div>
-        <div class="nav-platform-btn" onclick="enterApp('driver'); closeNav();">
+        <div class="nav-platform-btn" onclick="closeNav(); requirePin('driver');">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1.5" y="5.5" width="15" height="9" rx="2" stroke="#B4FF47" stroke-width="1.2"/><path d="M5 5.5V4a4 4 0 018 0v1.5" stroke="#B4FF47" stroke-width="1.2" stroke-linecap="round"/><circle cx="6" cy="10" r="1" fill="#B4FF47"/><circle cx="12" cy="10" r="1" fill="#B4FF47"/></svg>
           <span>Driver Hub</span>
         </div>
