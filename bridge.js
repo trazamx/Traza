@@ -76,6 +76,14 @@ app.post('/refresh', async (req, res) => {
   await pollVehicles();
   res.json({ ok: true, vehicleCount: vehicles.length, lastSync });
 });
+// ─── Proxy Stripe.js ─────────────────────────────────────
+app.get('/stripe.js', (req, res) => {
+  const https = require('https');
+  https.get('https://js.stripe.com/v3/', (r) => {
+    res.setHeader('Content-Type', 'application/javascript');
+    r.pipe(res);
+  }).on('error', (e) => res.status(500).send('// error: ' + e.message));
+});
 
 // ─── Stripe — crear intención de pago ────────────────────
 // La STRIPE_SECRET_KEY va en Railway → Variables, nunca en el código
