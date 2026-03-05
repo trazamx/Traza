@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>TRAZA — Plataforma de Entregas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
 /* ════════════════════════════════════════
    TOKENS
@@ -54,7 +54,7 @@ body {
 /* ════════════════════════════════════════
    TRAZA LANDING — ROLE SELECTOR
 ════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Barlow+Condensed:wght@600;700;800;900&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Bebas+Neue&family=Barlow+Condensed:wght@600;700;800;900&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* ═══════════════════════════════════
    TRAZA LANDING — Futuristic minimal
@@ -90,7 +90,7 @@ body {
 /* Logo canvas wrapper */
 .traza-logo-wrap {
   position: relative; z-index: 2;
-  margin-bottom: 10px;
+  margin-bottom: 0;
   animation: logo-float 6s ease-in-out infinite;
 }
 @keyframes logo-float {
@@ -107,7 +107,7 @@ body {
   color: rgba(110,110,136,0.65);
   text-transform: uppercase;
   margin-bottom: 56px;
-  margin-top: -8px;
+  margin-top: 4px;
   text-align: center;
   animation: land-in .6s ease .35s both;
 }
@@ -1632,8 +1632,6 @@ input::placeholder { color: var(--muted); }
 
   <div id="dots-btn" onclick="openNav()" title="Menú"><span></span><span></span><span></span></div>
 
-  <div class="traza-city">Monterrey</div>
-
   <div class="traza-logo-wrap">
     <canvas id="logo-canvas"></canvas>
   </div>
@@ -1987,156 +1985,885 @@ input::placeholder { color: var(--muted); }
 </div>
 
 <!-- ══════════════════════════════════════
-     CUSTOMER APP
+     CUSTOMER DELIVERY APP — Full Production
 ══════════════════════════════════════ -->
+<style>
+/* ── Delivery app specific styles ─────────── */
+.del-hero {
+  background: linear-gradient(135deg, #000A1F 0%, #001028 60%, #000810 100%);
+  padding: 20px 16px 0;
+  position: relative;
+  overflow: hidden;
+}
+.del-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 70% 30%, rgba(0,200,255,0.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+.del-hero-title {
+  font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+  font-size: 32px;
+  letter-spacing: .06em;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.del-hero-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .22em;
+  color: rgba(0,200,255,0.55);
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+/* Speed selector tabs */
+.speed-tabs {
+  display: flex;
+  gap: 6px;
+  padding-bottom: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: -1px;
+}
+.speed-tabs::-webkit-scrollbar { display: none; }
+.speed-tab {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 14px 12px;
+  border-radius: 10px 10px 0 0;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-bottom: none;
+  cursor: pointer;
+  transition: all .22s;
+  background: rgba(255,255,255,0.02);
+  position: relative;
+}
+.speed-tab.active {
+  background: var(--surface);
+  border-color: rgba(0,200,255,0.2);
+  border-bottom-color: transparent;
+}
+.speed-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0; right: 0; height: 1px;
+  background: var(--surface);
+}
+.speed-tab-icon { font-size: 18px; line-height: 1; }
+.speed-tab-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .1em;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+}
+.speed-tab.active .speed-tab-name { color: #00C8FF; }
+.speed-tab-price {
+  font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+  font-size: 16px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: .04em;
+  line-height: 1;
+}
+.speed-tab.active .speed-tab-price { color: rgba(255,255,255,0.92); }
+.speed-tab-eta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7px;
+  color: rgba(0,200,255,0.4);
+  text-transform: uppercase;
+}
+.speed-tab.active .speed-tab-eta { color: rgba(0,200,255,0.8); }
+
+/* Category chips */
+.cat-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 14px 16px 0;
+  -webkit-overflow-scrolling: touch;
+}
+.cat-row::-webkit-scrollbar { display: none; }
+.cat-chip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all .22s;
+}
+.cat-chip.active {
+  background: rgba(0,200,255,0.08);
+  border-color: rgba(0,200,255,0.3);
+}
+.cat-chip-icon { font-size: 16px; line-height: 1; }
+.cat-chip-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.cat-chip.active .cat-chip-name { color: #00C8FF; }
+
+/* Pricing info bar */
+.price-infobar {
+  margin: 12px 16px 0;
+  padding: 10px 14px;
+  background: rgba(0,200,255,0.05);
+  border: 1px solid rgba(0,200,255,0.12);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.price-infobar-icon { font-size: 16px; flex-shrink: 0; }
+.price-infobar-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .05em;
+  color: rgba(0,200,255,0.7);
+  line-height: 1.5;
+}
+.price-infobar-price {
+  margin-left: auto;
+  font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+  font-size: 26px;
+  color: #fff;
+  letter-spacing: .04em;
+  flex-shrink: 0;
+}
+
+/* Form section */
+.form-section {
+  padding: 16px 16px 0;
+}
+.form-section-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .25em;
+  color: rgba(255,255,255,0.22);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.form-section-title::after {
+  content: '';
+  flex: 1; height: 1px;
+  background: rgba(255,255,255,0.05);
+}
+
+/* Address inputs with icon */
+.addr-row {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.addr-field {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+}
+.addr-field:last-child { border-bottom: none; }
+.addr-field-dot {
+  width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px;
+}
+.addr-dot-green { color: #00E096; }
+.addr-dot-cyan { color: #00C8FF; }
+.addr-field input {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 12px 12px 12px 0;
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+}
+.addr-field input::placeholder { color: var(--muted); font-size: 13px; }
+
+/* Contact row */
+.contact-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+/* Package detail fields */
+.pkg-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.pkg-sel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.pkg-sel.active {
+  border-color: rgba(0,200,255,0.35);
+  background: rgba(0,200,255,0.05);
+}
+.pkg-sel-icon { font-size: 20px; line-height: 1; margin-bottom: 2px; }
+.pkg-sel-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+}
+.pkg-sel.active .pkg-sel-name { color: #fff; }
+.pkg-sel-desc {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .06em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* Summary card */
+.summary-card {
+  margin: 14px 16px;
+  background: linear-gradient(135deg, rgba(0,200,255,0.06) 0%, rgba(0,100,200,0.04) 100%);
+  border: 1px solid rgba(0,200,255,0.15);
+  border-radius: 12px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.summary-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,200,255,0.4), transparent);
+}
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.summary-row:last-child { margin-bottom: 0; }
+.summary-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .14em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.summary-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--white);
+}
+.summary-total {
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.summary-total-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .14em;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+}
+.summary-total-price {
+  font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+  font-size: 36px;
+  color: #fff;
+  letter-spacing: .04em;
+  line-height: 1;
+}
+.summary-total-price span {
+  color: #00C8FF;
+  font-size: 0.55em;
+  vertical-align: super;
+}
+
+/* CTA buttons */
+.cta-wrap {
+  padding: 0 16px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.btn-cta-main {
+  background: linear-gradient(135deg, #0062FF 0%, #00A8FF 100%);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 700;
+  padding: 15px 20px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 24px rgba(0,100,255,0.35);
+  transition: all .2s;
+  letter-spacing: .02em;
+}
+.btn-cta-main:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.btn-cta-main:active { transform: scale(.98); }
+.btn-cta-wa {
+  background: rgba(37,211,102,0.1);
+  color: #25D366;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(37,211,102,0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all .2s;
+  text-decoration: none;
+}
+.btn-cta-wa:hover { background: rgba(37,211,102,0.18); }
+
+/* Competitor price compare */
+.price-compare {
+  margin: 0 16px 14px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+}
+.price-compare-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .2em;
+  color: rgba(255,255,255,0.2);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.price-compare-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+.price-compare-row:last-child { margin-bottom: 0; }
+.pcr-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: .06em;
+}
+.pcr-price {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  text-decoration: line-through;
+}
+.pcr-traza {
+  color: #00E096;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ── Store picker grid ── */
+.store-picker-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+.store-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all .18s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.store-card.active {
+  background: rgba(0,200,255,0.07);
+  border-color: rgba(0,200,255,0.35);
+}
+.store-card-icon { font-size: 22px; flex-shrink: 0; }
+.store-card-info { flex: 1; min-width: 0; }
+.store-card-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+.store-card.active .store-card-name { color: #fff; }
+.store-card-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .05em;
+  color: var(--muted);
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+.store-card.active .store-card-sub { color: rgba(0,200,255,0.6); }
+
+/* ── Address autocomplete dropdown ── */
+.addr-dropdown {
+  position: absolute;
+  left: 0; right: 0;
+  background: #0D1628;
+  border: 1px solid rgba(0,200,255,0.22);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  z-index: 300;
+  max-height: 240px;
+  overflow-y: auto;
+  box-shadow: 0 12px 32px rgba(0,0,0,.7);
+}
+.addr-suggestion {
+  padding: 11px 14px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background .12s;
+}
+.addr-suggestion:last-child { border-bottom: none; border-radius: 0 0 10px 10px; }
+.addr-suggestion:hover, .addr-suggestion:focus { background: rgba(0,200,255,0.08); color: #fff; outline: none; }
+.addr-suggestion-icon { font-size: 13px; opacity: .55; flex-shrink: 0; }
+.addr-suggestion-main { font-size: 13px; font-weight: 500; line-height: 1.3; }
+.addr-suggestion-sub { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--muted); margin-top: 1px; }
+.addr-loading { padding:12px 14px; font-size:12px; color:var(--muted); font-family:var(--font-mono); letter-spacing:.05em; }
+
+/* Track page */
+.track-search {
+  padding: 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+}
+.track-search input {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+}
+.track-search input:focus { border-color: rgba(0,200,255,0.4); }
+.track-search input::placeholder { color: var(--muted); }
+
+/* Order status timeline */
+.timeline {
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.tl-step {
+  display: flex;
+  gap: 14px;
+  position: relative;
+}
+.tl-step::before {
+  content: '';
+  position: absolute;
+  left: 15px; top: 30px; bottom: -4px;
+  width: 2px;
+  background: rgba(255,255,255,0.07);
+}
+.tl-step:last-child::before { display: none; }
+.tl-dot-wrap {
+  width: 32px; height: 32px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--muted2);
+  border: 2px solid rgba(255,255,255,0.08);
+  font-size: 14px;
+  position: relative; z-index: 1;
+  margin-bottom: 20px;
+}
+.tl-step.done .tl-dot-wrap { background: rgba(0,224,150,0.12); border-color: var(--green); }
+.tl-step.active .tl-dot-wrap {
+  background: rgba(0,200,255,0.12);
+  border-color: #00C8FF;
+  box-shadow: 0 0 12px rgba(0,200,255,0.3);
+  animation: tl-pulse 2s ease infinite;
+}
+@keyframes tl-pulse { 0%,100%{box-shadow:0 0 12px rgba(0,200,255,0.3)} 50%{box-shadow:0 0 20px rgba(0,200,255,0.6)} }
+.tl-step::before { left: 15px; }
+.tl-content { flex: 1; padding-top: 4px; }
+.tl-title {
+  font-weight: 600; font-size: 14px;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.2; margin-bottom: 2px;
+}
+.tl-step.done .tl-title, .tl-step.active .tl-title { color: var(--white); }
+.tl-sub {
+  font-family: var(--font-mono);
+  font-size: 10px; color: var(--muted);
+  letter-spacing: .05em;
+}
+.tl-step.active .tl-sub { color: rgba(0,200,255,0.6); }
+</style>
+
 <div class="app-shell" id="customer-app">
-  <div class="topbar">
+  <div class="topbar" style="background:linear-gradient(135deg,#000A1F,#001028);">
     <div class="tb-back" onclick="goHome()">←</div>
-    <div class="tb-title">Send Package</div>
-    <span class="tb-badge badge-customer">TRAZA</span>
+    <div class="tb-title" style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;letter-spacing:.1em;">TRAZA Delivery</div>
+    <span class="tb-badge badge-customer">ZMM</span>
   </div>
 
   <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
-    <div class="app-body">
+    <div class="app-body" id="delivery-body">
 
-      <!-- PAGE: New Order -->
+      <!-- ── PAGE: ORDER ───────────────────────────── -->
       <div class="page active" id="c-new">
-        <div class="section">
 
-          <!-- Service type -->
-          <div class="label-sm">Service Type</div>
-          <div class="svc-row">
-            <div class="svc-opt sel" onclick="selectService(this,'express',149,'⚡','1-2 hrs')">
-              <div class="so-icon">⚡</div>
-              <div class="so-name">Express</div>
-              <div class="so-price">$149</div>
-            </div>
-            <div class="svc-opt" onclick="selectService(this,'sameday',99,'📦','2-4 hrs')">
-              <div class="so-icon">📦</div>
-              <div class="so-name">Same-Day</div>
-              <div class="so-price">$99</div>
-            </div>
-            <div class="svc-opt" onclick="selectService(this,'food',79,'🍔','30-60 min')">
-              <div class="so-icon">🍔</div>
-              <div class="so-name">Food</div>
-              <div class="so-price">$79</div>
-            </div>
-          </div>
+        <!-- Hero + speed selector -->
+        <div class="del-hero">
+          <div class="del-hero-title">¿A dónde enviamos?</div>
+          <div class="del-hero-sub">Entrega hoy · Monterrey ZMM · 60+ unidades activas</div>
 
-          <!-- Form -->
-          <div class="form-group">
-            <label>Pickup Address</label>
-            <input type="text" id="c-from" placeholder="e.g. San Pedro, Monterrey">
-          </div>
-          <div class="form-group">
-            <label>Delivery Address</label>
-            <input type="text" id="c-to" placeholder="e.g. Cumbres, Monterrey">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div class="form-group">
-              <label>Your Name</label>
-              <input type="text" id="c-name" placeholder="Full name">
+          <!-- Speed tabs -->
+          <div class="speed-tabs">
+            <div class="speed-tab active" id="stab-turbo" onclick="selectSpeed(this,'turbo',89,'🚀','20–30 min')">
+              <span class="speed-tab-icon">🚀</span>
+              <span class="speed-tab-name">Turbo</span>
+              <span class="speed-tab-price">$89</span>
+              <span class="speed-tab-eta">20–30 min</span>
             </div>
-            <div class="form-group">
-              <label>Phone / WhatsApp</label>
+            <div class="speed-tab" id="stab-express" onclick="selectSpeed(this,'express',129,'⚡','1–2 hrs')">
+              <span class="speed-tab-icon">⚡</span>
+              <span class="speed-tab-name">Express</span>
+              <span class="speed-tab-price">$129</span>
+              <span class="speed-tab-eta">1–2 hrs</span>
+            </div>
+            <div class="speed-tab" id="stab-sameday" onclick="selectSpeed(this,'sameday',99,'📦','2–4 hrs')">
+              <span class="speed-tab-icon">📦</span>
+              <span class="speed-tab-name">Same Day</span>
+              <span class="speed-tab-price">$99</span>
+              <span class="speed-tab-eta">hoy mismo</span>
+            </div>
+            <div class="speed-tab" id="stab-programado" onclick="selectSpeed(this,'programado',149,'📅','hora elegida')">
+              <span class="speed-tab-icon">📅</span>
+              <span class="speed-tab-name">Programado</span>
+              <span class="speed-tab-price">$149</span>
+              <span class="speed-tab-eta">tú eliges hora</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category chips -->
+        <div class="cat-row">
+          <div class="cat-chip active" id="cat-paquete" onclick="selectCat(this,'paquete')">
+            <span class="cat-chip-icon">📦</span>
+            <span class="cat-chip-name">Paquete</span>
+          </div>
+          <div class="cat-chip" id="cat-flores" onclick="selectCat(this,'flores')">
+            <span class="cat-chip-icon">🌸</span>
+            <span class="cat-chip-name">Flores</span>
+          </div>
+          <div class="cat-chip" id="cat-documentos" onclick="selectCat(this,'documentos')">
+            <span class="cat-chip-icon">📄</span>
+            <span class="cat-chip-name">Documentos</span>
+          </div>
+          <div class="cat-chip" id="cat-comida" onclick="selectCat(this,'comida')">
+            <span class="cat-chip-icon">🍔</span>
+            <span class="cat-chip-name">Comida</span>
+          </div>
+          <div class="cat-chip" id="cat-farmacia" onclick="selectCat(this,'farmacia')">
+            <span class="cat-chip-icon">💊</span>
+            <span class="cat-chip-name">Farmacia</span>
+          </div>
+          <div class="cat-chip" id="cat-compras" onclick="selectCat(this,'compras')">
+            <span class="cat-chip-icon">🛍️</span>
+            <span class="cat-chip-name">Compras</span>
+          </div>
+          <div class="cat-chip" id="cat-otro" onclick="selectCat(this,'otro')">
+            <span class="cat-chip-icon">📋</span>
+            <span class="cat-chip-name">Otro</span>
+          </div>
+        </div>
+
+        <!-- Price info bar -->
+        <div class="price-infobar">
+          <span class="price-infobar-icon" id="pi-icon">🚀</span>
+          <span class="price-infobar-text" id="pi-text">Turbo — 20 a 30 minutos<br>Paquete · ZMM cobertura total</span>
+          <span class="price-infobar-price" id="pi-price">$89</span>
+        </div>
+
+        <!-- Store picker panel (shown for flores/farmacia/comida/compras) -->
+        <div id="store-picker-panel" style="display:none;padding:0 16px 0;">
+          <div class="form-section-title" style="margin-top:14px" id="store-picker-title">Elige la tienda</div>
+          <div class="store-picker-grid" id="store-picker-grid"></div>
+        </div>
+
+        <!-- Address fields -->
+        <div class="form-section">
+          <div class="form-section-title">Direcciones</div>
+          <div style="position:relative">
+            <div class="addr-row">
+              <div class="addr-field">
+                <span class="addr-field-dot addr-dot-green">●</span>
+                <input type="text" id="c-from" placeholder="Origen — colonia o calle, Monterrey"
+                  autocomplete="off" oninput="addrSearch('c-from','c-from-drop')" onfocus="addrSearch('c-from','c-from-drop')">
+              </div>
+              <div class="addr-field">
+                <span class="addr-field-dot addr-dot-cyan">◆</span>
+                <input type="text" id="c-to" placeholder="Destino — colonia o calle, Monterrey"
+                  autocomplete="off" oninput="addrSearch('c-to','c-to-drop')" onfocus="addrSearch('c-to','c-to-drop')">
+              </div>
+            </div>
+            <div id="c-from-drop" class="addr-dropdown" style="display:none;top:50%;"></div>
+            <div id="c-to-drop"   class="addr-dropdown" style="display:none;top:100%;"></div>
+          </div>
+        </div>
+
+        <!-- Contact fields -->
+        <div class="form-section">
+          <div class="form-section-title">Tus datos</div>
+          <div class="contact-row">
+            <div class="form-group" style="margin-bottom:0">
+              <label>Nombre</label>
+              <input type="text" id="c-name" placeholder="Nombre completo">
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label>WhatsApp</label>
               <input type="tel" id="c-phone" placeholder="81 0000 0000">
             </div>
           </div>
-          <div class="form-group">
-            <label>Package Description</label>
-            <input type="text" id="c-desc" placeholder="e.g. Small box, documents...">
-          </div>
+        </div>
 
-          <!-- Price summary -->
-          <div class="card" style="margin-bottom:14px">
-            <div class="row-between">
-              <span style="color:var(--muted);font-size:13px">Service</span>
-              <span style="font-weight:600" id="c-svc-name">Express</span>
+        <!-- Package type -->
+        <div class="form-section" id="pkg-section">
+          <div class="form-section-title">Tipo de envío</div>
+          <div class="pkg-grid">
+            <div class="pkg-sel active" id="pkg-chico" onclick="selectPkg(this,'chico')">
+              <span class="pkg-sel-icon">📮</span>
+              <span class="pkg-sel-name">Chico</span>
+              <span class="pkg-sel-desc">Sobre / &lt;1kg</span>
             </div>
-            <div class="divider"></div>
-            <div class="row-between">
-              <span style="color:var(--muted);font-size:13px">Estimated time</span>
-              <span style="font-family:var(--font-mono);font-size:11px;color:var(--blue)" id="c-svc-time">1-2 hrs</span>
+            <div class="pkg-sel" id="pkg-mediano" onclick="selectPkg(this,'mediano')">
+              <span class="pkg-sel-icon">📦</span>
+              <span class="pkg-sel-name">Mediano</span>
+              <span class="pkg-sel-desc">Caja hasta 5kg</span>
             </div>
-            <div class="row-between" style="margin-top:8px">
-              <span style="font-weight:600;font-size:15px">Total</span>
-              <span style="font-family:var(--font-head);font-size:28px;font-weight:700;color:var(--blue)" id="c-svc-price">$149</span>
+            <div class="pkg-sel" id="pkg-grande" onclick="selectPkg(this,'grande')">
+              <span class="pkg-sel-icon">📫</span>
+              <span class="pkg-sel-name">Grande</span>
+              <span class="pkg-sel-desc">Hasta 20kg</span>
+            </div>
+            <div class="pkg-sel" id="pkg-fragil" onclick="selectPkg(this,'fragil')">
+              <span class="pkg-sel-icon">🌸</span>
+              <span class="pkg-sel-name">Frágil</span>
+              <span class="pkg-sel-desc">Flores / vidrio</span>
             </div>
           </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label>Nota para el conductor (opcional)</label>
+            <input type="text" id="c-desc" placeholder="Ej: tocar el timbre, dejar en recepción…">
+          </div>
+        </div>
 
-          <button class="btn btn-primary" onclick="placeOrder()">
-            Place Order →
+        <!-- Order summary -->
+        <div class="summary-card">
+          <div class="summary-row">
+            <span class="summary-label">Servicio</span>
+            <span class="summary-val" id="sum-svc">🚀 Turbo — 20–30 min</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Categoría</span>
+            <span class="summary-val" id="sum-cat">📦 Paquete</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Tamaño</span>
+            <span class="summary-val" id="sum-pkg">Chico (&lt;1kg)</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Cobertura</span>
+            <span class="summary-val" style="color:var(--green)">✓ Monterrey ZMM</span>
+          </div>
+          <div class="summary-total">
+            <span class="summary-total-label">Total</span>
+            <span class="summary-total-price"><span>$</span><span id="sum-price">89</span></span>
+          </div>
+        </div>
+
+        <!-- Competitor price compare -->
+        <div class="price-compare">
+          <div class="price-compare-title">vs. competencia (tarifa aprox.)</div>
+          <div class="price-compare-row">
+            <span class="pcr-name">Uber Flash</span>
+            <span class="pcr-price">$120–$180</span>
+          </div>
+          <div class="price-compare-row">
+            <span class="pcr-name">Rappi Turbo</span>
+            <span class="pcr-price">$89–$149</span>
+          </div>
+          <div class="price-compare-row">
+            <span class="pcr-name">Envíos Pronto</span>
+            <span class="pcr-price">$60–$85 (sin GPS)</span>
+          </div>
+          <div class="price-compare-row" style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(0,224,150,0.12)">
+            <span class="pcr-name pcr-traza">TRAZA — GPS en vivo + notif.</span>
+            <span class="pcr-price pcr-traza" id="comp-price">$89</span>
+          </div>
+        </div>
+
+        <!-- CTAs -->
+        <div class="cta-wrap">
+          <button class="btn-cta-main" onclick="placeOrder()">
+            <span>Ordenar ahora</span>
+            <span>→</span>
           </button>
-          <div style="margin-top:10px">
-            <a href="https://wa.me/528115550619?text=Hola%20TRAZA%2C%20quiero%20hacer%20un%20envío" target="_blank"
-               class="btn btn-ghost" style="font-size:13px">
-              💬 Order via WhatsApp instead
-            </a>
-          </div>
+          <a href="https://wa.me/528115550619?text=Hola%20TRAZA%2C%20quiero%20un%20envío" target="_blank" class="btn-cta-wa">
+            <span>💬</span>
+            <span>Pedir por WhatsApp</span>
+          </a>
         </div>
       </div>
 
-      <!-- PAGE: Track -->
+      <!-- ── PAGE: TRACK ───────────────────────────── -->
       <div class="page" id="c-track">
-        <div class="section">
-          <div class="form-group">
-            <label>Tracking ID</label>
-            <div style="display:flex;gap:8px">
-              <input type="text" id="track-input" placeholder="e.g. ORD-00847" style="flex:1">
-              <button class="btn btn-primary btn-sm" onclick="trackOrder()" style="width:auto;padding:11px 16px">→</button>
-            </div>
-          </div>
-          <div id="track-result" style="display:none">
-            <div class="card slide-up">
-              <div class="oc-header">
-                <span class="oc-id" id="tr-id">—</span>
+        <div class="track-search">
+          <input type="text" id="track-input" placeholder="Número de seguimiento  TRZ-00001" style="font-family:var(--font-mono);font-size:13px;letter-spacing:.04em;">
+          <button class="btn btn-primary btn-sm" onclick="trackOrder()" style="width:auto;padding:11px 18px;flex-shrink:0;">Buscar</button>
+        </div>
+
+        <div id="track-result" style="display:none">
+          <!-- Order card -->
+          <div class="section" style="padding-bottom:0">
+            <div class="card slide-up" style="padding:18px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <span style="font-family:var(--font-mono);font-size:13px;color:var(--blue);letter-spacing:.06em" id="tr-id">—</span>
                 <span class="pill" id="tr-status-pill">—</span>
               </div>
-              <div class="oc-route">
-                <div class="from" id="tr-from">—</div>
-                <div style="margin-top:4px" id="tr-to">—</div>
+              <div style="margin-bottom:10px">
+                <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px">ORIGEN</div>
+                <div style="font-size:14px;font-weight:500" id="tr-from">—</div>
               </div>
-              <div class="divider"></div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-                <div>
-                  <div class="label-sm">Driver</div>
-                  <div style="font-size:14px;font-weight:500" id="tr-driver">—</div>
-                </div>
-                <div>
-                  <div class="label-sm">ETA</div>
-                  <div style="font-size:14px;font-weight:500;color:var(--blue)" id="tr-eta">—</div>
-                </div>
+              <div style="margin-bottom:14px">
+                <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px">DESTINO</div>
+                <div style="font-size:14px;font-weight:500" id="tr-to">—</div>
               </div>
-              <!-- Progress bar -->
-              <div style="margin-top:14px">
-                <div style="height:4px;background:var(--muted2);border-radius:2px;overflow:hidden">
-                  <div id="tr-progress" style="height:100%;background:var(--blue);border-radius:2px;transition:width 1s"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;margin-top:6px;font-family:var(--font-mono);font-size:9px;color:var(--muted)">
-                  <span>Pickup</span><span>In Transit</span><span>Delivered</span>
-                </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding-top:12px;border-top:1px solid var(--border)">
+                <div><div class="label-sm">Conductor</div><div style="font-size:13px;font-weight:500" id="tr-driver">—</div></div>
+                <div><div class="label-sm">ETA</div><div style="font-size:13px;font-weight:500;color:var(--blue)" id="tr-eta">—</div></div>
+                <div><div class="label-sm">Servicio</div><div style="font-size:13px;font-weight:500" id="tr-svc">—</div></div>
               </div>
-            </div>
-
-            <!-- Live mini map -->
-            <div class="map-box" style="height:160px;margin-top:10px">
-              <canvas id="track-map" height="160" style="width:100%;display:block"></canvas>
-              <div class="map-label">Driver location · Live</div>
             </div>
           </div>
+
+          <!-- Timeline -->
+          <div class="timeline" id="track-timeline">
+            <div class="tl-step done">
+              <div class="tl-dot-wrap">✓</div>
+              <div class="tl-content">
+                <div class="tl-title">Orden recibida</div>
+                <div class="tl-sub" id="tl-t1">—</div>
+              </div>
+            </div>
+            <div class="tl-step done">
+              <div class="tl-dot-wrap">🚗</div>
+              <div class="tl-content">
+                <div class="tl-title">Conductor asignado</div>
+                <div class="tl-sub" id="tl-t2">—</div>
+              </div>
+            </div>
+            <div class="tl-step active">
+              <div class="tl-dot-wrap">📍</div>
+              <div class="tl-content">
+                <div class="tl-title">En camino al origen</div>
+                <div class="tl-sub" id="tl-t3">En progreso…</div>
+              </div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-dot-wrap">📦</div>
+              <div class="tl-content">
+                <div class="tl-title">Paquete recogido</div>
+                <div class="tl-sub">Pendiente</div>
+              </div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-dot-wrap">🏠</div>
+              <div class="tl-content">
+                <div class="tl-title">Entregado</div>
+                <div class="tl-sub">Pendiente</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mini live map -->
+          <div class="section" style="padding-top:0">
+            <div class="map-box" style="height:160px">
+              <canvas id="track-map" height="160" style="width:100%;display:block"></canvas>
+              <div class="map-label">GPS conductor · en vivo</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div id="track-empty" style="padding:48px 24px;text-align:center">
+          <div style="font-size:42px;margin-bottom:16px">📡</div>
+          <div style="font-weight:600;font-size:16px;margin-bottom:8px">Rastreo en tiempo real</div>
+          <div style="color:var(--muted);font-size:13px;line-height:1.6">Ingresa tu número de seguimiento.<br>Formato: <span style="font-family:var(--font-mono);color:var(--blue)">TRZ-XXXXX</span></div>
         </div>
       </div>
 
     </div>
 
     <div class="bottom-nav">
-      <button class="bn-item active" onclick="customerTab('c-new','c-new-btn')" id="c-new-btn">
+      <button class="bn-item active" onclick="delivTab('c-new','dtab-new')" id="dtab-new">
         <span class="bn-icon">📦</span>
-        <span class="bn-label">New Order</span>
+        <span class="bn-label">Enviar</span>
       </button>
-      <button class="bn-item" onclick="customerTab('c-track','c-track-btn')" id="c-track-btn">
+      <button class="bn-item" onclick="delivTab('c-track','dtab-track')" id="dtab-track">
         <span class="bn-icon">📡</span>
-        <span class="bn-label">Track</span>
+        <span class="bn-label">Rastrear</span>
       </button>
     </div>
   </div>
@@ -2148,13 +2875,13 @@ input::placeholder { color: var(--muted); }
 <div style="position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px" id="success-modal">
   <div style="background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:36px;max-width:360px;width:100%;text-align:center">
     <div style="font-size:52px;margin-bottom:16px">🚀</div>
-    <div style="font-family:var(--font-head);font-size:26px;font-weight:700;margin-bottom:10px">Order Placed!</div>
+    <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:30px;letter-spacing:.06em;margin-bottom:10px">¡Orden Enviada!</div>
     <div style="color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.6">
-      Your order has been received. A driver will be auto-assigned based on proximity.
+      Tu orden fue recibida. Un conductor será asignado por proximidad GPS en segundos.
     </div>
-    <div style="font-family:var(--font-mono);font-size:14px;color:var(--blue);background:var(--blue-dim);padding:10px 20px;border-radius:8px;letter-spacing:.08em;margin-bottom:20px" id="modal-order-id">ORD-00000</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:20px">You'll receive updates via WhatsApp</div>
-    <button class="btn btn-primary" onclick="closeModal()">Track Order →</button>
+    <div style="font-family:var(--font-mono);font-size:14px;color:var(--blue);background:var(--blue-dim);padding:10px 20px;border-radius:8px;letter-spacing:.08em;margin-bottom:20px" id="modal-order-id">TRZ-00000</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Recibirás actualizaciones por WhatsApp</div>
+    <button class="btn btn-primary" onclick="closeModal()">Rastrear orden →</button>
   </div>
 </div>
 
@@ -2249,6 +2976,128 @@ const STARS = [];
 const SHOOTING_STARS = [];
 let lastShoot = 0;
 
+// ── Hologram cars on perspective grid ──
+const HOLO_CARS = [];
+const HOLO_LANES = [-0.28, -0.10, 0.10, 0.28];
+
+function spawnHoloCar() {
+  const lane  = HOLO_LANES[Math.floor(Math.random() * HOLO_LANES.length)];
+  const speed = 0.0012 + Math.random() * 0.0014;
+  const hue   = Math.random() < 0.55 ? 195 : Math.random() < 0.6 ? 160 : 270;
+  const alpha = 0.18 + Math.random() * 0.22;
+  const willFlash = Math.random() < 0.30;
+  const flashAtT  = 0.35 + Math.random() * 0.40;
+  const flashDur  = 0.06 + Math.random() * 0.08;
+  HOLO_CARS.push({ lane, t: 0, speed, hue, alpha, willFlash, flashAtT, flashDur });
+}
+
+function drawHoloCars(ctx, W, H) {
+  const horizY  = H * 0.62;
+  const vanishX = W * 0.5;
+
+  if (HOLO_CARS.length < 6 && Math.random() < 0.018) spawnHoloCar();
+
+  for (let i = HOLO_CARS.length - 1; i >= 0; i--) {
+    const car = HOLO_CARS[i];
+    car.t += car.speed;
+    if (car.t > 1) { HOLO_CARS.splice(i, 1); continue; }
+
+    const persp = Math.pow(car.t, 1.8);
+    const y     = horizY + (H - horizY) * persp;
+    const scale = 0.08 + persp * 0.92;
+    const x     = vanishX + car.lane * W * persp;
+
+    const cw = (22 + persp * 38) * scale;
+    const ch = (8  + persp * 14) * scale;
+    const a  = car.alpha * (0.3 + persp * 0.7);
+    const h  = car.hue;
+
+    // High-beam flash: smooth bell curve over flash window
+    let flashStrength = 0;
+    if (car.willFlash) {
+      const dt = car.t - car.flashAtT;
+      if (dt >= 0 && dt <= car.flashDur) {
+        flashStrength = Math.sin((dt / car.flashDur) * Math.PI);
+      }
+    }
+    const isHigh    = flashStrength > 0;
+    const lightA    = isHigh ? a + flashStrength * 0.55 : a;
+    const lightSize = Math.max(1, scale * 3) * (isHigh ? 1 + flashStrength * 1.8 : 1);
+    const glowR     = isHigh ? lightSize * 3.5 * (1 + flashStrength * 2.2) : lightSize * 3.5;
+
+    ctx.save();
+    ctx.translate(x, y);
+
+    // Body
+    ctx.beginPath();
+    ctx.roundRect(-cw/2, -ch/2, cw, ch, ch*0.3);
+    ctx.strokeStyle = `hsla(${h},100%,70%,${a})`;
+    ctx.lineWidth   = Math.max(0.4, scale * 1.2);
+    ctx.stroke();
+    // Cab
+    ctx.beginPath();
+    ctx.roundRect(-cw*0.22, -ch/2 - ch*0.65, cw*0.44, ch*0.65, ch*0.25);
+    ctx.stroke();
+
+    // Headlights
+    [-cw*0.35, cw*0.35].forEach(lx => {
+      // High-beam cone
+      if (isHigh) {
+        const coneLen = ch * (2 + flashStrength * 7);
+        const coneW   = cw * (0.15 + flashStrength * 0.45);
+        const cone = ctx.createLinearGradient(lx, ch*0.1, lx, ch*0.1 - coneLen);
+        cone.addColorStop(0,   `hsla(${h},100%,90%,${flashStrength * 0.38})`);
+        cone.addColorStop(0.5, `hsla(${h},90%,80%,${flashStrength * 0.14})`);
+        cone.addColorStop(1,   'transparent');
+        ctx.beginPath();
+        ctx.moveTo(lx - coneW*0.5, ch*0.15);
+        ctx.lineTo(lx + coneW*0.5, ch*0.15);
+        ctx.lineTo(lx + coneW*2.0, ch*0.15 - coneLen);
+        ctx.lineTo(lx - coneW*2.0, ch*0.15 - coneLen);
+        ctx.closePath();
+        ctx.fillStyle = cone;
+        ctx.fill();
+      }
+      // Glow halo
+      const lg = ctx.createRadialGradient(lx, ch*0.1, 0, lx, ch*0.1, glowR);
+      lg.addColorStop(0,   `hsla(${h},100%,92%,${lightA})`);
+      lg.addColorStop(0.4, `hsla(${h},100%,75%,${lightA * 0.4})`);
+      lg.addColorStop(1,   'transparent');
+      ctx.fillStyle = lg;
+      ctx.beginPath(); ctx.arc(lx, ch*0.1, glowR, 0, Math.PI*2); ctx.fill();
+      // Core
+      ctx.beginPath(); ctx.arc(lx, ch*0.1, lightSize, 0, Math.PI*2);
+      ctx.fillStyle = `hsla(${h},100%,${isHigh ? 98 : 90}%,${lightA})`;
+      ctx.fill();
+    });
+
+    // Scanline flicker
+    if (Math.random() < 0.04) {
+      ctx.beginPath(); ctx.moveTo(-cw/2, 0); ctx.lineTo(cw/2, 0);
+      ctx.strokeStyle = `hsla(${h},100%,80%,${a*0.6})`;
+      ctx.lineWidth = Math.max(0.3, scale * 0.8);
+      ctx.stroke();
+    }
+
+    // Speed trail
+    const trailLen = (8 + persp * 40) * scale;
+    const tAlpha   = a * 0.35;
+    [-cw*0.3, 0, cw*0.3].forEach(tx => {
+      const tg = ctx.createLinearGradient(tx, -ch*0.15, tx, -ch*0.15 + trailLen);
+      tg.addColorStop(0, `hsla(${h},100%,70%,${tAlpha})`);
+      tg.addColorStop(1, 'transparent');
+      ctx.beginPath();
+      ctx.moveTo(tx, -ch*0.15); ctx.lineTo(tx, -ch*0.15 + trailLen);
+      ctx.strokeStyle = tg;
+      ctx.lineWidth = Math.max(0.3, scale * 0.9);
+      ctx.stroke();
+    });
+
+    ctx.restore();
+  }
+}
+
+
 function initBgCanvas() {
   const c = document.getElementById('landing-canvas');
   if (!c) return;
@@ -2270,6 +3119,23 @@ function initBgCanvas() {
       twinkle: Math.random() * Math.PI * 2,
       speed:   Math.random() * 0.8 + 0.4,
     });
+  }
+  // Seed initial hologram cars
+  HOLO_CARS.length = 0;
+  for (let i = 0; i < 3; i++) {
+    const lane = HOLO_LANES[i % HOLO_LANES.length];
+    HOLO_CARS.push({ lane, t: 0.1 + i * 0.28, speed: 0.0012 + Math.random()*0.0012, hue: [195,160,270][i], alpha: 0.20 + Math.random()*0.18, willFlash: i === 1, flashAtT: 0.5, flashDur: 0.08 });
+  }
+  // roundRect polyfill for older browsers
+  if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+      r = Math.min(r, w/2, h/2);
+      this.moveTo(x+r,y); this.lineTo(x+w-r,y); this.arcTo(x+w,y,x+w,y+r,r);
+      this.lineTo(x+w,y+h-r); this.arcTo(x+w,y+h,x+w-r,y+h,r);
+      this.lineTo(x+r,y+h); this.arcTo(x,y+h,x,y+h-r,r);
+      this.lineTo(x,y+r); this.arcTo(x,y,x+r,y,r); this.closePath();
+      return this;
+    };
   }
   cancelAnimationFrame(landingAnimFrame);
   drawBg(c);
@@ -2319,19 +3185,69 @@ function drawBg(c) {
   ctx.fillStyle = '#00030C';
   ctx.fillRect(0, 0, W, H);
 
-  // Deep blue-purple nebula glow, off-center
-  const g1 = ctx.createRadialGradient(W*.42, H*.38, 0, W*.42, H*.38, W*.5);
-  g1.addColorStop(0, 'rgba(10,40,120,0.22)');
+  // ── Perspective grid on lower half ──
+  const horizY = H * 0.62;
+  const vanishX = W * 0.5;
+  const gridAlpha = 0.07;
+  const gridScroll = (t * 0.4) % 1; // slow scroll depth
+
+  ctx.save();
+  // Vertical lines (vanishing to horizon)
+  const vLines = 18;
+  for (let i = 0; i <= vLines; i++) {
+    const nx = i / vLines; // 0..1 across bottom
+    const bx = W * nx;
+    const frac = (bx - vanishX) / (W * 0.5);
+    ctx.beginPath();
+    ctx.moveTo(vanishX + frac * 0.01, horizY);
+    ctx.lineTo(bx, H);
+    const edgeAlpha = 1 - Math.abs(nx - 0.5) * 1.6;
+    ctx.strokeStyle = `rgba(0,200,255,${gridAlpha * Math.max(0, edgeAlpha)})`;
+    ctx.lineWidth = 0.7;
+    ctx.stroke();
+  }
+  // Horizontal lines (perspective receding)
+  const hLines = 10;
+  for (let j = 0; j <= hLines; j++) {
+    const rawT = (j / hLines + gridScroll) % 1;
+    // Perspective: y position
+    const persp = Math.pow(rawT, 2.2);
+    const y = horizY + (H - horizY) * persp;
+    const spread = (W * 0.5) * rawT * 0.98;
+    const la = gridAlpha * rawT * 0.9;
+    ctx.beginPath();
+    ctx.moveTo(vanishX - spread, y);
+    ctx.lineTo(vanishX + spread, y);
+    ctx.strokeStyle = `rgba(0,200,255,${la})`;
+    ctx.lineWidth = 0.6;
+    ctx.stroke();
+  }
+  // Fade the grid at top (horizon) with gradient overlay
+  const gridFade = ctx.createLinearGradient(0, horizY - 30, 0, horizY + 60);
+  gridFade.addColorStop(0, '#00030C');
+  gridFade.addColorStop(1, 'transparent');
+  ctx.fillStyle = gridFade;
+  ctx.fillRect(0, horizY - 30, W, 90);
+
+  // Hologram cars on the grid
+  drawHoloCars(ctx, W, H);
+
+  ctx.restore();
+
+  // Nebula glows
+  const g1 = ctx.createRadialGradient(W*.38, H*.28, 0, W*.38, H*.28, W*.45);
+  g1.addColorStop(0, 'rgba(8,35,110,0.18)');
   g1.addColorStop(1, 'transparent');
   ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);
 
-  const g2 = ctx.createRadialGradient(W*.68, H*.65, 0, W*.68, H*.65, W*.35);
-  g2.addColorStop(0, 'rgba(40,0,80,0.10)');
+  const g2 = ctx.createRadialGradient(W*.72, H*.55, 0, W*.72, H*.55, W*.30);
+  g2.addColorStop(0, 'rgba(30,0,70,0.09)');
   g2.addColorStop(1, 'transparent');
   ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
 
-  // Stars
+  // Stars (only upper 65% to not overlap grid)
   STARS.forEach(s => {
+    if (s.y > H * 0.6) return;
     const o = s.o * (0.5 + 0.5 * Math.sin(t * s.speed + s.twinkle));
     ctx.beginPath();
     ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
@@ -2339,13 +3255,12 @@ function drawBg(c) {
     ctx.fill();
   });
 
-  // Shoot every 5s
-  if (now - lastShoot > 5000) {
-    spawnShootingStar(W, H);
+  // Shoot every 6s
+  if (now - lastShoot > 6000) {
+    spawnShootingStar(W, H * 0.6);
     lastShoot = now;
   }
 
-  // Draw shooting stars
   for (let i = SHOOTING_STARS.length - 1; i >= 0; i--) {
     const s   = SHOOTING_STARS[i];
     const ang = Math.atan2(s.vy, s.vx);
@@ -2362,10 +3277,9 @@ function drawBg(c) {
     ctx.moveTo(tailX, tailY);
     ctx.lineTo(s.x, s.y);
     ctx.strokeStyle = grad;
-    ctx.lineWidth   = 1.8;
+    ctx.lineWidth   = 1.6;
     ctx.stroke();
 
-    // Glowing head
     const hg = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 4);
     hg.addColorStop(0, `rgba(255,255,255,${s.life * s.bright})`);
     hg.addColorStop(1, 'transparent');
@@ -2379,7 +3293,7 @@ function drawBg(c) {
   landingAnimFrame = requestAnimationFrame(() => drawBg(c));
 }
 
-// ── Logo: SpaceX-style — clean filled text + cold scanline sweep + cyan A ──
+// ── Logo: Bebas Neue — eternal, minimal movement, white + cyan A ──
 let logoAnimId;
 const LOGO_TEXT = 'TRAZA';
 
@@ -2387,52 +3301,51 @@ function drawLogo(canvas) {
   const ctx = canvas.getContext('2d');
   const W   = canvas.width, H = canvas.height;
   const t   = Date.now() * 0.001;
-  const fs  = Math.min(window.innerWidth * 0.15, 115);
+  const fs  = Math.min(window.innerWidth * 0.18, 132);
 
   ctx.clearRect(0, 0, W, H);
 
-  ctx.font         = `800 ${fs}px 'Syne', Arial`;
+  ctx.font         = `${fs}px 'Bebas Neue', 'Barlow Condensed', Arial`;
   ctx.textAlign    = 'center';
   ctx.textBaseline = 'middle';
-  ctx.letterSpacing = Math.round(fs * 0.08) + 'px';
+  ctx.letterSpacing = Math.round(fs * 0.05) + 'px';
 
-  // ── Outer glow pass ──
+  // ── Subtle white glow behind ──
   ctx.save();
-  ctx.shadowColor = 'rgba(200,170,110,0.15)';
-  ctx.shadowBlur  = 24;
-  ctx.fillStyle   = 'rgba(200,170,110,0.04)';
+  ctx.shadowColor = 'rgba(255,255,255,0.08)';
+  ctx.shadowBlur  = 32;
+  ctx.fillStyle   = 'rgba(255,255,255,0.03)';
   ctx.fillText(LOGO_TEXT, W/2, H/2);
   ctx.restore();
 
-  // ── Main fill — sandy warm, semi-transparent ──
+  // ── Main fill — pure white, eternal ──
   ctx.save();
-  const fillGrad = ctx.createLinearGradient(0, H*0.15, 0, H*0.88);
-  fillGrad.addColorStop(0,   'rgba(255,252,245,0.82)');
-  fillGrad.addColorStop(0.45,'rgba(245,240,228,0.68)');
-  fillGrad.addColorStop(1,   'rgba(230,224,210,0.52)');
+  const fillGrad = ctx.createLinearGradient(0, H*0.1, 0, H*0.9);
+  fillGrad.addColorStop(0,   'rgba(255,255,255,0.97)');
+  fillGrad.addColorStop(0.5, 'rgba(255,255,255,0.91)');
+  fillGrad.addColorStop(1,   'rgba(220,230,245,0.82)');
   ctx.fillStyle = fillGrad;
   ctx.fillText(LOGO_TEXT, W/2, H/2);
   ctx.restore();
 
-  // ── Middle A override — cyan glow ──
-  // Measure letter positions
+  // ── Middle A override — cyan ──
   ctx.save();
-  ctx.font         = `800 ${fs}px 'Syne', Arial`;
+  ctx.font         = `${fs}px 'Bebas Neue', 'Barlow Condensed', Arial`;
   ctx.textAlign    = 'left';
   ctx.textBaseline = 'middle';
-  const lsp   = Math.round(fs * 0.12);
+  const lsp   = Math.round(fs * 0.05);
   const total = ctx.measureText(LOGO_TEXT).width + lsp * (LOGO_TEXT.length - 1);
   let lx = W/2 - total/2;
   for (let i = 0; i < LOGO_TEXT.length; i++) {
     const ch  = LOGO_TEXT[i];
     const chW = ctx.measureText(ch).width;
-    if (i === 2) { // middle A
-      ctx.shadowColor = 'rgba(0,200,255,0.9)';
-      ctx.shadowBlur  = 18;
-      const cg = ctx.createLinearGradient(lx, H*0.2, lx, H*0.85);
+    if (i === 2) {
+      ctx.shadowColor = 'rgba(0,200,255,0.6)';
+      ctx.shadowBlur  = 14;
+      const cg = ctx.createLinearGradient(lx, H*0.1, lx, H*0.9);
       cg.addColorStop(0, 'rgba(160,240,255,1)');
       cg.addColorStop(0.5,'rgba(0,200,255,1)');
-      cg.addColorStop(1, 'rgba(0,140,220,0.85)');
+      cg.addColorStop(1, 'rgba(0,150,230,0.9)');
       ctx.fillStyle = cg;
       ctx.fillText(ch, lx, H/2);
     }
@@ -2440,25 +3353,24 @@ function drawLogo(canvas) {
   }
   ctx.restore();
 
-  // ── Scanline sweep — moving horizontal light band ──
-  const sweep = (Math.sin(t * 0.55) * 0.5 + 0.5); // 0→1 oscillating
-  const sweepY = H * (0.15 + sweep * 0.7);
-  const scanH  = H * 0.18;
+  // ── Scanline — ONE slow drift, very subtle ──
+  const sweep = (Math.sin(t * 0.22) * 0.5 + 0.5);
+  const sweepY = H * (0.1 + sweep * 0.8);
+  const scanH  = H * 0.22;
   const scanG  = ctx.createLinearGradient(0, sweepY - scanH, 0, sweepY + scanH);
-  scanG.addColorStop(0,   'rgba(180,230,255,0)');
-  scanG.addColorStop(0.45,'rgba(180,230,255,0.07)');
-  scanG.addColorStop(0.5, 'rgba(220,245,255,0.13)');
-  scanG.addColorStop(0.55,'rgba(180,230,255,0.07)');
-  scanG.addColorStop(1,   'rgba(180,230,255,0)');
+  scanG.addColorStop(0,   'rgba(200,230,255,0)');
+  scanG.addColorStop(0.45,'rgba(200,230,255,0.04)');
+  scanG.addColorStop(0.5, 'rgba(230,245,255,0.09)');
+  scanG.addColorStop(0.55,'rgba(200,230,255,0.04)');
+  scanG.addColorStop(1,   'rgba(200,230,255,0)');
 
-  // Clip to letter shapes before drawing scan
   const offScan = document.createElement('canvas');
   offScan.width = W; offScan.height = H;
   const sctx = offScan.getContext('2d');
-  sctx.font         = `800 ${fs}px 'Syne', Arial`;
+  sctx.font         = `${fs}px 'Bebas Neue', 'Barlow Condensed', Arial`;
   sctx.textAlign    = 'center';
   sctx.textBaseline = 'middle';
-  sctx.letterSpacing = Math.round(fs * 0.08) + 'px';
+  sctx.letterSpacing = Math.round(fs * 0.05) + 'px';
   sctx.fillStyle    = '#fff';
   sctx.fillText(LOGO_TEXT, W/2, H/2);
   sctx.globalCompositeOperation = 'source-in';
@@ -2466,14 +3378,14 @@ function drawLogo(canvas) {
   sctx.fillRect(0, 0, W, H);
   ctx.drawImage(offScan, 0, 0);
 
-  // ── Thin outline on top — very subtle ──
+  // ── Thin crisp outline ──
   ctx.save();
-  ctx.font         = `800 ${fs}px 'Syne', Arial`;
+  ctx.font         = `${fs}px 'Bebas Neue', 'Barlow Condensed', Arial`;
   ctx.textAlign    = 'center';
   ctx.textBaseline = 'middle';
-  ctx.letterSpacing = Math.round(fs * 0.08) + 'px';
-  ctx.strokeStyle  = 'rgba(210,185,140,0.18)';
-  ctx.lineWidth    = 0.6;
+  ctx.letterSpacing = Math.round(fs * 0.05) + 'px';
+  ctx.strokeStyle  = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth    = 0.5;
   ctx.strokeText(LOGO_TEXT, W/2, H/2);
   ctx.restore();
 }
@@ -2491,9 +3403,9 @@ function startLogoAnim() {
 function initLogoCanvas() {
   const c = document.getElementById('logo-canvas');
   if (!c) return;
-  const fs = Math.min(window.innerWidth * 0.20, 155);
-  c.width  = Math.min(window.innerWidth * 0.88, 680);
-  c.height = fs * 1.3;
+  const fs = Math.min(window.innerWidth * 0.22, 168);
+  c.width  = Math.min(window.innerWidth * 0.88, 720);
+  c.height = fs * 1.25;
   startLogoAnim();
 }
 
@@ -3049,83 +3961,306 @@ function renderAdminDriversList(){
 ══════════════════════════════════════════ */
 let selectedService = { id:'express', price:149, name:'Express', time:'1-2 hrs' };
 
-function selectService(el, id, price, icon, time){
-  document.querySelectorAll('.svc-opt').forEach(e=>e.classList.remove('sel'));
-  el.classList.add('sel');
-  selectedService = { id, price, name: el.querySelector('.so-name').textContent, time };
-  setEl('c-svc-name',  selectedService.name);
-  setEl('c-svc-time',  selectedService.time);
-  setEl('c-svc-price', '$'+selectedService.price);
+// ── Delivery consumer state ──
+let delivSpeed = { id:'turbo', price:89, icon:'🚀', name:'Turbo', eta:'20–30 min' };
+let delivCat   = { id:'paquete', icon:'📦', name:'Paquete' };
+let delivPkg   = { id:'chico', name:'Chico (<1kg)' };
+
+function selectSpeed(el, id, price, icon, eta){
+  document.querySelectorAll('.speed-tab').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active');
+  delivSpeed = { id, price, icon, name: el.querySelector('.speed-tab-name').textContent.trim(), eta };
+  document.getElementById('pi-icon').textContent  = icon;
+  document.getElementById('pi-text').innerHTML    = `${delivSpeed.name} — ${eta}<br>${delivCat.name} · ZMM cobertura total`;
+  document.getElementById('pi-price').textContent = '$'+price;
+  document.getElementById('sum-svc').textContent  = icon+' '+delivSpeed.name+' — '+eta;
+  document.getElementById('sum-price').textContent= price;
+  document.getElementById('comp-price').textContent='$'+price;
 }
 
-function customerTab(pageId, btnId){
+// ── Store catalogs ──────────────────────────────────────────────
+const STORES = {
+  flores: [
+    { name:'Azap Flores',        sub:'San Pedro · Online',     icon:'🌹', addr:'Vía Cordillera 635, San Pedro' },
+    { name:'La Violetera',       sub:'Monterrey · Valle',      icon:'💜', addr:'Lázaro Cárdenas 827, Valle' },
+    { name:'Envía Flores',       sub:'ZMM · 20+ años',         icon:'🌸', addr:'Online / Zona MTY' },
+    { name:'Verbena Flores',     sub:'San Pedro · Artesanal',  icon:'🌼', addr:'Gonzalitos 800, Monterrey' },
+    { name:'Bloom & Co',         sub:'San Pedro · Moderno',    icon:'🌺', addr:'Humberto Lobo 418, San Pedro' },
+    { name:'Flores y Fresas',    sub:'Del Valle · Plaza Reloj',icon:'🍓', addr:'Calz. del Valle 201, San Pedro' },
+    { name:'Rosabel',            sub:'Monterrey · Tradicional',icon:'🌷', addr:'Pino Suárez 765, Monterrey' },
+    { name:'Bloom Lab',          sub:'San Pedro · Editorial',  icon:'🌻', addr:'Vasconcelos Ote 101, San Pedro' },
+    { name:'Encanto Flores',     sub:'Monterrey · Juvenil',    icon:'🌿', addr:'Hidalgo Ote 503, Monterrey' },
+    { name:'Florería Petunia',   sub:'ZMM · 15 años',          icon:'🌱', addr:'Ruiz Cortines 1234, Guadalupe' },
+  ],
+  farmacia: [
+    { name:'Farmacia Guadalajara', sub:'24 hrs · ZMM completa', icon:'💊', addr:'Av. Revolución 2703, Monterrey' },
+    { name:'Farmacias Benavides',  sub:'Norte de México · 100+ años', icon:'💉', addr:'Pino Suárez 1068, Monterrey' },
+    { name:'Farmacias del Ahorro', sub:'1,800+ suc. nacionales', icon:'🏥', addr:'Gonzalitos 600 Sur, Monterrey' },
+    { name:'Farmacias Similares',  sub:'Genéricos · Dr. Simi',  icon:'🩺', addr:'Av. Lincoln 3200, Monterrey' },
+    { name:'Farmacia San Pablo',   sub:'Especializada · ZMM',   icon:'🔬', addr:'Garza Sada 2501, Monterrey' },
+  ],
+  comida: [
+    { name:'Taco Palenque',      sub:'Regio · Tacos 24 hrs',   icon:'🌮', addr:'Múltiples suc. ZMM' },
+    { name:"McDonald's",         sub:'Cadena · Drive-thru',    icon:'🍔', addr:'Múltiples suc. ZMM' },
+    { name:'KFC',                sub:'Pollo frito · Combos',   icon:'🍗', addr:'Múltiples suc. ZMM' },
+    { name:'Domino\'s Pizza',    sub:'Delivery propio · ZMM',  icon:'🍕', addr:'Múltiples suc. ZMM' },
+    { name:'Little Caesars',     sub:'Pizza · Express',        icon:'👑', addr:'Múltiples suc. ZMM' },
+  ],
+  compras: [
+    { name:'Walmart',            sub:'Super · ZMM completa',   icon:'🛒', addr:'Múltiples suc. ZMM' },
+    { name:'Soriana',            sub:'Super · Norte México',   icon:'🏪', addr:'Múltiples suc. ZMM' },
+    { name:'HEB',                sub:'Premium · San Pedro/MTY',icon:'🌟', addr:'Múltiples suc. ZMM' },
+    { name:'Chedraui',           sub:'Super · Variedad',       icon:'🛍️', addr:'Múltiples suc. ZMM' },
+    { name:'Sam\'s Club',        sub:'Mayoreo · Membresía',    icon:'📦', addr:'Múltiples suc. ZMM' },
+  ],
+};
+
+let selectedStore = null;
+
+function renderStorePicker(catId) {
+  const panel = document.getElementById('store-picker-panel');
+  const grid  = document.getElementById('store-picker-grid');
+  const title = document.getElementById('store-picker-title');
+  const list  = STORES[catId];
+  if (!list) { panel.style.display='none'; selectedStore=null; return; }
+  const labels = { flores:'🌸 Elige la florería', farmacia:'💊 Elige la farmacia',
+                   comida:'🍽️ Elige el restaurante', compras:'🛒 Elige la tienda' };
+  title.textContent = labels[catId] || 'Elige la tienda';
+  grid.innerHTML = list.map((s,i)=>`
+    <div class="store-card" id="sc-${catId}-${i}" onclick="selectStore('${catId}',${i})">
+      <span class="store-card-icon">${s.icon}</span>
+      <div class="store-card-info">
+        <div class="store-card-name">${s.name}</div>
+        <div class="store-card-sub">${s.sub}</div>
+      </div>
+    </div>`).join('');
+  panel.style.display = 'block';
+  // Auto-fill pickup with first store
+  selectStore(catId, 0);
+}
+
+function selectStore(catId, idx) {
+  document.querySelectorAll(`[id^="sc-${catId}-"]`).forEach(e=>e.classList.remove('active'));
+  const card = document.getElementById(`sc-${catId}-${idx}`);
+  if(card) card.classList.add('active');
+  const store = STORES[catId][idx];
+  selectedStore = store;
+  const fromInput = document.getElementById('c-from');
+  fromInput.value = store.addr;
+  fromInput.style.color = 'rgba(0,200,255,0.85)';
+  hideDropdown('c-from-drop');
+}
+
+function selectCat(el, id){
+  document.querySelectorAll('.cat-chip').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active');
+  const icon = el.querySelector('.cat-chip-icon').textContent;
+  const name = el.querySelector('.cat-chip-name').textContent;
+  delivCat = { id, icon, name };
+  document.getElementById('pi-text').innerHTML = `${delivSpeed.name} — ${delivSpeed.eta}<br>${name} · ZMM cobertura total`;
+  document.getElementById('sum-cat').textContent = icon+' '+name;
+  if(id==='flores') document.getElementById('pkg-fragil').querySelector('.pkg-sel-icon').textContent='🌸';
+  else if(id==='documentos') document.getElementById('pkg-fragil').querySelector('.pkg-sel-icon').textContent='📋';
+  else document.getElementById('pkg-fragil').querySelector('.pkg-sel-icon').textContent='🌸';
+  // Reset from address when switching category
+  if(['flores','farmacia','comida','compras'].includes(id)){
+    document.getElementById('c-from').style.color='';
+    renderStorePicker(id);
+  } else {
+    document.getElementById('store-picker-panel').style.display='none';
+    document.getElementById('c-from').value='';
+    document.getElementById('c-from').style.color='';
+    selectedStore = null;
+  }
+}
+
+// ── Address Autocomplete — Nominatim OSM ─────────────────────────────────────
+let addrTimers = {};
+let addrControllers = {};
+
+function hideDropdown(dropId){
+  const d = document.getElementById(dropId);
+  if(d) d.style.display='none';
+}
+
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.addr-row') && !e.target.closest('.addr-dropdown')){
+    hideDropdown('c-from-drop');
+    hideDropdown('c-to-drop');
+  }
+});
+
+async function addrSearch(inputId, dropId) {
+  const input = document.getElementById(inputId);
+  const drop  = document.getElementById(dropId);
+  const q     = input.value.trim();
+
+  if(q.length < 3){ hideDropdown(dropId); return; }
+
+  clearTimeout(addrTimers[inputId]);
+  addrTimers[inputId] = setTimeout(async ()=>{
+    if(addrControllers[inputId]) addrControllers[inputId].abort();
+    addrControllers[inputId] = new AbortController();
+
+    drop.style.display = 'block';
+    drop.innerHTML = '<div class="addr-loading">Buscando…</div>';
+
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?` +
+        `q=${encodeURIComponent(q+' Monterrey Nuevo León')}&format=json&limit=6` +
+        `&addressdetails=1&countrycodes=mx&viewbox=-100.7,25.9,-99.7,25.3&bounded=1`;
+
+      const res  = await fetch(url, {
+        signal: addrControllers[inputId].signal,
+        headers: { 'Accept-Language': 'es' }
+      });
+      const data = await res.json();
+
+      if(!data.length){
+        drop.innerHTML = '<div class="addr-loading">Sin resultados — intenta con otra calle o colonia</div>';
+        return;
+      }
+
+      drop.innerHTML = data.map(r=>{
+        const parts = r.display_name.split(', ');
+        const main  = parts.slice(0,2).join(', ');
+        const sub   = parts.slice(2,5).join(', ');
+        return `<div class="addr-suggestion" tabindex="0"
+          onclick="pickAddr('${inputId}','${dropId}','${r.display_name.replace(/'/g,'&#39;')}')"
+          onkeydown="if(event.key==='Enter')pickAddr('${inputId}','${dropId}','${r.display_name.replace(/'/g,'&#39;')}')">
+          <span class="addr-suggestion-icon">📍</span>
+          <div>
+            <div class="addr-suggestion-main">${main}</div>
+            <div class="addr-suggestion-sub">${sub}</div>
+          </div>
+        </div>`;
+      }).join('');
+    } catch(err){
+      if(err.name==='AbortError') return;
+      drop.innerHTML = '<div class="addr-loading">Error de conexión</div>';
+    }
+  }, 320);
+}
+
+function pickAddr(inputId, dropId, val){
+  const input = document.getElementById(inputId);
+  // Clean up: remove country/long suffix
+  const clean = val.split(', ').slice(0,4).join(', ');
+  input.value = clean;
+  input.style.color = '';
+  // If origin was auto-filled by store, remove store override
+  if(inputId === 'c-from') {
+    input.style.color = '';
+  }
+  hideDropdown(dropId);
+  input.blur();
+}
+
+function selectPkg(el, id){
+  document.querySelectorAll('.pkg-sel').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active');
+  const name = el.querySelector('.pkg-sel-name').textContent;
+  const desc = el.querySelector('.pkg-sel-desc').textContent;
+  delivPkg = { id, name: name+' ('+desc+')' };
+  document.getElementById('sum-pkg').textContent = delivPkg.name;
+}
+
+function delivTab(pageId, btnId){
   document.querySelectorAll('#customer-app .page').forEach(p=>p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
   document.querySelectorAll('#customer-app .bn-item').forEach(b=>b.classList.remove('active'));
   document.getElementById(btnId).classList.add('active');
 }
 
-function placeOrder(){
-  const from = document.getElementById('c-from').value.trim();
-  const to   = document.getElementById('c-to').value.trim();
-  const name = document.getElementById('c-name').value.trim();
-  if(!from||!to||!name){ alert('Please fill in all required fields.'); return; }
+// Legacy alias
+function customerTab(pageId, btnId){ delivTab(pageId, btnId.replace('-btn','').replace('c-new','dtab-new').replace('c-track','dtab-track')); }
 
-  const id = orderId();
+function placeOrder(){
+  const from  = document.getElementById('c-from').value.trim();
+  const to    = document.getElementById('c-to').value.trim();
+  const name  = document.getElementById('c-name').value.trim();
+  const phone = document.getElementById('c-phone').value.trim();
+  if(!from) { document.getElementById('c-from').focus(); showToast('Ingresa la dirección de origen'); return; }
+  if(!to)   { document.getElementById('c-to').focus();   showToast('Ingresa la dirección de destino'); return; }
+  if(!name) { document.getElementById('c-name').focus(); showToast('Ingresa tu nombre'); return; }
+
+  const id = 'TRZ-' + String(Math.floor(10000 + Math.random()*89999));
   const newOrder = {
     id, from, to,
     source: 'traza',
     status: 'active',
-    earn: selectedService.price,
-    dist: rand(2,10).toFixed(1)+' km',
-    eta: Math.floor(rand(10,40))+' min',
+    earn:   delivSpeed.price,
+    dist:   rand(2,12).toFixed(1)+' km',
+    eta:    delivSpeed.eta,
     driver: pick(DRIVER_NAMES),
-    service: selectedService.name,
+    service: delivSpeed.name,
+    cat: delivCat.name,
   };
   orders.push(newOrder);
-
   setEl('modal-order-id', id);
   document.getElementById('success-modal').style.display='flex';
-
-  // Pre-fill tracking
   document.getElementById('track-input').value = id;
 }
 
 function closeModal(){
   document.getElementById('success-modal').style.display='none';
-  customerTab('c-track','c-track-btn');
+  delivTab('c-track','dtab-track');
   trackOrder();
 }
 
 function trackOrder(){
-  const id = document.getElementById('track-input').value.trim();
+  const id    = document.getElementById('track-input').value.trim().toUpperCase();
   const order = orders.find(o=>o.id===id);
-  const el = document.getElementById('track-result');
+  const empty = document.getElementById('track-empty');
+  const res   = document.getElementById('track-result');
 
   if(!order){
-    alert('Order not found. Try a valid order ID.');
+    empty.style.display='block';
+    res.style.display='none';
+    showToast('Orden no encontrada — verifica el número');
     return;
   }
 
-  el.style.display = 'block';
+  empty.style.display='none';
+  res.style.display='block';
+
   setEl('tr-id', order.id);
-  document.getElementById('tr-from').textContent = '📍 From: ' + order.from;
-  document.getElementById('tr-to').textContent   = '📬 To: '   + order.to;
-  setEl('tr-driver', order.driver || 'Assigning...');
-  setEl('tr-eta', order.eta || '—');
+  document.getElementById('tr-from').textContent = '📍 '+order.from;
+  document.getElementById('tr-to').textContent   = '📬 '+order.to;
+  setEl('tr-driver', order.driver || 'Asignando…');
+  setEl('tr-eta',    order.eta    || '—');
+  setEl('tr-svc',    order.service|| '—');
+
+  const now  = new Date();
+  const hm   = n => n.toString().padStart(2,'0');
+  const tstr = hm(now.getHours())+':'+hm(now.getMinutes());
+  setEl('tl-t1', 'Recibida a las '+tstr);
+  setEl('tl-t2', 'Conductor: '+order.driver);
+  setEl('tl-t3', 'ETA: '+order.eta);
 
   const statusMap = {
-    pending:   { label:'Pending',    cls:'pill-yellow', progress:'8%' },
-    active:    { label:'In Transit', cls:'pill-blue',   progress:'58%'},
-    delivered: { label:'Delivered',  cls:'pill-green',  progress:'100%'},
+    pending:   'pill-yellow',
+    active:    'pill-blue',
+    delivered: 'pill-green',
   };
-  const s = statusMap[order.status] || statusMap.active;
   const pill = document.getElementById('tr-status-pill');
-  pill.textContent = s.label;
-  pill.className   = 'pill ' + s.cls;
-  document.getElementById('tr-progress').style.width = s.progress;
+  pill.textContent = order.status==='delivered' ? 'Entregado' : order.status==='active' ? 'En camino' : 'Pendiente';
+  pill.className   = 'pill '+(statusMap[order.status]||'pill-blue');
 
   drawTrackMap(order);
+}
+
+function showToast(msg){
+  let t = document.getElementById('_toast');
+  if(!t){ t=document.createElement('div'); t.id='_toast';
+    Object.assign(t.style,{position:'fixed',bottom:'90px',left:'50%',transform:'translateX(-50%)',
+      background:'rgba(0,0,0,.9)',color:'#fff',padding:'10px 20px',borderRadius:'100px',
+      fontFamily:'var(--font-mono)',fontSize:'11px',letterSpacing:'.05em',zIndex:'999',
+      border:'1px solid rgba(0,200,255,0.2)',transition:'opacity .3s',pointerEvents:'none'});
+    document.body.appendChild(t);
+  }
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(t._hide); t._hide=setTimeout(()=>t.style.opacity='0',2400);
 }
 
 /* ══════════════════════════════════════════
@@ -4009,7 +5144,7 @@ async function sendChat() {
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 3h12a1 1 0 011 1v8a1 1 0 01-1 1H5l-3 3V4a1 1 0 011-1z" stroke="#00C8FF" stroke-width="1.2" stroke-linejoin="round"/></svg>
             </div>
             <div class="contact-card-label">Email</div>
-            <div class="contact-card-val"><a href="mailto:trazalogisticamx@gmail.com">trazalogisticamx<br>@gmail.com</a></div>
+            <div class="contact-card-val"><a href="/cdn-cgi/l/email-protection#93e7e1f2e9f2fffcf4fae0e7faf0f2feebd3f4fef2faffbdf0fcfe">trazalogisticamx<br>@gmail.com</a></div>
           </div>
           <div class="contact-card">
             <div class="contact-card-icon">
@@ -4139,11 +5274,4 @@ async function sendChat() {
 
       <div id="nav-footer">
         <div id="nav-footer-brand">TRAZA · Logística Inteligente</div>
-        <a href="mailto:trazalogisticamx@gmail.com" id="nav-footer-email">trazalogisticamx@gmail.com</a>
-        <a href="tel:8115550619" id="nav-footer-phone">811 555 0619</a>
-      </div>
-    </div>
-  </div></div>
-
-</body>
-</html>
+        <a href="/cdn-cgi/l/email-protection#f48086958e95989b939d87809d9795998cb49399959d98da979b99" id="nav-footer-email"><span class="__cf_email__" data-cfemail="661214071c070a09010f
