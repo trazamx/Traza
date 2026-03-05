@@ -91,13 +91,16 @@ body {
 .traza-logo-wrap {
   position: relative; z-index: 2;
   margin-bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   animation: logo-float 6s ease-in-out infinite;
 }
 @keyframes logo-float {
   0%,100% { transform: translateY(0px); }
   50%      { transform: translateY(-6px); }
 }
-#logo-canvas { display: block; }
+#logo-canvas { display: block; margin: 0 auto; }
 .traza-tagline {
   position: relative; z-index: 2;
   font-family: 'JetBrains Mono', monospace;
@@ -1639,6 +1642,36 @@ input::placeholder { color: var(--muted); }
 
   <div class="traza-logo-wrap">
     <canvas id="logo-canvas"></canvas>
+    <!-- SVG logo overlay for crisp rendering -->
+    <svg id="logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 160" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(85vw,420px);pointer-events:none;opacity:0">
+      <defs>
+        <filter id="wglow2" x="-8%" y="-20%" width="116%" height="140%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="cglow2" x="-12%" y="-25%" width="124%" height="150%">
+          <feGaussianBlur stdDeviation="6" result="blur"/>
+          <feFlood flood-color="#00C8FF" flood-opacity="0.5" result="color"/>
+          <feComposite in="color" in2="blur" operator="in" result="glow"/>
+          <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <linearGradient id="wg2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="rgba(255,255,255,0.22)"/>
+          <stop offset="50%"  stop-color="rgba(255,255,255,0.15)"/>
+          <stop offset="100%" stop-color="rgba(200,220,255,0.10)"/>
+        </linearGradient>
+        <linearGradient id="cg2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="rgba(160,240,255,1)"/>
+          <stop offset="50%"  stop-color="rgba(0,200,255,1)"/>
+          <stop offset="100%" stop-color="rgba(0,150,230,0.9)"/>
+        </linearGradient>
+      </defs>
+      <text x="16"  y="128" font-family="'Bebas Neue','Barlow Condensed',sans-serif" font-size="128" fill="url(#wg2)" filter="url(#wglow2)" letter-spacing="6">T</text>
+      <text x="103" y="128" font-family="'Bebas Neue','Barlow Condensed',sans-serif" font-size="128" fill="url(#wg2)" filter="url(#wglow2)" letter-spacing="6">R</text>
+      <text x="196" y="128" font-family="'Bebas Neue','Barlow Condensed',sans-serif" font-size="128" fill="url(#cg2)" filter="url(#cglow2)" letter-spacing="6">A</text>
+      <text x="282" y="128" font-family="'Bebas Neue','Barlow Condensed',sans-serif" font-size="128" fill="url(#wg2)" filter="url(#wglow2)" letter-spacing="6">Z</text>
+      <text x="372" y="128" font-family="'Bebas Neue','Barlow Condensed',sans-serif" font-size="128" fill="url(#wg2)" filter="url(#wglow2)" letter-spacing="6">A</text>
+    </svg>
   </div>
 
   <div class="traza-tagline">Logística Inteligente</div>
@@ -1959,25 +1992,172 @@ input::placeholder { color: var(--muted); }
       <!-- PAGE: Drivers -->
       <div class="page" id="a-drivers">
         <div class="section">
-          <div class="label-sm">All Drivers (60)</div>
+          <div class="label-sm">Conductores (60)</div>
           <div id="drivers-list"></div>
+        </div>
+      </div>
+
+      <!-- PAGE: Clientes / Email DB -->
+      <div class="page" id="a-clients">
+        <div class="section">
+          <div class="row-between" style="margin-bottom:12px">
+            <div class="label-sm" style="margin:0">Base de Clientes</div>
+            <button class="btn btn-primary btn-sm" onclick="exportClientsCSV()">⬇ CSV</button>
+          </div>
+          <div id="clients-list">
+            <div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">Sin clientes aún</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: Reportes del día -->
+      <div class="page" id="a-reports">
+        <div class="section">
+          <div class="label-sm" style="margin-bottom:12px">Reporte del Día</div>
+          <div class="stats-grid" style="margin-bottom:16px">
+            <div class="stat-card" style="border-color:rgba(180,255,71,.2)">
+              <div class="s-val" style="color:#B4FF47" id="rep-total">$0</div>
+              <div class="s-label">Total cobrado</div>
+            </div>
+            <div class="stat-card">
+              <div class="s-val" id="rep-orders">0</div>
+              <div class="s-label">Órdenes</div>
+            </div>
+            <div class="stat-card" style="border-color:rgba(0,200,255,.2)">
+              <div class="s-val" style="color:var(--blue)" id="rep-clients">0</div>
+              <div class="s-label">Clientes únicos</div>
+            </div>
+            <div class="stat-card">
+              <div class="s-val" id="rep-km">0</div>
+              <div class="s-label">Km totales</div>
+            </div>
+          </div>
+          <div class="label-sm" style="margin-bottom:8px">Órdenes del día</div>
+          <div id="rep-orders-list"></div>
+          <button class="btn btn-primary" style="margin-top:14px;width:100%" onclick="exportReportCSV()">⬇ Exportar reporte CSV</button>
+        </div>
+      </div>
+
+      <!-- PAGE: Stripe / Pagos -->
+      <div class="page" id="a-stripe">
+        <div class="section">
+          <div class="label-sm" style="margin-bottom:16px">Integración de Pagos</div>
+
+          <!-- Status -->
+          <div class="card" style="padding:16px;margin-bottom:14px;border-color:rgba(180,255,71,.2)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+              <span style="font-size:20px">💳</span>
+              <div>
+                <div style="font-weight:700;font-size:14px">Stripe</div>
+                <div id="stripe-status-txt" style="font-size:11px;font-family:var(--font-mono);color:var(--muted)">No configurado</div>
+              </div>
+              <span id="stripe-status-pill" class="pill pill-muted" style="margin-left:auto">Inactivo</span>
+            </div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">
+              Actualmente los pagos son simulados. Conecta Stripe para cobrar tarjetas reales con comisión de ~2.9% + $3 MXN por transacción.
+            </div>
+          </div>
+
+          <!-- Setup steps -->
+          <div style="font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px">Setup (15 min)</div>
+          <div id="stripe-steps">
+            <div class="card" style="padding:14px;margin-bottom:8px">
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <div style="width:22px;height:22px;border-radius:50%;background:rgba(0,200,255,.15);border:1px solid rgba(0,200,255,.4);display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--font-mono);color:var(--blue);flex-shrink:0">1</div>
+                <div>
+                  <div style="font-weight:600;font-size:13px;margin-bottom:3px">Crear cuenta Stripe</div>
+                  <div style="font-size:11px;color:var(--muted);line-height:1.5">Entra a <span style="color:var(--blue);font-family:var(--font-mono)">stripe.com</span> y crea tu cuenta con RFC de Traza. Toma ~5 min.</div>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="padding:14px;margin-bottom:8px">
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <div style="width:22px;height:22px;border-radius:50%;background:rgba(0,200,255,.15);border:1px solid rgba(0,200,255,.4);display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--font-mono);color:var(--blue);flex-shrink:0">2</div>
+                <div>
+                  <div style="font-weight:600;font-size:13px;margin-bottom:3px">Obtener Publishable Key</div>
+                  <div style="font-size:11px;color:var(--muted);line-height:1.5">Dashboard → Developers → API Keys → Publishable key (empieza con <span style="font-family:var(--font-mono);color:var(--blue)">pk_live_...</span>)</div>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="padding:14px;margin-bottom:8px">
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <div style="width:22px;height:22px;border-radius:50%;background:rgba(0,200,255,.15);border:1px solid rgba(0,200,255,.4);display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--font-mono);color:var(--blue);flex-shrink:0">3</div>
+                <div>
+                  <div style="font-weight:600;font-size:13px;margin-bottom:3px">Pegar tu key aquí</div>
+                  <div style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.5">Esto activa el cobro real de tarjetas en la app.</div>
+                  <div style="display:flex;gap:6px">
+                    <input id="stripe-key-input" type="text" placeholder="pk_live_..." maxlength="120"
+                      style="flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:8px;padding:9px 11px;color:#fff;font-family:var(--font-mono);font-size:11px">
+                    <button class="btn btn-primary btn-sm" onclick="saveStripeKey()" style="padding:9px 14px;white-space:nowrap">Guardar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="padding:14px;margin-bottom:8px">
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <div style="width:22px;height:22px;border-radius:50%;background:rgba(0,200,255,.15);border:1px solid rgba(0,200,255,.4);display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--font-mono);color:var(--blue);flex-shrink:0">4</div>
+                <div>
+                  <div style="font-weight:600;font-size:13px;margin-bottom:3px">Backend para Secret Key</div>
+                  <div style="font-size:11px;color:var(--muted);line-height:1.5">La Secret Key (<span style="font-family:var(--font-mono);color:var(--blue)">sk_live_...</span>) va en el servidor TRAZA en Railway — nunca en el frontend. Contacta al dev para conectar el endpoint <span style="font-family:var(--font-mono);color:var(--blue)">/create-payment-intent</span>.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- EmailJS config -->
+          <div style="font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:16px 0 10px">Email de Confirmación</div>
+          <div class="card" style="padding:14px;margin-bottom:8px">
+            <div style="font-weight:600;font-size:13px;margin-bottom:6px">EmailJS → trazalogisticamx@gmail.com</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5">
+              1. emailjs.com → conecta Gmail de Traza<br>
+              2. Crea template con variables: <span style="font-family:var(--font-mono);color:var(--blue)">{{order_id}} {{to_name}} {{price}}</span><br>
+              3. Pega tus IDs en el código (línea ~5550)
+            </div>
+            <div style="display:flex;gap:6px;margin-bottom:6px">
+              <input id="ejs-svc" type="text" placeholder="Service ID (service_...)" 
+                style="flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;color:#fff;font-family:var(--font-mono);font-size:11px">
+            </div>
+            <div style="display:flex;gap:6px;margin-bottom:6px">
+              <input id="ejs-tpl" type="text" placeholder="Template ID (template_...)"
+                style="flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;color:#fff;font-family:var(--font-mono);font-size:11px">
+            </div>
+            <div style="display:flex;gap:6px">
+              <input id="ejs-key" type="text" placeholder="Public Key"
+                style="flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;color:#fff;font-family:var(--font-mono);font-size:11px">
+              <button class="btn btn-primary btn-sm" onclick="saveEmailJSConfig()" style="padding:8px 14px">Guardar</button>
+            </div>
+            <div id="ejs-status" style="font-size:10px;font-family:var(--font-mono);color:var(--muted);margin-top:8px"></div>
+          </div>
+
         </div>
       </div>
 
     </div>
 
-    <div class="bottom-nav">
+    <div class="bottom-nav" style="overflow-x:auto">
       <button class="bn-item active" onclick="adminTab('a-map','a-map-btn')" id="a-map-btn">
         <span class="bn-icon">🗺️</span>
-        <span class="bn-label">Map</span>
+        <span class="bn-label">Mapa</span>
       </button>
       <button class="bn-item" onclick="adminTab('a-orders','a-ord-btn')" id="a-ord-btn">
         <span class="bn-icon">📋</span>
-        <span class="bn-label">Orders</span>
+        <span class="bn-label">Órdenes</span>
       </button>
       <button class="bn-item" onclick="adminTab('a-drivers','a-drv-btn')" id="a-drv-btn">
         <span class="bn-icon">👥</span>
-        <span class="bn-label">Drivers</span>
+        <span class="bn-label">Conductores</span>
+      </button>
+      <button class="bn-item" onclick="adminTab('a-clients','a-cli-btn')" id="a-cli-btn">
+        <span class="bn-icon">📧</span>
+        <span class="bn-label">Clientes</span>
+      </button>
+      <button class="bn-item" onclick="adminTab('a-reports','a-rep-btn')" id="a-rep-btn">
+        <span class="bn-icon">📊</span>
+        <span class="bn-label">Reporte</span>
+      </button>
+      <button class="bn-item" onclick="adminTab('a-stripe','a-str-btn')" id="a-str-btn">
+        <span class="bn-icon">💳</span>
+        <span class="bn-label">Pagos</span>
       </button>
     </div>
   </div>
@@ -3288,6 +3468,14 @@ input::placeholder { color: var(--muted); }
               <div class="map-label">GPS conductor · en vivo</div>
             </div>
           </div>
+
+          <!-- Leaflet route map on track -->
+          <div id="track-map-leaflet-wrap" style="display:none;padding:0 16px 16px">
+            <div style="font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px">Trayecto de la orden</div>
+            <div style="border-radius:12px;overflow:hidden;border:1px solid rgba(0,200,255,0.15)">
+              <div id="track-leaflet-map" style="height:180px;width:100%"></div>
+            </div>
+          </div>
         </div>
 
         <!-- Empty state -->
@@ -3300,6 +3488,27 @@ input::placeholder { color: var(--muted); }
 
     </div>
 
+      <!-- PAGE: Historial -->
+      <div class="page" id="c-history">
+        <div style="padding:20px 16px 12px">
+          <div class="form-section-title">Mis órdenes</div>
+          <!-- Email lookup -->
+          <div style="display:flex;gap:8px;margin-bottom:16px">
+            <input type="email" id="hist-email" placeholder="tu@correo.com"
+              style="flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:10px;padding:11px 13px;color:#fff;font-size:13px;font-family:var(--font-mono)"
+              onkeydown="if(event.key==='Enter')lookupHistory()">
+            <button class="btn btn-primary btn-sm" onclick="lookupHistory()" style="padding:11px 16px">Buscar</button>
+          </div>
+          <div id="hist-list">
+            <div style="text-align:center;padding:48px 20px;color:var(--muted)">
+              <div style="font-size:36px;margin-bottom:12px">📋</div>
+              <div style="font-size:14px;font-weight:600;margin-bottom:6px">Historial de envíos</div>
+              <div style="font-size:12px;line-height:1.6">Ingresa tu correo para ver<br>todas tus órdenes anteriores.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     <div class="bottom-nav">
       <button class="bn-item active" onclick="delivTab('c-new','dtab-new')" id="dtab-new">
         <span class="bn-icon">📦</span>
@@ -3308,6 +3517,10 @@ input::placeholder { color: var(--muted); }
       <button class="bn-item" onclick="delivTab('c-track','dtab-track')" id="dtab-track">
         <span class="bn-icon">📡</span>
         <span class="bn-label">Rastrear</span>
+      </button>
+      <button class="bn-item" onclick="delivTab('c-history','dtab-hist')" id="dtab-hist">
+        <span class="bn-icon">🕑</span>
+        <span class="bn-label">Historial</span>
       </button>
     </div>
   </div>
@@ -3765,9 +3978,9 @@ function drawLogo(canvas) {
   // ── Main fill — pure white, eternal ──
   ctx.save();
   const fillGrad = ctx.createLinearGradient(0, H*0.1, 0, H*0.9);
-  fillGrad.addColorStop(0,   'rgba(255,255,255,0.97)');
-  fillGrad.addColorStop(0.5, 'rgba(255,255,255,0.91)');
-  fillGrad.addColorStop(1,   'rgba(220,230,245,0.82)');
+  fillGrad.addColorStop(0,   'rgba(255,255,255,0.22)');
+  fillGrad.addColorStop(0.5, 'rgba(255,255,255,0.15)');
+  fillGrad.addColorStop(1,   'rgba(200,220,255,0.10)');
   ctx.fillStyle = fillGrad;
   ctx.fillText(LOGO_TEXT, W/2, H/2);
   ctx.restore();
@@ -3851,6 +4064,16 @@ function initLogoCanvas() {
   c.width  = Math.min(window.innerWidth * 0.88, 720);
   c.height = fs * 1.25;
   startLogoAnim();
+  // Fade-in SVG logo over canvas after font loads
+  const svg = document.getElementById('logo-svg');
+  if(svg){
+    document.fonts.ready.then(()=>{
+      svg.style.transition='opacity 0.8s ease';
+      svg.style.opacity='1';
+      // Fade out canvas underneath since SVG is crisper
+      setTimeout(()=>{ if(c) c.style.opacity='0'; }, 400);
+    });
+  }
 }
 
 // ── Init landing ──────────────────────────
@@ -4357,14 +4580,25 @@ function renderAdminQueue(){
   const pending = orders.filter(o=>o.status==='pending');
   const el = document.getElementById('admin-queue');
   if(!pending.length){
-    el.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">No pending orders</div>';
+    el.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">Sin órdenes pendientes</div>';
     return;
   }
+
+  // Real Traza fleet units for manual assign dropdown
+  const TRAZA_UNITS = [
+    {id:'U-01', name:'Unidad 01 — Taxi', type:'taxi'},
+    {id:'U-02', name:'Unidad 02 — Taxi', type:'taxi'},
+    {id:'U-03', name:'Unidad 03 — Taxi', type:'taxi'},
+    {id:'U-04', name:'Unidad 04 — Taxi', type:'taxi'},
+    {id:'U-05', name:'Unidad 05 — Taxi', type:'taxi'},
+    {id:'KAN',  name:'Kangoo Van',       type:'van'},
+  ];
+
   el.innerHTML = pending.map(o=>`
-    <div class="order-card">
+    <div class="order-card" id="qcard-${o.id}">
       <div class="oc-header">
         <span class="oc-id">${o.id}</span>
-        <span class="oc-source src-${o.source}">${PLATFORM_LABELS[o.source]}</span>
+        <span class="oc-source src-${o.source}">${PLATFORM_LABELS[o.source]||'TRAZA'}</span>
       </div>
       <div class="oc-route">
         <div class="from">📍 ${o.from}</div>
@@ -4375,11 +4609,45 @@ function renderAdminQueue(){
         <span>📏 <span class="val">${o.dist}</span></span>
         <span>⏱ <span class="val">${o.eta}</span></span>
       </div>
-      <div style="margin-top:10px">
-        <button class="btn btn-primary btn-sm" onclick="manualAssign('${o.id}')">⚡ Assign Driver</button>
+      <div style="margin-top:10px;display:flex;gap:6px">
+        <select id="unit-sel-${o.id}"
+          style="flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;color:#fff;font-size:12px;font-family:var(--font-mono)">
+          <option value="">— Elegir unidad —</option>
+          ${TRAZA_UNITS.map(u=>`<option value="${u.id}">${u.name}</option>`).join('')}
+          <option value="AUTO">⚡ Auto (conductor disponible)</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="assignToUnit('${o.id}')" style="white-space:nowrap">Asignar</button>
       </div>
     </div>
   `).join('');
+}
+
+function assignToUnit(orderId){
+  const order   = orders.find(o=>o.id===orderId);
+  const sel     = document.getElementById('unit-sel-'+orderId);
+  const unitId  = sel?.value;
+  if(!order){ showToast('Orden no encontrada'); return; }
+  if(!unitId){ showToast('Elige una unidad primero'); return; }
+
+  if(unitId==='AUTO'){
+    autoAssign(order);
+    showToast('✓ '+order.id+' asignado automáticamente');
+  } else {
+    order.status   = 'active';
+    order.driver   = unitId;
+    order.assignedAt = new Date().toLocaleTimeString();
+    // Simulate delivery
+    const delivTime = rand(15000,35000);
+    setTimeout(()=>{
+      order.status='delivered';
+      order.deliveredAt=new Date().toLocaleTimeString();
+    }, delivTime);
+    showToast('✓ '+order.id+' → '+unitId);
+  }
+
+  // Remove card from queue
+  const card = document.getElementById('qcard-'+orderId);
+  if(card){ card.style.opacity='0'; card.style.transform='translateX(40px)'; card.style.transition='all .3s'; setTimeout(()=>card.remove(),300); }
 }
 
 function renderAdminOrdersList(){
@@ -4436,6 +4704,176 @@ function renderAdminDriversList(){
     </div>
   `).join('');
 }
+
+// ── Clientes: Email DB ────────────────────────────────────────────────────────
+function renderClientsList(){
+  const el = document.getElementById('clients-list');
+  const db = JSON.parse(localStorage.getItem('traza_email_db')||'[]');
+  if(!db.length){
+    el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">Sin clientes aún.<br>Los emails se guardan automáticamente al pagar.</div>';
+    return;
+  }
+  el.innerHTML = db.map((c,i)=>`
+    <div class="card" style="padding:12px;margin-bottom:6px">
+      <div class="row-between">
+        <div>
+          <div style="font-weight:600;font-size:14px">${c.name||'—'}</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--blue);margin-top:2px">${c.email}</div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px">${c.phone||''} · ${c.orderId||''}</div>
+        </div>
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-align:right">
+          ${new Date(c.ts||Date.now()).toLocaleDateString('es-MX')}<br>
+          <span style="color:var(--green)">#${i+1}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function exportClientsCSV(){
+  const db = JSON.parse(localStorage.getItem('traza_email_db')||'[]');
+  if(!db.length){ showToast('Sin clientes para exportar'); return; }
+  const rows = [['#','Nombre','Email','Teléfono','Orden','Fecha']];
+  db.forEach((c,i)=>{
+    rows.push([i+1, c.name||'', c.email||'', c.phone||'', c.orderId||'',
+      new Date(c.ts||Date.now()).toLocaleDateString('es-MX')]);
+  });
+  downloadCSV(rows, 'traza-clientes-'+today()+'.csv');
+}
+
+// ── Reportes ──────────────────────────────────────────────────────────────────
+function renderReports(){
+  const todayOrders = orders.filter(o=>o.source==='traza');
+  const total  = todayOrders.reduce((s,o)=>s+(o.earn||0),0);
+  const kmTot  = todayOrders.reduce((s,o)=>s+parseFloat(o.dist||0),0);
+  const emails = [...new Set(todayOrders.map(o=>o.email).filter(Boolean))];
+
+  setEl('rep-total',   '$'+total);
+  setEl('rep-orders',  todayOrders.length);
+  setEl('rep-clients', emails.length);
+  setEl('rep-km',      kmTot.toFixed(1));
+
+  const list = document.getElementById('rep-orders-list');
+  if(!todayOrders.length){
+    list.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted);font-size:13px">Sin órdenes hoy</div>';
+    return;
+  }
+  list.innerHTML = todayOrders.map(o=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--blue)">${o.id}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">${(o.from||'').slice(0,28)}…</div>
+        <div style="font-size:11px;color:var(--muted)">${o.dist||'—'} · ${o.service||'—'}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#B4FF47">$${o.earn||0}</div>
+        <div style="font-size:10px;color:var(--muted)">${o.email||''}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function exportReportCSV(){
+  const todayOrders = orders.filter(o=>o.source==='traza');
+  if(!todayOrders.length){ showToast('Sin órdenes para exportar'); return; }
+  const rows = [['Orden','Origen','Destino','Servicio','Distancia','Total','Email','Conductor']];
+  todayOrders.forEach(o=>{
+    rows.push([o.id, o.from||'', o.to||'', o.service||'', o.dist||'', '$'+(o.earn||0), o.email||'', o.driver||'']);
+  });
+  downloadCSV(rows, 'traza-reporte-'+today()+'.csv');
+}
+
+// ── CSV helper ────────────────────────────────────────────────────────────────
+function downloadCSV(rows, filename){
+  const csv = rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8;'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ Descargando '+filename);
+}
+function today(){ return new Date().toISOString().slice(0,10); }
+
+// ── Historial de cliente ──────────────────────────────────────────────────────
+function lookupHistory(){
+  const email = (document.getElementById('hist-email')?.value||'').trim().toLowerCase();
+  const list  = document.getElementById('hist-list');
+  if(!email){ showToast('Ingresa tu correo'); return; }
+
+  // Find orders in session + localStorage DB
+  const myOrders = orders.filter(o=>o.email && o.email.toLowerCase()===email);
+
+  if(!myOrders.length){
+    list.innerHTML=`
+      <div style="text-align:center;padding:48px 20px;color:var(--muted)">
+        <div style="font-size:32px;margin-bottom:12px">📭</div>
+        <div style="font-size:13px">Sin órdenes para<br><span style="color:var(--blue);font-family:var(--font-mono)">${email}</span></div>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = `
+    <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">
+      ${myOrders.length} orden${myOrders.length>1?'es':''} encontrada${myOrders.length>1?'s':''}
+    </div>
+    ${myOrders.map(o=>`
+      <div class="card" style="padding:14px;margin-bottom:8px;cursor:pointer" onclick="document.getElementById('track-input').value='${o.id}';delivTab('c-track','dtab-track');trackOrder()">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--blue)">${o.id}</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#B4FF47">$${o.earn||0}</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">📍 ${(o.from||'—').slice(0,40)}</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">📬 ${(o.to||'—').slice(0,40)}</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="pill ${o.status==='delivered'?'pill-green':'pill-blue'}" style="font-size:10px">${o.status==='delivered'?'Entregado':'En camino'}</span>
+          <span style="font-size:10px;color:var(--muted);font-family:var(--font-mono)">${o.dist||'—'} · ${o.service||'—'}</span>
+          <span style="font-size:10px;color:var(--muted);margin-left:auto">→ Rastrear</span>
+        </div>
+      </div>
+    `).join('')}`;
+}
+
+// ── Stripe config ─────────────────────────────────────────────────────────────
+function saveStripeKey(){
+  const key = (document.getElementById('stripe-key-input')?.value||'').trim();
+  if(!key.startsWith('pk_')){ showToast('Key debe empezar con pk_live_ o pk_test_'); return; }
+  localStorage.setItem('traza_stripe_pk', key);
+  window.TRAZA_STRIPE_PK = key;
+  document.getElementById('stripe-status-pill').textContent='Guardado';
+  document.getElementById('stripe-status-pill').className='pill pill-green';
+  document.getElementById('stripe-status-txt').textContent=key.slice(0,24)+'…';
+  showToast('✓ Stripe key guardada — activa en producción al conectar backend');
+}
+
+// ── EmailJS config from admin panel ──────────────────────────────────────────
+function saveEmailJSConfig(){
+  const svc = (document.getElementById('ejs-svc')?.value||'').trim();
+  const tpl = (document.getElementById('ejs-tpl')?.value||'').trim();
+  const key = (document.getElementById('ejs-key')?.value||'').trim();
+  if(!svc||!tpl||!key){ showToast('Llena los 3 campos'); return; }
+  localStorage.setItem('traza_ejs',JSON.stringify({svc,tpl,key}));
+  // Apply immediately
+  if(typeof emailjs!=='undefined') emailjs.init({publicKey:key});
+  const st = document.getElementById('ejs-status');
+  if(st) st.textContent='✓ Guardado y activo — próximo pago enviará email real desde trazalogisticamx@gmail.com';
+  if(st) st.style.color='#B4FF47';
+  showToast('✓ EmailJS configurado');
+}
+
+// Load saved EmailJS config on boot
+(function loadEmailJSConfig(){
+  try {
+    const saved = JSON.parse(localStorage.getItem('traza_ejs')||'{}');
+    if(saved.svc && saved.key && typeof emailjs!=='undefined'){
+      emailjs.init({publicKey: saved.key});
+    }
+    // Pre-fill admin inputs if open
+    if(saved.svc) { const e=document.getElementById('ejs-svc'); if(e) e.value=saved.svc; }
+    if(saved.tpl) { const e=document.getElementById('ejs-tpl'); if(e) e.value=saved.tpl; }
+    if(saved.key) { const e=document.getElementById('ejs-key'); if(e) e.value=saved.key; }
+  } catch(e){}
+})();
 
 /* ══════════════════════════════════════════
    CUSTOMER LOGIC
@@ -5382,13 +5820,25 @@ function initEmailJS(){
 window.addEventListener('load', initEmailJS);
 
 async function sendConfirmationEmail(params){
-  if(typeof emailjs === 'undefined' || EMAILJS_PUBLIC_KEY === 'TU_PUBLIC_KEY'){
-    console.log('[TRAZA EMAIL — modo demo]', params);
+  // Use admin-panel saved config if available, otherwise fall back to hardcoded
+  let svcId  = EMAILJS_SERVICE_ID;
+  let tplId  = EMAILJS_TEMPLATE_ID;
+  let pubKey = EMAILJS_PUBLIC_KEY;
+  try {
+    const saved = JSON.parse(localStorage.getItem('traza_ejs')||'{}');
+    if(saved.svc) svcId  = saved.svc;
+    if(saved.tpl) tplId  = saved.tpl;
+    if(saved.key) pubKey = saved.key;
+  } catch(e){}
+
+  if(typeof emailjs === 'undefined' || pubKey === 'TU_PUBLIC_KEY'){
+    console.log('[TRAZA EMAIL — modo demo] Para:', params.to_email, '| Orden:', params.order_id, '| Total:', params.price);
     return true;
   }
   try {
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
-    console.log('[TRAZA EMAIL] Enviado a', params.to_email);
+    emailjs.init({publicKey: pubKey});
+    await emailjs.send(svcId, tplId, params);
+    console.log('[TRAZA EMAIL] ✓ Enviado a', params.to_email);
     return true;
   } catch(e){
     console.warn('[TRAZA EMAIL] Error:', e);
@@ -5429,7 +5879,9 @@ function finalizeOrder(method){
       driver: pick(DRIVER_NAMES),
       service: delivSpeed.name,
       cat: delivCat.name,
-      email, name, payMethod: method
+      email, name, payMethod: method,
+      fromCoords: _coords.from ? {lat:_coords.from.lat, lon:_coords.from.lon} : null,
+      toCoords:   _coords.to   ? {lat:_coords.to.lat,   lon:_coords.to.lon}   : null,
     };
     orders.push(newOrder);
 
@@ -5463,8 +5915,55 @@ function closeModal(){
   document.getElementById('success-modal').style.display='none';
   delivTab('c-track','dtab-track');
   trackOrder();
+  // Limpiar formulario para nuevo pedido
+  setTimeout(resetOrderForm, 800);
 }
 
+function resetOrderForm(){
+  // Addresses
+  ['from','to'].forEach(side=>{
+    ['cp','col','calle','num'].forEach(f=>{
+      const el = document.getElementById(side+'-'+f);
+      if(el){ el.value=''; el.classList.remove('valid'); }
+    });
+    const badge = document.getElementById(side+'-cp-badge');
+    const res   = document.getElementById(side+'-resolved');
+    if(badge){ badge.textContent=''; }
+    if(res)  { res.textContent=''; res.className='addr-resolved'; }
+  });
+  // Reset state
+  _addrState.from = {cp:'',colonias:[],colonia:'',ready:false};
+  _addrState.to   = {ready:false};
+  _coords.from = _coords.to = null;
+  // Hide map + speed picker + pay section
+  document.getElementById('route-map-section').style.display='none';
+  document.getElementById('speed-picker-section').style.display='none';
+  document.getElementById('pay-section-wrap').style.display='none';
+  // Reset pay button
+  const btnTxt = document.getElementById('btn-pay-text');
+  const btnIcon = document.getElementById('btn-pay-icon');
+  const btn = document.getElementById('btn-pay-main');
+  if(btnTxt) btnTxt.textContent='Pagar y ordenar';
+  if(btnIcon) btnIcon.textContent='💳';
+  if(btn) btn.classList.remove('loading');
+  // Clear card fields
+  ['card-num','card-exp','card-cvv'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.value='';
+  });
+  // Reset pay total
+  const amt = document.getElementById('pay-total-amt');
+  if(amt) amt.textContent='$—';
+  // Reset sum-km
+  const sumKm = document.getElementById('sum-km');
+  if(sumKm){ sumKm.textContent='— km'; sumKm.style.color='rgba(255,255,255,.35)'; }
+  // Reset leaflet map markers
+  if(_fromMarker && _routeMap){ _routeMap.removeLayer(_fromMarker); _fromMarker=null; }
+  if(_toMarker   && _routeMap){ _routeMap.removeLayer(_toMarker);   _toMarker=null; }
+  if(_routeLayer && _routeMap){ _routeMap.removeLayer(_routeLayer); _routeLayer=null; }
+}
+
+let _trackInterval = null;
 function trackOrder(){
   const id    = document.getElementById('track-input').value.trim().toUpperCase();
   const order = orders.find(o=>o.id===id);
@@ -5474,7 +5973,7 @@ function trackOrder(){
   if(!order){
     empty.style.display='block';
     res.style.display='none';
-    showToast('Orden no encontrada — verifica el número');
+    if(id) showToast('Orden no encontrada — verifica el número');
     return;
   }
 
@@ -5505,6 +6004,52 @@ function trackOrder(){
   pill.className   = 'pill '+(statusMap[order.status]||'pill-blue');
 
   drawTrackMap(order);
+
+  // Show Leaflet route map on track page if we have coords
+  showTrackLeafletMap(order);
+
+  // Live ETA countdown simulation
+  clearInterval(_trackInterval);
+  if(order.status==='active'){
+    let etaMin = parseInt(order.eta)||25;
+    _trackInterval = setInterval(()=>{
+      etaMin = Math.max(1, etaMin-1);
+      setEl('tr-eta', etaMin+' min');
+      setEl('tl-t3', 'ETA: '+etaMin+' min restantes');
+      if(etaMin<=1){
+        clearInterval(_trackInterval);
+        pill.textContent='Llegando…';
+        pill.className='pill pill-green';
+      }
+    }, 30000); // cada 30s
+  }
+}
+
+function showTrackLeafletMap(order){
+  const wrap = document.getElementById('track-map-leaflet-wrap');
+  if(!wrap) return;
+
+  // Use stored coords from order if available
+  const hasCoords = order.fromCoords && order.toCoords;
+  if(!hasCoords){ wrap.style.display='none'; return; }
+
+  wrap.style.display='block';
+  if(!window._trackLeafMap){
+    window._trackLeafMap = L.map('track-leaflet-map',{zoomControl:false,attributionControl:false});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd'}).addTo(window._trackLeafMap);
+  }
+  const map = window._trackLeafMap;
+  if(window._trackFromMk) map.removeLayer(window._trackFromMk);
+  if(window._trackToMk)   map.removeLayer(window._trackToMk);
+  if(window._trackLine)   map.removeLayer(window._trackLine);
+
+  const f = order.fromCoords, t = order.toCoords;
+  const mkF = L.divIcon({className:'',html:'<div style="width:11px;height:11px;background:#00E096;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px #00E096"></div>',iconAnchor:[5,5]});
+  const mkT = L.divIcon({className:'',html:'<div style="width:11px;height:11px;background:#00C8FF;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px #00C8FF"></div>',iconAnchor:[5,5]});
+  window._trackFromMk = L.marker([f.lat,f.lon],{icon:mkF}).addTo(map);
+  window._trackToMk   = L.marker([t.lat,t.lon],{icon:mkT}).addTo(map);
+  window._trackLine   = L.polyline([[f.lat,f.lon],[t.lat,t.lon]],{color:'#00C8FF',weight:3,dashArray:'6,4',opacity:.7}).addTo(map);
+  map.fitBounds(L.latLngBounds([[f.lat,f.lon],[t.lat,t.lon]]),{padding:[20,20]});
 }
 
 function showToast(msg){
@@ -5703,8 +6248,34 @@ function adminTab(pageId, btnId){
   document.getElementById(pageId).classList.add('active');
   document.querySelectorAll('#admin-app .bn-item').forEach(b=>b.classList.remove('active'));
   document.getElementById(btnId).classList.add('active');
-  if(pageId==='a-orders') renderAdminOrdersList();
+  if(pageId==='a-orders')  renderAdminOrdersList();
   if(pageId==='a-drivers') renderAdminDriversList();
+  if(pageId==='a-clients') renderClientsList();
+  if(pageId==='a-reports') renderReports();
+  if(pageId==='a-stripe')  initStripePanel();
+}
+
+function initStripePanel(){
+  const saved = localStorage.getItem('traza_stripe_pk')||'';
+  if(saved){
+    const inp = document.getElementById('stripe-key-input');
+    if(inp) inp.value=saved;
+    const pill = document.getElementById('stripe-status-pill');
+    if(pill){ pill.textContent='Activo'; pill.className='pill pill-green'; }
+    const txt = document.getElementById('stripe-status-txt');
+    if(txt) txt.textContent=saved.slice(0,24)+'…';
+  }
+  // Pre-fill EmailJS
+  try {
+    const ejs = JSON.parse(localStorage.getItem('traza_ejs')||'{}');
+    if(ejs.svc){ const e=document.getElementById('ejs-svc'); if(e) e.value=ejs.svc; }
+    if(ejs.tpl){ const e=document.getElementById('ejs-tpl'); if(e) e.value=ejs.tpl; }
+    if(ejs.key){ const e=document.getElementById('ejs-key'); if(e) e.value=ejs.key; }
+    if(ejs.svc){
+      const st=document.getElementById('ejs-status');
+      if(st){ st.textContent='✓ Configurado y activo'; st.style.color='#B4FF47'; }
+    }
+  } catch(e){}
 }
 
 /* ══════════════════════════════════════════
